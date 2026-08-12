@@ -156,6 +156,14 @@ function InlineDrill({
     if (!submitted) inputRef.current?.focus();
   }, [idx, submitted]);
 
+  // Advance on keyup so the submission keydown can't also trigger next
+  useEffect(() => {
+    if (!submitted) return;
+    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') handleNext(); }
+    window.addEventListener('keyup', onKey);
+    return () => window.removeEventListener('keyup', onKey);
+  }, [submitted, idx]);
+
   function handleSubmit() {
     if (!input.trim()) return;
     const isCorrect = comparePinyin(input, q.item.pinyin);
@@ -176,10 +184,7 @@ function InlineDrill({
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') {
-      if (!submitted) handleSubmit();
-      else handleNext();
-    }
+    if (e.key === 'Enter' && !submitted) handleSubmit();
   }
 
   const { item, type } = q;
@@ -268,7 +273,6 @@ function InlineDrill({
             </p>
           </div>
           <button
-            autoFocus
             onClick={handleNext}
             className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors text-base"
           >
@@ -619,6 +623,14 @@ function MixedPracticeStep({
     }
   }
 
+  // Advance drill question on keyup so submission keydown can't also trigger next
+  useEffect(() => {
+    if (!submitted || !currentDrill) return;
+    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') advance(drillCorrect); }
+    window.addEventListener('keyup', onKey);
+    return () => window.removeEventListener('keyup', onKey);
+  }, [submitted, idx, drillCorrect]);
+
   function handleDrillSubmit() {
     if (!input.trim() || !currentDrill) return;
     const isCorrect = comparePinyin(input, currentDrill.q.item.pinyin);
@@ -708,7 +720,6 @@ function MixedPracticeStep({
                   <p className="text-xs text-gray-500 mt-1">{item.chineseChar} · {item.englishMeaning}</p>
                 </div>
                 <button
-                  autoFocus
                   onClick={() => advance(drillCorrect)}
                   className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
                 >
