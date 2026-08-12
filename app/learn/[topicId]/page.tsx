@@ -423,7 +423,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     const updated = markStepComplete(1, progress);
     await saveTopicProgress(updated);
     setProgress(updated);
-    await awardXp(xpForStep(1, 1, 1));
+    if (!progress.step1Complete) await awardXp(xpForStep(1, 1, 1));
     setStep(2);
   }
 
@@ -464,7 +464,9 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
       })
     );
 
-    await awardXp(xp);
+    const stepKey = `step${step}Complete` as keyof TopicProgress;
+    const alreadyComplete = !!progress[stepKey];
+    if (!alreadyComplete) await awardXp(xp);
 
     if (autoComplete) {
       const updated = markStepComplete(step, progress);
