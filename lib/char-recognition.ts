@@ -99,12 +99,35 @@ function renderTemplate(char: string): Float32Array {
   return toNorm(tmp);
 }
 
-// Intersection-over-union between two binary Float32 images.
+// Morphological dilation: expand each dark pixel by `radius` in all directions.
+// This makes the comparison tolerant of stroke-width and small position differences.
+function dilate(img: Float32Array, size = 64, radius = 3): Float32Array {
+  const out = new Float32Array(size * size);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      if (img[y * size + x]! > 0.35) {
+        for (let dy = -radius; dy <= radius; dy++) {
+          for (let dx = -radius; dx <= radius; dx++) {
+            const ny = y + dy, nx = x + dx;
+            if (ny >= 0 && ny < size && nx >= 0 && nx < size) {
+              out[ny * size + nx] = 1;
+            }
+          }
+        }
+      }
+    }
+  }
+  return out;
+}
+
+// IoU after dilating both images so stroke-width / slight-offset differences don't penalise.
 function iou(a: Float32Array, b: Float32Array): number {
+  const da = dilate(a);
+  const db = dilate(b);
   let inter = 0, union = 0;
-  for (let i = 0; i < a.length; i++) {
-    const av = a[i]! > 0.35;
-    const bv = b[i]! > 0.35;
+  for (let i = 0; i < da.length; i++) {
+    const av = da[i]! > 0.5;
+    const bv = db[i]! > 0.5;
     if (av && bv) inter++;
     if (av || bv) union++;
   }
@@ -150,9 +173,14 @@ export async function recognizeChar(
   }
   // Template-matching fallback
   const drawn = toNorm(canvas);
+  // Reject blank canvas (fewer than 80 dark pixels in the 64×64 normalised image)
+  const inkPixels = drawn.reduce((s, v) => s + (v > 0.35 ? 1 : 0), 0);
+  if (inkPixels < 80) {
+    return { method: 'template', predicted: null, score: 0, correct: false };
+  }
   const template = renderTemplate(expectedChar);
   const score = iou(drawn, template);
-  const correct = score > 0.28;
+  const correct = score > 0.18;
   return {
     method: 'template',
     predicted: correct ? expectedChar : null,
