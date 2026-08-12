@@ -72,7 +72,7 @@ function StepNav({
             }`}>
               {done ? '✓' : step}
             </div>
-            <span className={`text-xs ${active ? 'text-orange-500 font-medium' : 'text-gray-400'}`}>
+            <span className={`text-sm ${active ? 'text-orange-500 font-medium' : 'text-gray-400'}`}>
               {label}
             </span>
           </button>
@@ -93,20 +93,20 @@ function ExplanationStep({
 }) {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-500">Read through each word, then continue when ready.</p>
+      <p className="text-base text-gray-500">Read through each word, then continue when ready.</p>
       <div className="grid gap-3">
         {items.map(item => (
-          <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-4 items-start">
-            <div className="text-4xl font-bold chinese-text text-gray-900 leading-none shrink-0">{item.chineseChar}</div>
+          <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-4 items-center">
+            <div className="text-5xl font-bold chinese-text text-gray-900 leading-none shrink-0">{item.chineseChar}</div>
             <div className="min-w-0">
-              <div className="text-base font-medium text-orange-500">{item.pinyin}</div>
-              <div className="text-sm font-medium text-gray-800 mt-0.5">{item.englishMeaning}</div>
-              <div className="text-sm text-gray-500 mt-1 chinese-text">
+              <div className="text-lg font-medium text-orange-500">{item.pinyin}</div>
+              <div className="text-base font-medium text-gray-800 mt-0.5">{item.englishMeaning}</div>
+              <div className="text-base text-gray-500 mt-1 chinese-text">
                 {item.examplePrefix}
                 <span className="text-orange-500 font-semibold">{item.chineseChar}</span>
                 {item.exampleSuffix}
               </div>
-              <div className="text-xs text-gray-400 italic mt-0.5">{item.exampleEnglish}</div>
+              <div className="text-sm text-gray-400 italic mt-0.5">{item.exampleEnglish}</div>
               {item.notes && (
                 <div className="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1.5">
                   💡 {item.notes}
@@ -118,7 +118,7 @@ function ExplanationStep({
       </div>
       <button
         onClick={onComplete}
-        className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors"
+        className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 transition-colors text-base"
       >
         I've read this — Continue
       </button>
@@ -195,7 +195,7 @@ function InlineDrill({
           <>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Pinyin drill</p>
             <p className="text-base text-gray-600 italic">{item.exampleEnglish}</p>
-            <p className="text-xl chinese-text text-gray-800 font-medium leading-relaxed">
+            <p className="text-2xl chinese-text text-gray-800 font-medium leading-relaxed">
               {item.examplePrefix}
               <span className="inline-block border-b-2 border-dashed border-orange-400 min-w-[3rem] mx-1 text-center text-orange-400">
                 {submitted ? <span className="text-red-600">{item.chineseChar}</span> : '?'}
@@ -206,14 +206,14 @@ function InlineDrill({
         ) : (
           <>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Character → Pinyin</p>
-            <p className="text-xl chinese-text text-gray-800 font-medium leading-relaxed">
+            <p className="text-2xl chinese-text text-gray-800 font-medium leading-relaxed">
               {item.examplePrefix}
               <span className="inline-block bg-orange-50 border border-orange-300 rounded px-1.5 mx-1 text-orange-700 font-bold">
                 {item.chineseChar}
               </span>
               {item.exampleSuffix}
             </p>
-            <p className="text-sm text-gray-400 italic">{item.exampleEnglish}</p>
+            <p className="text-base text-gray-400 italic">{item.exampleEnglish}</p>
           </>
         )}
       </div>
@@ -227,17 +227,17 @@ function InlineDrill({
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type pinyin, e.g. ni3 hao3"
-            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-xl px-4 py-4 text-base focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
           />
           {converted && (
-            <p className="text-sm text-gray-500 px-1">
+            <p className="text-base text-gray-500 px-1">
               → <span className="text-orange-500 font-medium">{converted}</span>
             </p>
           )}
           <button
             onClick={handleSubmit}
             disabled={!input.trim()}
-            className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-40"
+            className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-40 text-base"
           >
             Check
           </button>
@@ -263,7 +263,7 @@ function InlineDrill({
           </div>
           <button
             onClick={handleNext}
-            className="w-full bg-gray-800 text-white font-semibold py-3 rounded-xl hover:bg-gray-900 transition-colors"
+            className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors text-base"
           >
             {idx + 1 >= total ? 'Finish' : 'Next →'}
           </button>
@@ -318,10 +318,10 @@ function StepResultScreen({
         </div>
       )}
       <div className="flex gap-3">
-        <button onClick={onRetry} className="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50">
+        <button onClick={onRetry} className="flex-1 border border-gray-300 text-gray-700 font-semibold py-4 rounded-xl hover:bg-gray-50 text-base">
           Retry
         </button>
-        <button onClick={onNext} className="flex-1 bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600">
+        <button onClick={onNext} className="flex-1 bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 text-base">
           Next Step →
         </button>
       </div>
@@ -510,13 +510,13 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
       {/* header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/" className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-4">
+          <Link href="/" className="text-gray-500 hover:text-gray-700 text-base font-medium shrink-0">
             ← Home
           </Link>
-          <h1 className="font-semibold text-gray-800 text-sm truncate max-w-[200px]">{topic.name}</h1>
+          <h1 className="font-semibold text-gray-800 text-base truncate flex-1">{topic.name}</h1>
           {userProgress && xpInfo && (
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-sm shrink-0">
               <span className="text-amber-600 font-semibold">Lv {userProgress.level}</span>
               <div className="w-16 bg-gray-200 rounded-full h-1.5">
                 <div className="bg-amber-400 h-1.5 rounded-full" style={{ width: `${xpInfo.percent}%` }} />
