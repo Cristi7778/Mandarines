@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍊 Mandarines
 
-## Getting Started
+**The simplest way to learn Mandarin Chinese.**
 
-First, run the development server:
+Mandarines takes you from zero to HSK 4 through a structured, gamified journey — one topic at a time, with instant feedback on every answer.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Learn Mode** — every topic follows the same 6-step pattern so you always know what to expect:
+1. Read the vocabulary with examples
+2. Pinyin drill — type the pronunciation from an English prompt
+3. Character recognition — see the character, recall its pinyin
+4. Speaking practice *(coming soon)*
+5. Writing practice *(coming soon)*
+6. Mixed drill — everything combined before you move on
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Recap Mode** — build your own custom drill. Pick any combination of skills and topics, set a question count, and go. Great for reviewing weak spots before an exam.
 
-## Learn More
+**Progress tracking** — XP, levels, streaks, and per-step completion per topic. All synced to your account so it follows you across devices.
 
-To learn more about Next.js, take a look at the following resources:
+**55 topics** across 5 stations — Foundation → HSK 1 → HSK 2 → HSK 3 → HSK 4, following the official HSK curriculum.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org) — React framework
+- [Supabase](https://supabase.com) — auth + database
+- [Tailwind CSS](https://tailwindcss.com) — styling
