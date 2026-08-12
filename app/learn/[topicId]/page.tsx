@@ -711,6 +711,23 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
 
   const xpInfo = userProgress ? xpToNextLevel(userProgress.totalXp) : null;
 
+  // Enter key handler for step landing pages (2, 3, 6)
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Enter') return;
+      if (stepResult || drilling.drilling) return; // handled by sub-components
+      if (step === 2 || step === 3) {
+        if (progress?.['step' + step + 'Complete' as keyof TopicProgress]) handleNextStep();
+        else startDrill(step);
+      } else if (step === 6) {
+        if (progress?.step6Complete) handleNextStep();
+        else startDrill(6);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [step, stepResult, drilling, progress]);
+
   return (
     <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
       {/* header */}
