@@ -156,12 +156,16 @@ function InlineDrill({
     if (!submitted) inputRef.current?.focus();
   }, [idx, submitted]);
 
-  // Advance on keyup so the submission keydown can't also trigger next
+  // Advance only when the user presses Enter fresh after submission.
+  // seenKeydown guards against the keyup of the submission press firing immediately.
   useEffect(() => {
     if (!submitted) return;
-    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') handleNext(); }
-    window.addEventListener('keyup', onKey);
-    return () => window.removeEventListener('keyup', onKey);
+    let seenKeydown = false;
+    function onDown(e: KeyboardEvent) { if (e.key === 'Enter') seenKeydown = true; }
+    function onUp(e: KeyboardEvent) { if (e.key === 'Enter' && seenKeydown) handleNext(); }
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
+    return () => { window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp); };
   }, [submitted, idx]);
 
   function handleSubmit() {
@@ -623,12 +627,15 @@ function MixedPracticeStep({
     }
   }
 
-  // Advance drill question on keyup so submission keydown can't also trigger next
+  // Advance only on a fresh Enter press after submission (not the release of the submission press)
   useEffect(() => {
     if (!submitted || !currentDrill) return;
-    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') advance(drillCorrect); }
-    window.addEventListener('keyup', onKey);
-    return () => window.removeEventListener('keyup', onKey);
+    let seenKeydown = false;
+    function onDown(e: KeyboardEvent) { if (e.key === 'Enter') seenKeydown = true; }
+    function onUp(e: KeyboardEvent) { if (e.key === 'Enter' && seenKeydown) advance(drillCorrect); }
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
+    return () => { window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp); };
   }, [submitted, idx, drillCorrect]);
 
   function handleDrillSubmit() {
