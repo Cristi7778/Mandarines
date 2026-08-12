@@ -79,7 +79,7 @@ export default function HomePage() {
 
   if (user === undefined || user === null) {
     return (
-      <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center">
+      <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center">
         <div className="text-center space-y-2">
           <div className="text-4xl animate-pulse">🍊</div>
           <p className="text-gray-400 text-sm">Loading…</p>
@@ -89,18 +89,18 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8f7f4]">
+    <div className="min-h-screen flex flex-col bg-[#fcf0d7]">
       {/* Nav */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🍊</span>
-            <span className="text-lg font-semibold text-gray-800">Mandarines</span>
+            <span className="text-3xl">🍊</span>
+            <span className="text-xl font-bold text-gray-800">Mandarines</span>
           </div>
           <div className="flex items-center gap-4">
             {userProgress && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-semibold text-amber-600">Lv {userProgress.level}</span>
+              <div className="flex items-center gap-2 text-base">
+                <span className="font-bold text-amber-600">Lv {userProgress.level}</span>
                 <div className="w-24 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-amber-400 h-2 rounded-full transition-all"
@@ -111,17 +111,18 @@ export default function HomePage() {
               </div>
             )}
             {userProgress && userProgress.streakCount > 0 && (
-              <span className="text-sm font-medium text-orange-500">🔥 {userProgress.streakCount}</span>
+              <span className="text-base font-medium text-orange-500">🔥 {userProgress.streakCount}</span>
             )}
             <Link
               href="/recap"
-              className="bg-orange-500 text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-orange-600 transition-colors"
+              className="bg-orange-500 text-white font-medium px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
             >
               Recap
             </Link>
+            <Link href="/settings" className="text-gray-400 hover:text-gray-600 transition-colors text-xl">⚙︎</Link>
             <button
               onClick={handleLogout}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
             >
               Sign out
             </button>
@@ -140,7 +141,7 @@ export default function HomePage() {
 
           return (
             <section key={station}>
-              <div className={`flex items-center justify-between px-4 py-2.5 rounded-t-xl text-white font-semibold ${STATION_COLORS[station]}`}>
+              <div className={`flex items-center justify-between px-4 py-3 rounded-t-xl text-white font-bold text-lg ${STATION_COLORS[station]}`}>
                 <span>{station}{STATION_EMOJI[station] ? <span className="ml-2">{STATION_EMOJI[station]}</span> : null}</span>
                 <span className="text-xs font-normal opacity-80">
                   {completedCount}/{topics.length} complete
@@ -159,7 +160,7 @@ export default function HomePage() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-mono text-gray-400 shrink-0">{topic.sequenceOrder}.</span>
-                          <span className={`font-medium text-sm ${isComplete ? 'text-green-700' : 'text-gray-800'}`}>
+                          <span className={`font-medium text-base ${isComplete ? 'text-green-700' : 'text-gray-800'}`}>
                             {topic.name}
                           </span>
                           {isComplete && <span className="text-green-500 text-xs shrink-0">✓</span>}

@@ -32,7 +32,7 @@ export default function ResultsPage() {
   const wrong = results.filter(r => !r.correct);
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4] flex flex-col">
+    <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="text-gray-500 text-sm">← Home</Link>

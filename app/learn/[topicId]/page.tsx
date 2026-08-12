@@ -383,7 +383,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
 
   if (user === undefined) {
     return (
-      <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center">
+      <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center">
         <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">🍊</div>
       </div>
     );
@@ -507,7 +507,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
   const xpInfo = userProgress ? xpToNextLevel(userProgress.totalXp) : null;
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4] flex flex-col">
+    <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
       {/* header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -541,7 +541,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
         )}
 
         {/* content */}
-        <div className="bg-[#f8f7f4]">
+        <div className="bg-[#fcf0d7]">
           {/* Step result screen */}
           {stepResult && (
             <StepResultScreen

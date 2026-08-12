@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f7f4;
+  --background: #fcf0d7;
   --foreground: #1a1a1a;
 }
 
@@ -15,3 +15,43 @@ body {
 .chinese-text {
   font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
+
+/* ── Dark theme overrides ──────────────────────────────────────────────────── */
+
+[data-theme="dark"] body {
+  background-color: #1a1a1a;
+  color: #f2f2f7;
+}
+
+[data-theme="dark"] .bg-white { background-color: #252525 !important; }
+[data-theme="dark"] .bg-\[\#fcf0d7\],
+[data-theme="dark"] .bg-\[\#f8f7f4\] { background-color: #1a1a1a !important; }
+[data-theme="dark"] .bg-gray-50  { background-color: #2a2a2a !important; }
+[data-theme="dark"] .bg-gray-100 { background-color: #333 !important; }
+[data-theme="dark"] .bg-gray-200 { background-color: #444 !important; }
+
+[data-theme="dark"] .text-gray-900 { color: #f2f2f7 !important; }
+[data-theme="dark"] .text-gray-800 { color: #e5e5ea !important; }
+[data-theme="dark"] .text-gray-700 { color: #d1d1d6 !important; }
+[data-theme="dark"] .text-gray-600 { color: #aeaeb2 !important; }
+[data-theme="dark"] .text-gray-500 { color: #8e8e93 !important; }
+[data-theme="dark"] .text-gray-400 { color: #6c6c70 !important; }
+
+[data-theme="dark"] .border-gray-100 { border-color: #333 !important; }
+[data-theme="dark"] .border-gray-200 { border-color: #3a3a3a !important; }
+[data-theme="dark"] .border-gray-300 { border-color: #4a4a4a !important; }
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea {
+  background-color: #333 !important;
+  color: #f2f2f7 !important;
+  border-color: #555 !important;
+}
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder { color: #8e8e93 !important; }
+
+[data-theme="dark"] .divide-gray-100 > * + * { border-color: #333 !important; }
+[data-theme="dark"] .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
+
+[data-theme="dark"] .hover\:bg-gray-50:hover { background-color: #2a2a2a !important; }
+[data-theme="dark"] .hover\:bg-gray-200:hover { background-color: #444 !important; }

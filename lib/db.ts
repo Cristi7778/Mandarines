@@ -140,6 +140,21 @@ export async function saveItemProgress(p: ItemProgress): Promise<void> {
   );
 }
 
+// ─── Reset all progress ───────────────────────────────────────────────────────
+
+export async function resetAllProgress(): Promise<void> {
+  const userId = await uid();
+  if (!userId) return;
+  await Promise.all([
+    supabase.from('topic_progress').delete().eq('user_id', userId),
+    supabase.from('item_progress').delete().eq('user_id', userId),
+    supabase.from('user_progress').upsert(
+      { user_id: userId, total_xp: 0, level: 1, streak_count: 0, last_check_in: null, completed_topics: [], updated_at: new Date().toISOString() },
+      { onConflict: 'user_id' }
+    ),
+  ]);
+}
+
 // ─── Pending drill (localStorage only — temp handoff between drill → results) ─
 
 const PENDING_KEY = 'mandarin_pending';

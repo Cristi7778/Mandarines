@@ -67,7 +67,7 @@ function DrillContent() {
   }, [idx, submitted]);
 
   if (user === undefined) {
-    return <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center"><div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">🍊</div></div>;
+    return <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center"><div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">🍊</div></div>;
   }
 
   if (questions.length === 0) {
@@ -142,7 +142,7 @@ function DrillContent() {
   const { item, type } = q;
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4] flex flex-col">
+    <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={() => router.push('/recap')} className="text-gray-500 hover:text-gray-700 text-sm">

@@ -66,7 +66,7 @@ export default function AuthPage() {
 
   if (signupDone) {
     return (
-      <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center px-4">
         <div className="w-full max-w-sm space-y-6 text-center">
           <div className="text-5xl">🍊</div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-4">
@@ -89,7 +89,7 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="text-center space-y-1">
