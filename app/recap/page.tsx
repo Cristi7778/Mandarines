@@ -89,12 +89,12 @@ export default function RecapPage() {
                 onClick={() => toggleSkill(s)}
                 className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
                   skills.has(s)
-                    ? 'border-red-400 bg-red-50'
+                    ? 'border-orange-400 bg-orange-50'
                     : 'border-gray-200 bg-white hover:bg-gray-50'
                 }`}
               >
                 <div className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 ${
-                  skills.has(s) ? 'border-red-500 bg-red-500' : 'border-gray-300'
+                  skills.has(s) ? 'border-orange-500 bg-orange-500' : 'border-gray-300'
                 }`}>
                   {skills.has(s) && <span className="text-white text-xs">✓</span>}
                 </div>
@@ -117,7 +117,7 @@ export default function RecapPage() {
                 onClick={() => setCount(c)}
                 className={`flex-1 py-2.5 rounded-xl font-semibold text-sm border transition-colors ${
                   count === c
-                    ? 'border-red-500 bg-red-50 text-red-700'
+                    ? 'border-orange-500 bg-orange-50 text-orange-700'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                 }`}
               >
@@ -132,7 +132,7 @@ export default function RecapPage() {
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-gray-800">Topics</h2>
             <div className="flex gap-3 text-xs">
-              <button onClick={selectAll} className="text-red-600 underline">All</button>
+              <button onClick={selectAll} className="text-orange-500 underline">All</button>
               <button onClick={clearAll} className="text-gray-400 underline">None</button>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default function RecapPage() {
                       <label key={t.id} className="flex items-center gap-3 cursor-pointer group">
                         <div
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-                            selectedTopics.has(t.id) ? 'border-red-500 bg-red-500' : 'border-gray-300 group-hover:border-gray-400'
+                            selectedTopics.has(t.id) ? 'border-orange-500 bg-orange-500' : 'border-gray-300 group-hover:border-gray-400'
                           }`}
                           onClick={() => toggleTopic(t.id)}
                         >
@@ -173,7 +173,7 @@ export default function RecapPage() {
         <button
           onClick={startDrill}
           disabled={!canStart}
-          className="w-full bg-red-600 text-white font-semibold py-4 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-base"
+          className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-base"
         >
           Start Recap Drill
         </button>

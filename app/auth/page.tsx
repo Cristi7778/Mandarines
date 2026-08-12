@@ -95,7 +95,7 @@ export default function AuthPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="Email"
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
             />
             <input
               type="password"
@@ -103,7 +103,7 @@ export default function AuthPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder={mode === 'signup' ? 'Password (min 6 characters)' : 'Password'}
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
             />
             {mode === 'signup' && (
               <input
@@ -112,14 +112,14 @@ export default function AuthPage() {
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 placeholder="Confirm password"
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
               />
             )}
             {error && <p className="text-red-600 text-sm">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
+              className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-50 text-sm"
             >
               {loading
                 ? mode === 'login' ? 'Signing in…' : 'Creating account…'

@@ -150,7 +150,7 @@ function DrillContent() {
           </button>
           <div className="flex-1 mx-4">
             <div className="bg-gray-200 rounded-full h-2">
-              <div className="bg-red-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+              <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
             </div>
           </div>
           <span className="text-sm text-gray-500 shrink-0">{idx + 1}/{total}</span>
@@ -166,7 +166,7 @@ function DrillContent() {
               <p className="text-base text-gray-600 italic">{item.exampleEnglish}</p>
               <p className="text-2xl chinese-text text-gray-800 font-medium leading-relaxed">
                 {item.examplePrefix}
-                <span className="inline-block border-b-2 border-dashed border-red-400 min-w-[3rem] mx-1 px-2 text-center text-red-400">
+                <span className="inline-block border-b-2 border-dashed border-orange-400 min-w-[3rem] mx-1 px-2 text-center text-orange-400">
                   {submitted ? <span className="text-red-600 font-bold">{item.chineseChar}</span> : '?'}
                 </span>
                 {item.exampleSuffix}
@@ -177,7 +177,7 @@ function DrillContent() {
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Character → Pinyin</p>
               <p className="text-2xl chinese-text text-gray-800 font-medium leading-relaxed">
                 {item.examplePrefix}
-                <span className="inline-block bg-red-50 border border-red-300 rounded-lg px-2 py-0.5 mx-1 text-red-700 font-bold">
+                <span className="inline-block bg-orange-50 border border-orange-300 rounded-lg px-2 py-0.5 mx-1 text-orange-700 font-bold">
                   {item.chineseChar}
                 </span>
                 {item.exampleSuffix}
@@ -196,7 +196,7 @@ function DrillContent() {
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type pinyin with tone numbers, e.g. ni3 hao3"
-              className="w-full border border-gray-300 rounded-xl px-4 py-4 text-base focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+              className="w-full border border-gray-300 rounded-xl px-4 py-4 text-base focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
             />
             {converted && (
               <p className="text-sm text-gray-500 px-1">
@@ -206,7 +206,7 @@ function DrillContent() {
             <button
               onClick={handleSubmit}
               disabled={!input.trim()}
-              className="w-full bg-red-600 text-white font-bold py-4 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-40 text-base"
+              className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-40 text-base"
             >
               Check
             </button>

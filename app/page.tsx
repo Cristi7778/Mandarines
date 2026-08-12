@@ -69,12 +69,11 @@ export default function HomePage() {
   const byStation = topicsByStation();
   const xpInfo = userProgress ? xpToNextLevel(userProgress.totalXp) : null;
 
-  // Loading state
-  if (user === undefined) {
+  if (user === undefined || user === null) {
     return (
       <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center">
         <div className="text-center space-y-2">
-          <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">🍊</div>
+          <div className="text-4xl animate-pulse">🍊</div>
           <p className="text-gray-400 text-sm">Loading…</p>
         </div>
       </div>
@@ -108,7 +107,7 @@ export default function HomePage() {
             )}
             <Link
               href="/recap"
-              className="bg-red-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-red-700 transition-colors"
+              className="bg-orange-500 text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-orange-600 transition-colors"
             >
               Recap
             </Link>

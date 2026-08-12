@@ -67,12 +67,12 @@ function StepNav({
               done
                 ? 'bg-green-500 border-green-500 text-white'
                 : active
-                ? 'bg-red-600 border-red-600 text-white'
+                ? 'bg-orange-500 border-orange-500 text-white'
                 : 'bg-white border-gray-300 text-gray-400 group-hover:border-gray-400'
             }`}>
               {done ? '✓' : step}
             </div>
-            <span className={`text-xs ${active ? 'text-red-600 font-medium' : 'text-gray-400'}`}>
+            <span className={`text-xs ${active ? 'text-orange-500 font-medium' : 'text-gray-400'}`}>
               {label}
             </span>
           </button>
@@ -99,11 +99,11 @@ function ExplanationStep({
           <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-4 items-start">
             <div className="text-4xl font-bold chinese-text text-gray-900 leading-none shrink-0">{item.chineseChar}</div>
             <div className="min-w-0">
-              <div className="text-base font-medium text-red-600">{item.pinyin}</div>
+              <div className="text-base font-medium text-orange-500">{item.pinyin}</div>
               <div className="text-sm font-medium text-gray-800 mt-0.5">{item.englishMeaning}</div>
               <div className="text-sm text-gray-500 mt-1 chinese-text">
                 {item.examplePrefix}
-                <span className="text-red-600 font-semibold">{item.chineseChar}</span>
+                <span className="text-orange-500 font-semibold">{item.chineseChar}</span>
                 {item.exampleSuffix}
               </div>
               <div className="text-xs text-gray-400 italic mt-0.5">{item.exampleEnglish}</div>
@@ -118,7 +118,7 @@ function ExplanationStep({
       </div>
       <button
         onClick={onComplete}
-        className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors"
+        className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors"
       >
         I've read this — Continue
       </button>
@@ -184,7 +184,7 @@ function InlineDrill({
       {/* progress bar */}
       <div className="flex items-center gap-3">
         <div className="flex-1 bg-gray-200 rounded-full h-2">
-          <div className="bg-red-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+          <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
         </div>
         <span className="text-xs text-gray-500 shrink-0">{idx + 1}/{total}</span>
       </div>
@@ -197,7 +197,7 @@ function InlineDrill({
             <p className="text-base text-gray-600 italic">{item.exampleEnglish}</p>
             <p className="text-xl chinese-text text-gray-800 font-medium leading-relaxed">
               {item.examplePrefix}
-              <span className="inline-block border-b-2 border-dashed border-red-400 min-w-[3rem] mx-1 text-center text-red-400">
+              <span className="inline-block border-b-2 border-dashed border-orange-400 min-w-[3rem] mx-1 text-center text-orange-400">
                 {submitted ? <span className="text-red-600">{item.chineseChar}</span> : '?'}
               </span>
               {item.exampleSuffix}
@@ -208,7 +208,7 @@ function InlineDrill({
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Character → Pinyin</p>
             <p className="text-xl chinese-text text-gray-800 font-medium leading-relaxed">
               {item.examplePrefix}
-              <span className="inline-block bg-red-50 border border-red-300 rounded px-1.5 mx-1 text-red-700 font-bold">
+              <span className="inline-block bg-orange-50 border border-orange-300 rounded px-1.5 mx-1 text-orange-700 font-bold">
                 {item.chineseChar}
               </span>
               {item.exampleSuffix}
@@ -227,17 +227,17 @@ function InlineDrill({
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type pinyin, e.g. ni3 hao3"
-            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
           />
           {converted && (
             <p className="text-sm text-gray-500 px-1">
-              → <span className="text-red-600 font-medium">{converted}</span>
+              → <span className="text-orange-500 font-medium">{converted}</span>
             </p>
           )}
           <button
             onClick={handleSubmit}
             disabled={!input.trim()}
-            className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-40"
+            className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-40"
           >
             Check
           </button>
@@ -321,7 +321,7 @@ function StepResultScreen({
         <button onClick={onRetry} className="flex-1 border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50">
           Retry
         </button>
-        <button onClick={onNext} className="flex-1 bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700">
+        <button onClick={onNext} className="flex-1 bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600">
           Next Step →
         </button>
       </div>
@@ -394,7 +394,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-3">
           <p className="text-gray-500">Topic not found.</p>
-          <Link href="/" className="text-red-600 underline">Back to home</Link>
+          <Link href="/" className="text-orange-500 underline">Back to home</Link>
         </div>
       </div>
     );
@@ -581,7 +581,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                   )}
                   <button
                     onClick={() => startDrill(2)}
-                    className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors"
+                    className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors"
                   >
                     {progress?.step2Complete ? 'Practice again' : 'Start drill'} ({topic.items.length} words)
                   </button>
@@ -607,7 +607,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                   )}
                   <button
                     onClick={() => startDrill(3)}
-                    className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors"
+                    className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors"
                   >
                     {progress?.step3Complete ? 'Practice again' : 'Start drill'} ({topic.items.length} words)
                   </button>
@@ -639,7 +639,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                   )}
                   <button
                     onClick={() => startDrill(6)}
-                    className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors"
+                    className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors"
                   >
                     {progress?.step6Complete ? 'Practice again' : 'Start mixed drill'} ({topic.items.length * 2} questions)
                   </button>

@@ -22,7 +22,7 @@ export default function ResultsPage() {
       <div className="min-h-screen flex items-center justify-center text-center px-4">
         <div className="space-y-3">
           <p className="text-gray-500">No results to show.</p>
-          <Link href="/" className="text-red-600 underline text-sm">Go home</Link>
+          <Link href="/" className="text-orange-500 underline text-sm">Go home</Link>
         </div>
       </div>
     );
@@ -49,7 +49,7 @@ export default function ResultsPage() {
           <p className="text-gray-500">{meta.score} / {meta.total} correct</p>
           <div className="w-full bg-gray-100 rounded-full h-3 mt-2">
             <div
-              className="h-3 rounded-full transition-all bg-gradient-to-r from-red-500 to-amber-400"
+              className="h-3 rounded-full transition-all bg-gradient-to-r from-orange-400 to-amber-400"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -64,7 +64,7 @@ export default function ResultsPage() {
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-gray-800">Review ({wrong.length} missed)</h2>
               {wrong.length > 3 && (
-                <button onClick={() => setShowAll(v => !v)} className="text-xs text-red-600 underline">
+                <button onClick={() => setShowAll(v => !v)} className="text-xs text-orange-500 underline">
                   {showAll ? 'Show less' : 'Show all'}
                 </button>
               )}
@@ -98,7 +98,7 @@ export default function ResultsPage() {
         <div className="flex flex-col gap-3">
           <Link
             href="/recap"
-            className="w-full bg-red-600 text-white font-bold py-4 rounded-xl hover:bg-red-700 transition-colors text-center text-base"
+            className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition-colors text-center text-base"
           >
             New Recap Drill
           </Link>
