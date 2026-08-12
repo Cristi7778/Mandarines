@@ -25,7 +25,7 @@ function CallbackHandler() {
   return (
     <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center">
       <div className="text-center space-y-3">
-        <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">汉字</div>
+        <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">🍊</div>
         <p className="text-gray-500 text-sm">Signing you in…</p>
       </div>
     </div>

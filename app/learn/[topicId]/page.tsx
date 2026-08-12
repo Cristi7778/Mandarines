@@ -384,7 +384,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
   if (user === undefined) {
     return (
       <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center">
-        <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">汉字</div>
+        <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">🍊</div>
       </div>
     );
   }

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Mandarin Journey',
+  title: 'Mandarines',
   description: 'Learn Mandarin Chinese — HSK 1 through HSK 4',
 };
 

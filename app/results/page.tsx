@@ -106,7 +106,7 @@ export default function ResultsPage() {
             href="/"
             className="w-full border border-gray-300 text-gray-700 font-semibold py-4 rounded-xl hover:bg-gray-50 transition-colors text-center"
           >
-            Back to Journey Map
+            Back to Home
           </Link>
         </div>
       </main>

@@ -74,7 +74,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center">
         <div className="text-center space-y-2">
-          <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">汉字</div>
+          <div className="text-4xl chinese-text text-red-600 font-bold animate-pulse">🍊</div>
           <p className="text-gray-400 text-sm">Loading…</p>
         </div>
       </div>
@@ -87,8 +87,8 @@ export default function HomePage() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-red-600 chinese-text">汉字</span>
-            <span className="text-lg font-semibold text-gray-800">Journey</span>
+            <span className="text-2xl">🍊</span>
+            <span className="text-lg font-semibold text-gray-800">Mandarines</span>
           </div>
           <div className="flex items-center gap-4">
             {userProgress && (
