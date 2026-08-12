@@ -147,6 +147,8 @@ function InlineDrill({
   const [correct, setCorrect] = useState(false);
   const [results, setResults] = useState<DrillResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Set true on submit so the advance listener skips the very keydown that triggered it
+  const skipAdvanceRef = useRef(false);
 
   const q = questions[idx]!;
   const total = questions.length;
@@ -156,20 +158,20 @@ function InlineDrill({
     if (!submitted) inputRef.current?.focus();
   }, [idx, submitted]);
 
-  // Advance only when the user presses Enter fresh after submission.
-  // seenKeydown guards against the keyup of the submission press firing immediately.
   useEffect(() => {
     if (!submitted) return;
-    let seenKeydown = false;
-    function onDown(e: KeyboardEvent) { if (e.key === 'Enter') seenKeydown = true; }
-    function onUp(e: KeyboardEvent) { if (e.key === 'Enter' && seenKeydown) handleNext(); }
-    window.addEventListener('keydown', onDown);
-    window.addEventListener('keyup', onUp);
-    return () => { window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp); };
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Enter') return;
+      if (skipAdvanceRef.current) { skipAdvanceRef.current = false; return; }
+      handleNext();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [submitted, idx]);
 
   function handleSubmit() {
     if (!input.trim()) return;
+    skipAdvanceRef.current = true;
     const isCorrect = comparePinyin(input, q.item.pinyin);
     setCorrect(isCorrect);
     setSubmitted(true);
@@ -627,19 +629,22 @@ function MixedPracticeStep({
     }
   }
 
-  // Advance only on a fresh Enter press after submission (not the release of the submission press)
+  const skipDrillAdvanceRef = useRef(false);
+
   useEffect(() => {
     if (!submitted || !currentDrill) return;
-    let seenKeydown = false;
-    function onDown(e: KeyboardEvent) { if (e.key === 'Enter') seenKeydown = true; }
-    function onUp(e: KeyboardEvent) { if (e.key === 'Enter' && seenKeydown) advance(drillCorrect); }
-    window.addEventListener('keydown', onDown);
-    window.addEventListener('keyup', onUp);
-    return () => { window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp); };
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Enter') return;
+      if (skipDrillAdvanceRef.current) { skipDrillAdvanceRef.current = false; return; }
+      advance(drillCorrect);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [submitted, idx, drillCorrect]);
 
   function handleDrillSubmit() {
     if (!input.trim() || !currentDrill) return;
+    skipDrillAdvanceRef.current = true;
     const isCorrect = comparePinyin(input, currentDrill.q.item.pinyin);
     setDrillCorrect(isCorrect);
     setSubmitted(true);
