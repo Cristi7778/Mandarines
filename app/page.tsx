@@ -178,7 +178,7 @@ export default function HomePage() {
                       {hasItems ? (
                         <Link
                           href={`/learn/${topic.id}`}
-                          className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                          className={`shrink-0 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors ${
                             isComplete
                               ? 'bg-green-100 text-green-700 hover:bg-green-200'
                               : inProgress
