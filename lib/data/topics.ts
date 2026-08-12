@@ -72,8 +72,8 @@ const TOPICS: Topic[] = [
     id: 'topic-4',
     name: 'Possessives (的)',
     category: 'grammar',
-    station: 'Foundation',
-    sequenceOrder: 3,
+    station: 'HSK 1',
+    sequenceOrder: 4,
     description: "The particle 的 (de) marks possession and modifies nouns.",
     items: [
       it('t4i1', 'topic-4', '的', 'de', 'possessive particle (my, your, his…)',  '我',     '书。',         'My book.',         'Neutral tone (轻声). Always unstressed.'),
@@ -87,8 +87,8 @@ const TOPICS: Topic[] = [
     id: 'topic-5',
     name: 'Measure words',
     category: 'vocab',
-    station: 'Foundation',
-    sequenceOrder: 4,
+    station: 'HSK 1',
+    sequenceOrder: 5,
     description: 'Counters that go between numbers and nouns: 一个人, 一本书, 一张纸.',
     items: [
       it('t5i1', 'topic-5', '个', 'gè',   'general counter (people, objects)',  '一',   '人。',   'One person.',    'Most common; use when unsure which measure word to pick.'),
@@ -105,8 +105,8 @@ const TOPICS: Topic[] = [
     id: 'topic-6',
     name: 'Question particles 吗 / 呢 / 吧',
     category: 'grammar',
-    station: 'Foundation',
-    sequenceOrder: 5,
+    station: 'HSK 1',
+    sequenceOrder: 6,
     description: 'Sentence-final particles that turn statements into questions or soften assertions.',
     items: [
       it('t6i1', 'topic-6', '吗', 'ma', 'yes/no question particle',            '你是学生',   '？',   'Are you a student?',       'Neutral tone. Turns any statement into a yes/no question.'),
@@ -118,8 +118,8 @@ const TOPICS: Topic[] = [
     id: 'topic-13',
     name: 'Question words',
     category: 'grammar',
-    station: 'Foundation',
-    sequenceOrder: 6,
+    station: 'HSK 1',
+    sequenceOrder: 7,
     description: '什么, 谁, 哪儿, 怎么, 为什么 and the rest of the question-word toolkit.',
     items: [
       it('t13i1', 'topic-13', '什么', 'shénme',  'what',           '你叫',   '名字？',     'What is your name?'),
@@ -135,8 +135,8 @@ const TOPICS: Topic[] = [
     id: 'topic-7',
     name: 'Common adjectives',
     category: 'vocab',
-    station: 'Foundation',
-    sequenceOrder: 7,
+    station: 'HSK 1',
+    sequenceOrder: 8,
     description: 'Core adjectives for describing size, quality, appearance, and quantity.',
     items: [
       it('t7i1',  'topic-7', '好',   'hǎo',      'good; well',          '他',   '吗？',     'Is he well?'),
@@ -155,8 +155,8 @@ const TOPICS: Topic[] = [
     id: 'topic-1',
     name: 'Core verbs 1',
     category: 'vocab',
-    station: 'Foundation',
-    sequenceOrder: 8,
+    station: 'HSK 1',
+    sequenceOrder: 9,
     description: 'The first 10 essential action words you will use every day.',
     items: [
       it('t1i1',  'topic-1', '是',   'shì',     'to be; is/am/are',               '我',     '学生。',       'I am a student.'),
@@ -175,8 +175,8 @@ const TOPICS: Topic[] = [
     id: 'topic-8',
     name: 'Time words',
     category: 'vocab',
-    station: 'Foundation',
-    sequenceOrder: 9,
+    station: 'HSK 1',
+    sequenceOrder: 10,
     description: '今天, 明天, 昨天, 现在 and other common time expressions.',
     items: [
       it('t8i1', 'topic-8', '今天',   'jīntiān',  'today',          '',       '天气很好。',   'The weather is nice today.'),
@@ -192,8 +192,8 @@ const TOPICS: Topic[] = [
     id: 'topic-9',
     name: 'Family vocabulary',
     category: 'vocab',
-    station: 'Foundation',
-    sequenceOrder: 10,
+    station: 'HSK 1',
+    sequenceOrder: 11,
     description: 'Family members from parents to grandparents to siblings.',
     items: [
       it('t9i1',  'topic-9', '爸爸', 'bàba',   'dad; father',         '我',   '是老师。',   'My dad is a teacher.'),
@@ -213,7 +213,7 @@ const TOPICS: Topic[] = [
     name: 'Food & drink vocabulary',
     category: 'vocab',
     station: 'Foundation',
-    sequenceOrder: 11,
+    sequenceOrder: 3,
     description: 'Common foods and drinks you will order and discuss.',
     items: [
       it('t10i1',  'topic-10', '米饭', 'mǐfàn',  'cooked rice',     '我想吃', '。',       'I want to eat rice.'),
@@ -232,7 +232,7 @@ const TOPICS: Topic[] = [
     id: 'topic-11',
     name: 'Modern-life nouns',
     category: 'vocab',
-    station: 'Foundation',
+    station: 'HSK 1',
     sequenceOrder: 12,
     description: '手机, 电脑 and the everyday objects of modern life.',
     items: [
@@ -247,7 +247,7 @@ const TOPICS: Topic[] = [
     id: 'topic-12',
     name: 'Specific-action verbs',
     category: 'vocab',
-    station: 'Foundation',
+    station: 'HSK 1',
     sequenceOrder: 13,
     description: '找 (to look for), 等 (to wait) and other precise action words.',
     items: [
@@ -263,7 +263,7 @@ const TOPICS: Topic[] = [
     id: 'topic-cv2',
     name: 'Core verbs 2',
     category: 'vocab',
-    station: 'Foundation',
+    station: 'HSK 1',
     sequenceOrder: 14,
     description: 'The next 10 essential action words: 做, 买, 学, 喜欢, 知道 and more.',
     items: [
@@ -283,7 +283,7 @@ const TOPICS: Topic[] = [
     id: 'topic-14',
     name: 'Grammar: 了 (completed action)',
     category: 'grammar',
-    station: 'Foundation',
+    station: 'HSK 1',
     sequenceOrder: 15,
     description: '了 marks a completed action or a change of state.',
     items: [
@@ -298,7 +298,7 @@ const TOPICS: Topic[] = [
     id: 'topic-15',
     name: 'Grammar: 比 comparisons',
     category: 'grammar',
-    station: 'Foundation',
+    station: 'HSK 1',
     sequenceOrder: 16,
     description: 'The 比 structure: A 比 B + adjective = "A is more ___ than B".',
     items: [
