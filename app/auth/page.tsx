@@ -15,6 +15,7 @@ export default function AuthPage() {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [signupDone, setSignupDone] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -47,7 +48,7 @@ export default function AuthPage() {
     } else {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setError(error.message);
-      else router.replace('/');
+      else setSignupDone(true);
     }
 
     setLoading(false);
@@ -60,6 +61,30 @@ export default function AuthPage() {
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (error) setError(error.message);
+  }
+
+  if (signupDone) {
+    return (
+      <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center px-4">
+        <div className="w-full max-w-sm space-y-6 text-center">
+          <div className="text-5xl">🍊</div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-4">
+            <div className="text-4xl">📬</div>
+            <h2 className="text-lg font-semibold text-gray-800">Check your inbox</h2>
+            <p className="text-sm text-gray-500">
+              We sent a confirmation link to <span className="font-medium text-gray-700">{email}</span>.
+              Click it to activate your account, then come back to sign in.
+            </p>
+            <button
+              onClick={() => { setSignupDone(false); switchMode('login'); }}
+              className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors text-sm"
+            >
+              Go to Sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
