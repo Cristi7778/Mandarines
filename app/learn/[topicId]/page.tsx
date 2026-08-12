@@ -36,7 +36,7 @@ function buildDrillQuestions(items: Item[], types: Array<'pinyin-from-english' |
 
 // ─── Step nav ───────────────────────────────────────────────────────────────
 
-const STEP_LABELS = ['Teach', 'Pinyin', 'Chars', 'Speak', 'Stroke', 'Mixed', 'Writing'];
+const STEP_LABELS = ['Teach', 'Pinyin', 'Chars', 'Speak', 'Stroke', 'Writing', 'Mixed'];
 
 function StepNav({
   current,
@@ -541,6 +541,90 @@ function HanziWriterStep({
   );
 }
 
+// ─── Step 7: Mixed Practice ──────────────────────────────────────────────────
+
+type MixedPhase = 'pinyin' | 'chars' | 'stroke' | 'writing';
+
+function MixedPracticeStep({
+  items,
+  onComplete,
+}: {
+  items: Item[];
+  onComplete: (score: number, total: number) => void;
+}) {
+  const [phase, setPhase] = useState<MixedPhase>('pinyin');
+  const scoreRef = useRef({ correct: 0, total: 0 });
+
+  const pinyinQs = useMemo(() => buildDrillQuestions(items, ['pinyin-from-english']), [items]);
+  const charQs = useMemo(() => buildDrillQuestions(items, ['pinyin-from-char']), [items]);
+
+  function accumulate(correct: number, total: number) {
+    scoreRef.current.correct += correct;
+    scoreRef.current.total += total;
+  }
+
+  const phases: MixedPhase[] = ['pinyin', 'chars', 'stroke', 'writing'];
+  const phaseLabels: Record<MixedPhase, string> = {
+    pinyin: 'Pinyin',
+    chars: 'Characters',
+    stroke: 'Stroke Order',
+    writing: 'Writing',
+  };
+  const currentIdx = phases.indexOf(phase);
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <div className="flex gap-1.5">
+          {phases.map((p, i) => (
+            <div key={p} className={`flex-1 h-1.5 rounded-full transition-colors ${
+              i < currentIdx ? 'bg-green-500' : i === currentIdx ? 'bg-orange-500' : 'bg-gray-200'
+            }`} />
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 text-center font-medium tracking-wide">
+          {phaseLabels[phase]} · {currentIdx + 1} of 4
+        </p>
+      </div>
+
+      {phase === 'pinyin' && (
+        <InlineDrill
+          questions={pinyinQs}
+          onComplete={(results) => {
+            accumulate(results.filter(r => r.correct).length, results.length);
+            setPhase('chars');
+          }}
+        />
+      )}
+      {phase === 'chars' && (
+        <InlineDrill
+          questions={charQs}
+          onComplete={(results) => {
+            accumulate(results.filter(r => r.correct).length, results.length);
+            setPhase('stroke');
+          }}
+        />
+      )}
+      {phase === 'stroke' && (
+        <HanziWriterStep
+          items={items}
+          onComplete={(score, total) => {
+            accumulate(score, total);
+            setPhase('writing');
+          }}
+        />
+      )}
+      {phase === 'writing' && (
+        <ComingSoonStep
+          step={7}
+          label="Writing Practice"
+          onSkip={() => onComplete(scoreRef.current.correct, scoreRef.current.total)}
+        />
+      )}
+    </div>
+  );
+}
+
 // ─── Main page ───────────────────────────────────────────────────────────────
 
 type DrillingState = { drilling: false } | { drilling: true; questions: DrillQuestion[] };
@@ -556,6 +640,15 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const [drilling, setDrilling] = useState<DrillingState>({ drilling: false });
   const [stepResult, setStepResult] = useState<{ score: number; total: number; xpEarned: number; autoComplete: boolean } | null>(null);
+
+  // Stable ref so the Enter-key listener can always call the latest handler
+  // without being re-registered on every render (fixes Rules-of-Hooks ordering).
+  const enterKeyRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { enterKeyRef.current(e); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []); // mount/unmount only — must stay before any early returns
 
   useEffect(() => {
     if (user === null) { router.replace('/auth'); return; }
@@ -709,24 +802,32 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     setStepResult({ score, total, xpEarned: xp, autoComplete });
   }
 
+  async function handleMixedComplete(score: number, total: number) {
+    if (!progress) return;
+    const xp = xpForStep(7, score, total);
+    const autoComplete = score === total;
+    const alreadyComplete = !!progress.step7Complete;
+    if (!alreadyComplete) await awardXp(xp);
+    if (autoComplete) {
+      const updated = markStepComplete(7, progress);
+      await saveTopicProgress(updated);
+      setProgress(updated);
+    }
+    setStepResult({ score, total, xpEarned: xp, autoComplete });
+  }
+
   const xpInfo = userProgress ? xpToNextLevel(userProgress.totalXp) : null;
 
-  // Enter key handler for step landing pages (2, 3, 6)
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key !== 'Enter') return;
-      if (stepResult || drilling.drilling) return; // handled by sub-components
-      if (step === 2 || step === 3) {
-        if (progress?.['step' + step + 'Complete' as keyof TopicProgress]) handleNextStep();
-        else startDrill(step);
-      } else if (step === 6) {
-        if (progress?.step6Complete) handleNextStep();
-        else startDrill(6);
-      }
+  // Update the ref with fresh closures each render — no hook needed.
+  // Steps 6 (Writing/ComingSoon) and 7 (Mixed) handle Enter internally.
+  enterKeyRef.current = (e: KeyboardEvent) => {
+    if (e.key !== 'Enter') return;
+    if (stepResult || drilling.drilling) return;
+    if (step === 2 || step === 3) {
+      if (progress?.['step' + step + 'Complete' as keyof TopicProgress]) handleNextStep();
+      else startDrill(step);
     }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [step, stepResult, drilling, progress]);
+  };
 
   return (
     <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
@@ -850,33 +951,10 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                 <HanziWriterStep items={topic.items} onComplete={handleWritingComplete} />
               )}
               {step === 6 && (
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">Step 6: Mixed Practice</h2>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Both pinyin and character questions, mixed together.
-                    </p>
-                  </div>
-                  {progress?.step6Complete && (
-                    <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-green-700 text-sm font-medium">
-                      ✓ Step complete — review or move to writing
-                    </div>
-                  )}
-                  <button
-                    onClick={() => startDrill(6)}
-                    className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors"
-                  >
-                    {progress?.step6Complete ? 'Practice again' : 'Start mixed drill'} ({topic.items.length * 2} questions)
-                  </button>
-                  {progress?.step6Complete && (
-                    <button onClick={handleNextStep} className="w-full border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50">
-                      Next Step →
-                    </button>
-                  )}
-                </div>
+                <ComingSoonStep step={6} label="Writing Practice" onSkip={handleSkipComingSoon} />
               )}
               {step === 7 && (
-                <ComingSoonStep step={7} label="Writing Practice" onSkip={handleSkipComingSoon} />
+                <MixedPracticeStep items={topic.items} onComplete={handleMixedComplete} />
               )}
             </>
           )}

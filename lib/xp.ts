@@ -2,7 +2,7 @@ import type { UserProgress } from './types';
 
 const LEVEL_THRESHOLDS = [0, 100, 250, 500, 900, 1500, 2300, 3300, 4500, 6000, 8000];
 
-const STEP_BASE_XP = [10, 20, 20, 30, 30, 40];
+const STEP_BASE_XP = [10, 20, 20, 30, 30, 25, 50];
 
 export function xpForStep(step: number, score: number, total: number): number {
   const base = STEP_BASE_XP[step - 1] ?? 20;
