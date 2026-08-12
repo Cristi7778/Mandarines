@@ -268,6 +268,7 @@ function InlineDrill({
             </p>
           </div>
           <button
+            autoFocus
             onClick={handleNext}
             className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors text-base"
           >
@@ -468,7 +469,11 @@ function HanziWriterStep({
   }
 
   useEffect(() => {
-    function onKey(e: KeyboardEvent) { if (e.key === 'Enter' && phase === 'result') handleNext(); }
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Enter') return;
+      if (phase === 'result') handleNext();
+      else if (phase === 'watch') setPhase('quiz');
+    }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [phase, idx]);
@@ -543,7 +548,9 @@ function HanziWriterStep({
 
 // ─── Step 7: Mixed Practice ──────────────────────────────────────────────────
 
-type MixedPhase = 'pinyin' | 'chars' | 'stroke' | 'writing';
+type MixedQ =
+  | { kind: 'pinyin'; q: DrillQuestion }
+  | { kind: 'stroke'; item: Item; char: string };
 
 function MixedPracticeStep({
   items,
@@ -552,75 +559,224 @@ function MixedPracticeStep({
   items: Item[];
   onComplete: (score: number, total: number) => void;
 }) {
-  const [phase, setPhase] = useState<MixedPhase>('pinyin');
-  const scoreRef = useRef({ correct: 0, total: 0 });
+  // Sample 4 items independently per exercise type so different words are tested each way
+  const questions = useMemo<MixedQ[]>(() => {
+    function sample(n: number) { return [...items].sort(() => Math.random() - 0.5).slice(0, n); }
+    const qs: MixedQ[] = [
+      ...sample(4).map(item => ({ kind: 'pinyin' as const, q: { type: 'pinyin-from-english' as const, item } })),
+      ...sample(4).map(item => ({ kind: 'pinyin' as const, q: { type: 'pinyin-from-char' as const, item } })),
+      ...sample(4).map(item => ({ kind: 'stroke' as const, item, char: item.chineseChar[0]! })),
+    ];
+    return qs.sort(() => Math.random() - 0.5);
+  }, [items]);
 
-  const pinyinQs = useMemo(() => buildDrillQuestions(items, ['pinyin-from-english']), [items]);
-  const charQs = useMemo(() => buildDrillQuestions(items, ['pinyin-from-char']), [items]);
+  const [idx, setIdx] = useState(0);
+  const scoreRef = useRef(0);
 
-  function accumulate(correct: number, total: number) {
-    scoreRef.current.correct += correct;
-    scoreRef.current.total += total;
+  // Drill question state
+  const [input, setInput] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [drillCorrect, setDrillCorrect] = useState(false);
+
+  // Stroke question state
+  const [strokePhase, setStrokePhase] = useState<'watch' | 'quiz' | 'result'>('watch');
+  const [strokeMistakes, setStrokeMistakes] = useState(0);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const total = questions.length;
+  const current = questions[idx]!;
+  const currentDrill = current.kind === 'pinyin' ? current : null;
+  const currentStroke = current.kind === 'stroke' ? current : null;
+
+  // Reset per-question state when moving to a new question
+  useEffect(() => {
+    setInput('');
+    setSubmitted(false);
+    setDrillCorrect(false);
+    setStrokePhase('watch');
+    setStrokeMistakes(0);
+  }, [idx]);
+
+  // Focus input when a drill question appears
+  useEffect(() => {
+    if (currentDrill && !submitted) inputRef.current?.focus();
+  }, [idx, submitted, currentDrill]);
+
+  // Enter key: stroke watch phase → start quiz
+  useEffect(() => {
+    if (!currentStroke || strokePhase !== 'watch') return;
+    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') setStrokePhase('quiz'); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [currentStroke, strokePhase]);
+
+  function advance(correct: boolean) {
+    if (correct) scoreRef.current += 1;
+    if (idx + 1 >= total) {
+      onComplete(scoreRef.current, total);
+    } else {
+      setIdx(i => i + 1);
+    }
   }
 
-  const phases: MixedPhase[] = ['pinyin', 'chars', 'stroke', 'writing'];
-  const phaseLabels: Record<MixedPhase, string> = {
-    pinyin: 'Pinyin',
-    chars: 'Characters',
-    stroke: 'Stroke Order',
-    writing: 'Writing',
-  };
-  const currentIdx = phases.indexOf(phase);
+  function handleDrillSubmit() {
+    if (!input.trim() || !currentDrill) return;
+    const isCorrect = comparePinyin(input, currentDrill.q.item.pinyin);
+    setDrillCorrect(isCorrect);
+    setSubmitted(true);
+  }
+
+  const converted = input ? toToneMarks(input) : '';
 
   return (
     <div className="space-y-4">
-      <div className="space-y-1">
-        <div className="flex gap-1.5">
-          {phases.map((p, i) => (
-            <div key={p} className={`flex-1 h-1.5 rounded-full transition-colors ${
-              i < currentIdx ? 'bg-green-500' : i === currentIdx ? 'bg-orange-500' : 'bg-gray-200'
-            }`} />
-          ))}
+      {/* Progress */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 bg-gray-200 rounded-full h-2">
+          <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${(idx / total) * 100}%` }} />
         </div>
-        <p className="text-xs text-gray-500 text-center font-medium tracking-wide">
-          {phaseLabels[phase]} · {currentIdx + 1} of 4
-        </p>
+        <span className="text-xs text-gray-500 shrink-0">{idx + 1} / {total}</span>
       </div>
 
-      {phase === 'pinyin' && (
-        <InlineDrill
-          questions={pinyinQs}
-          onComplete={(results) => {
-            accumulate(results.filter(r => r.correct).length, results.length);
-            setPhase('chars');
-          }}
-        />
-      )}
-      {phase === 'chars' && (
-        <InlineDrill
-          questions={charQs}
-          onComplete={(results) => {
-            accumulate(results.filter(r => r.correct).length, results.length);
-            setPhase('stroke');
-          }}
-        />
-      )}
-      {phase === 'stroke' && (
-        <HanziWriterStep
-          items={items}
-          onComplete={(score, total) => {
-            accumulate(score, total);
-            setPhase('writing');
-          }}
-        />
-      )}
-      {phase === 'writing' && (
-        <ComingSoonStep
-          step={7}
-          label="Writing Practice"
-          onSkip={() => onComplete(scoreRef.current.correct, scoreRef.current.total)}
-        />
-      )}
+      {/* Drill question (pinyin / char recognition) */}
+      {currentDrill && (() => {
+        const { item, type } = currentDrill.q;
+        return (
+          <div className="space-y-3">
+            <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+              {type === 'pinyin-from-english' ? (
+                <>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Pinyin</p>
+                  <p className="text-base text-gray-600 italic">{item.exampleEnglish}</p>
+                  <p className="text-2xl chinese-text text-gray-800 font-medium leading-relaxed">
+                    {item.examplePrefix}
+                    <span className="inline-block border-b-2 border-dashed border-orange-400 min-w-[3rem] mx-1 text-center text-orange-400">
+                      {submitted ? <span className="text-red-600">{item.chineseChar}</span> : '?'}
+                    </span>
+                    {item.exampleSuffix}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Character → Pinyin</p>
+                  <p className="text-2xl chinese-text text-gray-800 font-medium leading-relaxed">
+                    {item.examplePrefix}
+                    <span className="inline-block bg-orange-50 border border-orange-300 rounded px-1.5 mx-1 text-orange-700 font-bold">
+                      {item.chineseChar}
+                    </span>
+                    {item.exampleSuffix}
+                  </p>
+                  <p className="text-base text-gray-400 italic">{item.exampleEnglish}</p>
+                </>
+              )}
+            </div>
+            {!submitted ? (
+              <div className="space-y-2">
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleDrillSubmit(); }}
+                  placeholder="Type pinyin, e.g. ni3 hao3"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-4 text-base focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                />
+                {converted && (
+                  <p className="text-base text-gray-500 px-1">→ <span className="text-orange-500 font-medium">{converted}</span></p>
+                )}
+                <button
+                  onClick={handleDrillSubmit}
+                  disabled={!input.trim()}
+                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 text-base"
+                >
+                  Check
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className={`rounded-xl p-4 ${drillCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">{drillCorrect ? '✅' : '❌'}</span>
+                    <span className={`font-semibold ${drillCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                      {drillCorrect ? 'Correct!' : 'Not quite'}
+                    </span>
+                  </div>
+                  {!drillCorrect && (
+                    <p className="text-sm text-gray-600">
+                      Correct: <span className="font-semibold text-red-700">{item.pinyin}</span>
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">{item.chineseChar} · {item.englishMeaning}</p>
+                </div>
+                <button
+                  autoFocus
+                  onClick={() => advance(drillCorrect)}
+                  className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
+                >
+                  {idx + 1 >= total ? 'Finish' : 'Next →'}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* Stroke order question */}
+      {currentStroke && (() => {
+        const { item, char } = currentStroke;
+        return (
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center space-y-1">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Stroke Order</p>
+              <p className="text-3xl chinese-text font-bold text-gray-800">{item.chineseChar}</p>
+              <p className="text-base text-orange-500">{item.pinyin}</p>
+              <p className="text-sm text-gray-500">{item.englishMeaning}</p>
+            </div>
+            <div className="flex justify-center">
+              <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden">
+                <WriterCanvas
+                  key={`${idx}-${strokePhase}`}
+                  char={char}
+                  phase={strokePhase === 'quiz' ? 'quiz' : 'watch'}
+                  onQuizDone={(mistakes) => { setStrokeMistakes(mistakes); setStrokePhase('result'); }}
+                />
+              </div>
+            </div>
+            {strokePhase === 'watch' && (
+              <div className="space-y-2">
+                <p className="text-center text-sm text-gray-500">Watch the stroke order, then try it yourself</p>
+                <button
+                  onClick={() => setStrokePhase('quiz')}
+                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 text-base"
+                >
+                  Try it yourself →
+                </button>
+              </div>
+            )}
+            {strokePhase === 'quiz' && (
+              <div className="text-center space-y-1">
+                <p className="text-sm text-gray-500">Draw each stroke in the correct order</p>
+                <p className="text-xs text-gray-400">Follow the grey outline</p>
+              </div>
+            )}
+            {strokePhase === 'result' && (
+              <div className="space-y-3">
+                <div className={`rounded-xl p-4 text-center ${strokeMistakes < 3 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'}`}>
+                  <p className={`font-semibold text-lg ${strokeMistakes < 3 ? 'text-green-700' : 'text-amber-700'}`}>
+                    {strokeMistakes === 0 ? '✅ Perfect!' : strokeMistakes < 3 ? `👍 ${strokeMistakes} mistake${strokeMistakes !== 1 ? 's' : ''}` : `💪 ${strokeMistakes} mistakes`}
+                  </p>
+                </div>
+                <button
+                  autoFocus
+                  onClick={() => advance(strokeMistakes < 3)}
+                  className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
+                >
+                  {idx + 1 >= total ? 'Finish' : 'Next →'}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
