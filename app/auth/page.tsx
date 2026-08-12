@@ -1,32 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 type Mode = 'login' | 'signup';
-type SignupStep = 'email' | 'code' | 'password';
 
 export default function AuthPage() {
   const router = useRouter();
 
   const [mode, setMode] = useState<Mode>('login');
-
-  // login state
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-
-  // signup state
-  const [signupStep, setSignupStep] = useState<SignupStep>('email');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupCode, setSignupCode] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupConfirm, setSignupConfirm] = useState('');
-
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const codeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -34,86 +22,36 @@ export default function AuthPage() {
     });
   }, [router]);
 
-  useEffect(() => {
-    if (signupStep === 'code') codeRef.current?.focus();
-  }, [signupStep]);
-
   function switchMode(m: Mode) {
     setMode(m);
     setError('');
-    setSignupStep('email');
-    setSignupCode('');
-    setSignupPassword('');
-    setSignupConfirm('');
+    setPassword('');
+    setConfirm('');
   }
 
-  // ── Login ────────────────────────────────────────────────────────────────
-
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: loginPassword,
-    });
-    if (error) setError(error.message);
-    else router.replace('/');
-    setLoading(false);
-  }
 
-  // ── Sign-up step 1: send OTP ─────────────────────────────────────────────
-
-  async function handleSendCode(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: signupEmail,
-      options: { shouldCreateUser: true },
-    });
-    if (error) setError(error.message);
-    else setSignupStep('code');
-    setLoading(false);
-  }
-
-  // ── Sign-up step 2: verify OTP ───────────────────────────────────────────
-
-  async function handleVerifyCode(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    const { error } = await supabase.auth.verifyOtp({
-      email: signupEmail,
-      token: signupCode,
-      type: 'email',
-    });
-    if (error) setError(error.message);
-    else setSignupStep('password');
-    setLoading(false);
-  }
-
-  // ── Sign-up step 3: set password ─────────────────────────────────────────
-
-  async function handleSetPassword(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    if (signupPassword !== signupConfirm) {
-      setError('Passwords do not match.');
-      return;
+    if (mode === 'signup') {
+      if (password !== confirm) { setError('Passwords do not match.'); return; }
+      if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     }
-    if (signupPassword.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
+
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password: signupPassword });
-    if (error) setError(error.message);
-    else router.replace('/');
+
+    if (mode === 'login') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) setError(error.message);
+      else router.replace('/');
+    } else {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) setError(error.message);
+      else router.replace('/');
+    }
+
     setLoading(false);
   }
-
-  // ── Google ───────────────────────────────────────────────────────────────
 
   async function handleGoogle() {
     setError('');
@@ -123,14 +61,6 @@ export default function AuthPage() {
     });
     if (error) setError(error.message);
   }
-
-  // ── Step label ───────────────────────────────────────────────────────────
-
-  const stepLabel: Record<SignupStep, string> = {
-    email: 'Enter your email',
-    code: 'Check your inbox',
-    password: 'Set your password',
-  };
 
   return (
     <div className="min-h-screen bg-[#f8f7f4] flex items-center justify-center px-4">
@@ -158,157 +88,51 @@ export default function AuthPage() {
             ))}
           </div>
 
-          {/* ── Login form ── */}
-          {mode === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-3">
-              <input
-                type="email"
-                required
-                value={loginEmail}
-                onChange={e => setLoginEmail(e.target.value)}
-                placeholder="Email"
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
-              />
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email"
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+            />
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder={mode === 'signup' ? 'Password (min 6 characters)' : 'Password'}
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
+            />
+            {mode === 'signup' && (
               <input
                 type="password"
                 required
-                value={loginPassword}
-                onChange={e => setLoginPassword(e.target.value)}
-                placeholder="Password"
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
+                placeholder="Confirm password"
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
               />
-              {error && <p className="text-red-600 text-sm">{error}</p>}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
-              >
-                {loading ? 'Signing in…' : 'Sign in'}
-              </button>
-            </form>
-          )}
+            )}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
+            >
+              {loading
+                ? mode === 'login' ? 'Signing in…' : 'Creating account…'
+                : mode === 'login' ? 'Sign in' : 'Create account'}
+            </button>
+          </form>
 
-          {/* ── Sign-up flow ── */}
-          {mode === 'signup' && (
-            <div className="space-y-4">
-              {/* step indicator */}
-              <div className="flex items-center gap-2">
-                {(['email', 'code', 'password'] as SignupStep[]).map((s, i) => (
-                  <div key={s} className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      signupStep === s
-                        ? 'bg-red-600 text-white'
-                        : ['email', 'code', 'password'].indexOf(signupStep) > i
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-200 text-gray-400'
-                    }`}>
-                      {['email', 'code', 'password'].indexOf(signupStep) > i ? '✓' : i + 1}
-                    </div>
-                    {i < 2 && <div className="flex-1 h-px bg-gray-200 w-6" />}
-                  </div>
-                ))}
-                <span className="text-xs text-gray-500 ml-1">{stepLabel[signupStep]}</span>
-              </div>
-
-              {/* Step 1: email */}
-              {signupStep === 'email' && (
-                <form onSubmit={handleSendCode} className="space-y-3">
-                  <input
-                    type="email"
-                    required
-                    value={signupEmail}
-                    onChange={e => setSignupEmail(e.target.value)}
-                    placeholder="Email"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
-                  />
-                  {error && <p className="text-red-600 text-sm">{error}</p>}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
-                  >
-                    {loading ? 'Sending…' : 'Send code'}
-                  </button>
-                </form>
-              )}
-
-              {/* Step 2: OTP code */}
-              {signupStep === 'code' && (
-                <form onSubmit={handleVerifyCode} className="space-y-3">
-                  <p className="text-sm text-gray-500">
-                    We sent a 6-digit code to <span className="font-medium text-gray-700">{signupEmail}</span>.
-                  </p>
-                  <input
-                    ref={codeRef}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]{6}"
-                    maxLength={6}
-                    required
-                    value={signupCode}
-                    onChange={e => setSignupCode(e.target.value.replace(/\D/g, ''))}
-                    placeholder="000000"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-center tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
-                  />
-                  {error && <p className="text-red-600 text-sm">{error}</p>}
-                  <button
-                    type="submit"
-                    disabled={loading || signupCode.length !== 6}
-                    className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
-                  >
-                    {loading ? 'Verifying…' : 'Verify code'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSignupStep('email')}
-                    className="w-full text-xs text-gray-400 hover:text-gray-600"
-                  >
-                    Wrong email? Go back
-                  </button>
-                </form>
-              )}
-
-              {/* Step 3: set password */}
-              {signupStep === 'password' && (
-                <form onSubmit={handleSetPassword} className="space-y-3">
-                  <p className="text-sm text-gray-500">Email verified! Now set a password for your account.</p>
-                  <input
-                    type="password"
-                    required
-                    value={signupPassword}
-                    onChange={e => setSignupPassword(e.target.value)}
-                    placeholder="Password (min 6 characters)"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
-                  />
-                  <input
-                    type="password"
-                    required
-                    value={signupConfirm}
-                    onChange={e => setSignupConfirm(e.target.value)}
-                    placeholder="Confirm password"
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent"
-                  />
-                  {error && <p className="text-red-600 text-sm">{error}</p>}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
-                  >
-                    {loading ? 'Creating account…' : 'Create account'}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-
-          {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-gray-200" />
             <span className="text-xs text-gray-400">or</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
-          {/* Google */}
           <button
             onClick={handleGoogle}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
