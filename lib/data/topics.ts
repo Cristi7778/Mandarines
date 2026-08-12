@@ -312,17 +312,17 @@ const TOPICS: Topic[] = [
 
   // ─── Station: HSK 1 ───────────────────────────────────────────────────────
   {
-    id: 'topic-16', name: 'Full HSK 1 vocabulary review', category: 'review',
+    id: 'topic-16', name: 'Basic sentence patterns (SVO, 吗-questions)', category: 'grammar',
     station: 'HSK 1', sequenceOrder: 17, items: [],
-    description: 'Systematic drill of all ~150 HSK 1 words.',
-  },
-  {
-    id: 'topic-17', name: 'Basic sentence patterns (SVO, 吗-questions)', category: 'grammar',
-    station: 'HSK 1', sequenceOrder: 18, items: [],
     description: 'SVO word order, 是-sentences, 吗-questions, and 不 negation.',
   },
   {
-    id: 'topic-18', name: 'First full timed mock test', category: 'exam',
+    id: 'topic-17', name: 'Full HSK 1 vocabulary review', category: 'review',
+    station: 'HSK 1', sequenceOrder: 18, items: [],
+    description: 'Systematic drill of all ~150 HSK 1 words.',
+  },
+  {
+    id: 'topic-18', name: 'Practice timed test', category: 'exam',
     station: 'HSK 1', sequenceOrder: 19, items: [],
     description: 'Timed practice exam covering all HSK 1 content.',
   },

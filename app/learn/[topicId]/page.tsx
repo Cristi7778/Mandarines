@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useRef, useState } from 'react';
+import { use, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getTopicById } from '@/lib/data/topics';
@@ -91,6 +91,12 @@ function ExplanationStep({
   items: Item[];
   onComplete: () => void;
 }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') onComplete(); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onComplete]);
+
   return (
     <div className="space-y-4">
       <p className="text-base text-gray-500">Read through each word, then continue when ready.</p>
@@ -294,6 +300,12 @@ function StepResultScreen({
   onNext: () => void;
   onRetry: () => void;
 }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') onNext(); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onNext]);
+
   const pct = Math.round((score / total) * 100);
   return (
     <div className="space-y-4 text-center">
@@ -332,6 +344,12 @@ function StepResultScreen({
 // ─── Coming soon placeholder ─────────────────────────────────────────────────
 
 function ComingSoonStep({ step, label, onSkip }: { step: number; label: string; onSkip: () => void }) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') onSkip(); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onSkip]);
+
   return (
     <div className="text-center py-12 space-y-4">
       <div className="text-5xl">{step === 4 ? '🎙️' : '✏️'}</div>
@@ -347,6 +365,178 @@ function ComingSoonStep({ step, label, onSkip }: { step: number; label: string; 
       >
         Skip for now →
       </button>
+    </div>
+  );
+}
+
+// ─── Step 5: Stroke-order writing (hanzi-writer) ─────────────────────────────
+
+function WriterCanvas({
+  char,
+  phase,
+  onQuizDone,
+}: {
+  char: string;
+  phase: 'watch' | 'quiz';
+  onQuizDone: (mistakes: number) => void;
+}) {
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!divRef.current) return;
+    let cancelled = false;
+
+    import('hanzi-writer').then(({ default: HanziWriter }) => {
+      if (cancelled || !divRef.current) return;
+      const writer = (HanziWriter as any).create(divRef.current, char, {
+        width: 220,
+        height: 220,
+        padding: 5,
+        showOutline: true,
+        strokeColor: '#ea580c',
+        outlineColor: '#d1d5db',
+        drawingColor: '#1f2937',
+        strokeAnimationSpeed: 1,
+        delayBetweenStrokes: 300,
+        charDataLoader: (c: string, onLoad: (d: unknown) => void) => {
+          fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/${c}.json`)
+            .then(r => r.json())
+            .then(onLoad)
+            .catch(() => onLoad(null));
+        },
+      });
+
+      if (phase === 'watch') {
+        writer.animateCharacter();
+      } else {
+        writer.quiz({
+          leniency: 1,
+          onComplete: (summary: { totalMistakes: number }) => {
+            if (!cancelled) onQuizDone(summary.totalMistakes);
+          },
+        });
+      }
+    });
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return <div ref={divRef} style={{ width: 220, height: 220 }} />;
+}
+
+function HanziWriterStep({
+  items,
+  onComplete,
+}: {
+  items: Item[];
+  onComplete: (score: number, total: number) => void;
+}) {
+  const chars = useMemo(() =>
+    items.flatMap(item =>
+      [...item.chineseChar].map((c, ci) => ({
+        char: c,
+        word: item.chineseChar,
+        pinyin: item.pinyin,
+        meaning: item.englishMeaning,
+        isFirst: ci === 0,
+      }))
+    ), [items]);
+
+  const total = chars.length;
+  const [idx, setIdx] = useState(0);
+  const [phase, setPhase] = useState<'watch' | 'quiz' | 'result'>('watch');
+  const [currentMistakes, setCurrentMistakes] = useState(0);
+  const scoreRef = useRef(0);
+
+  const current = chars[idx];
+
+  function handleQuizDone(mistakes: number) {
+    setCurrentMistakes(mistakes);
+    if (mistakes < 3) scoreRef.current += 1;
+    setPhase('result');
+  }
+
+  function handleNext() {
+    if (idx + 1 >= total) {
+      onComplete(scoreRef.current, total);
+    } else {
+      setIdx(i => i + 1);
+      setPhase('watch');
+      setCurrentMistakes(0);
+    }
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === 'Enter' && phase === 'result') handleNext(); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [phase, idx]);
+
+  if (!current) return null;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="flex-1 bg-gray-200 rounded-full h-2">
+          <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${(idx / total) * 100}%` }} />
+        </div>
+        <span className="text-xs text-gray-500 shrink-0">{idx + 1}/{total}</span>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 p-4 text-center space-y-1">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{current.meaning}</p>
+        <p className="text-3xl chinese-text font-bold text-gray-800">{current.word}</p>
+        <p className="text-base text-orange-500">{current.pinyin}</p>
+      </div>
+
+      <div className="flex justify-center">
+        <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden">
+          <WriterCanvas
+            key={`${idx}-${phase === 'quiz' ? 'quiz' : 'watch'}`}
+            char={current.char}
+            phase={phase === 'quiz' ? 'quiz' : 'watch'}
+            onQuizDone={handleQuizDone}
+          />
+        </div>
+      </div>
+
+      {phase === 'watch' && (
+        <div className="space-y-2">
+          <p className="text-center text-sm text-gray-500">Watch the stroke order, then try it yourself</p>
+          <button
+            onClick={() => setPhase('quiz')}
+            className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 text-base"
+          >
+            Try it yourself →
+          </button>
+        </div>
+      )}
+      {phase === 'quiz' && (
+        <div className="text-center space-y-1">
+          <p className="text-sm text-gray-500">Draw each stroke in the correct order</p>
+          <p className="text-xs text-gray-400">Follow the grey outline</p>
+        </div>
+      )}
+      {phase === 'result' && (
+        <div className="space-y-3">
+          <div className={`rounded-xl p-4 text-center ${currentMistakes < 3 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'}`}>
+            <p className={`font-semibold text-lg ${currentMistakes < 3 ? 'text-green-700' : 'text-amber-700'}`}>
+              {currentMistakes === 0
+                ? '✅ Perfect!'
+                : currentMistakes < 3
+                ? `👍 ${currentMistakes} mistake${currentMistakes !== 1 ? 's' : ''}`
+                : `💪 ${currentMistakes} mistakes — keep practicing`}
+            </p>
+          </div>
+          <button
+            onClick={handleNext}
+            className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
+          >
+            {idx + 1 >= total ? 'Finish' : 'Next →'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -504,6 +694,20 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     setStep(s => Math.min(s + 1, 6));
   }
 
+  async function handleWritingComplete(score: number, total: number) {
+    if (!progress) return;
+    const xp = xpForStep(5, score, total);
+    const autoComplete = score === total;
+    const alreadyComplete = !!progress.step5Complete;
+    if (!alreadyComplete) await awardXp(xp);
+    if (autoComplete) {
+      const updated = markStepComplete(5, progress);
+      await saveTopicProgress(updated);
+      setProgress(updated);
+    }
+    setStepResult({ score, total, xpEarned: xp, autoComplete });
+  }
+
   const xpInfo = userProgress ? xpToNextLevel(userProgress.totalXp) : null;
 
   return (
@@ -625,7 +829,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                 <ComingSoonStep step={4} label="Speaking Practice" onSkip={handleSkipComingSoon} />
               )}
               {step === 5 && (
-                <ComingSoonStep step={5} label="Writing Practice" onSkip={handleSkipComingSoon} />
+                <HanziWriterStep items={topic.items} onComplete={handleWritingComplete} />
               )}
               {step === 6 && (
                 <div className="space-y-4">
