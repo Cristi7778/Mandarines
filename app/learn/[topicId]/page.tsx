@@ -16,6 +16,7 @@ import {
 import { addXp, updateStreak, xpForStep, xpToNextLevel } from '@/lib/xp';
 import { useUser } from '@/hooks/useUser';
 import type { DrillQuestion, DrillResult, Item, TopicProgress, UserProgress } from '@/lib/types';
+import { loadModel, recognizeChar } from '@/lib/char-recognition';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -556,6 +557,234 @@ function HanziWriterStep({
   );
 }
 
+// ─── Step 6: Writing Practice ────────────────────────────────────────────────
+
+function WritingStep({
+  items,
+  onComplete,
+}: {
+  items: Item[];
+  onComplete: (score: number, total: number) => void;
+}) {
+  // Prefer single-char items for clean prompts; fall back to first char of multi-char.
+  const sampleItems = useMemo(() => {
+    const single = items.filter(it => it.chineseChar.length === 1);
+    const pool = single.length >= 4 ? single : items;
+    return [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(4, pool.length));
+  }, [items]);
+
+  const [idx, setIdx] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [correct, setCorrect] = useState(false);
+  const [predicted, setPredicted] = useState<string | null>(null);
+  const [usedTemplate, setUsedTemplate] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [modelReady, setModelReady] = useState(false);
+  const scoreRef = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isDrawingRef = useRef(false);
+
+  const total = sampleItems.length;
+  const item = sampleItems[idx]!;
+  const expectedChar = item.chineseChar[0]!;
+
+  useEffect(() => {
+    loadModel().then(ok => setModelReady(ok));
+  }, []);
+
+  // Set up drawing events once on mount
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    ctx.strokeStyle = '#1f2937';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    function pos(e: MouseEvent | TouchEvent) {
+      // canvas is non-null here (guarded above), but TS widens inside closures
+      const el = canvas!;
+      const r = el.getBoundingClientRect();
+      const sx = el.width / r.width;
+      const sy = el.height / r.height;
+      if ('touches' in e && e.touches.length > 0) {
+        const t = e.touches[0]!;
+        return { x: (t.clientX - r.left) * sx, y: (t.clientY - r.top) * sy };
+      }
+      const me = e as MouseEvent;
+      return { x: (me.clientX - r.left) * sx, y: (me.clientY - r.top) * sy };
+    }
+    function down(e: MouseEvent | TouchEvent) {
+      isDrawingRef.current = true;
+      const p = pos(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    }
+    function move(e: MouseEvent | TouchEvent) {
+      if (!isDrawingRef.current) return;
+      const p = pos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      e.preventDefault();
+    }
+    function up() { isDrawingRef.current = false; }
+
+    canvas.addEventListener('mousedown', down);
+    canvas.addEventListener('mousemove', move);
+    canvas.addEventListener('mouseup', up);
+    canvas.addEventListener('mouseleave', up);
+    canvas.addEventListener('touchstart', down, { passive: false });
+    canvas.addEventListener('touchmove', move, { passive: false });
+    canvas.addEventListener('touchend', up);
+    return () => {
+      canvas.removeEventListener('mousedown', down);
+      canvas.removeEventListener('mousemove', move);
+      canvas.removeEventListener('mouseup', up);
+      canvas.removeEventListener('mouseleave', up);
+      canvas.removeEventListener('touchstart', down);
+      canvas.removeEventListener('touchmove', move);
+      canvas.removeEventListener('touchend', up);
+    };
+  }, []);
+
+  // Clear canvas and reset state on new question
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    setSubmitted(false);
+    setCorrect(false);
+    setPredicted(null);
+  }, [idx]);
+
+  function clearCanvas() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  async function handleSubmit() {
+    const canvas = canvasRef.current;
+    if (!canvas || loading) return;
+    setLoading(true);
+    const result = await recognizeChar(canvas, expectedChar);
+    setCorrect(result.correct);
+    setPredicted(result.predicted);
+    setUsedTemplate(result.method === 'template');
+    if (result.correct) scoreRef.current += 1;
+    setSubmitted(true);
+    setLoading(false);
+  }
+
+  function handleNext() {
+    if (idx + 1 >= total) onComplete(scoreRef.current, total);
+    else setIdx(i => i + 1);
+  }
+
+  // Enter: advance after submission
+  const skipRef = useRef(false);
+  useEffect(() => {
+    if (!submitted) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Enter') return;
+      if (skipRef.current) { skipRef.current = false; return; }
+      handleNext();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [submitted, idx]);
+
+  const multiChar = item.chineseChar.length > 1;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="flex-1 bg-gray-200 rounded-full h-2">
+          <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${(idx / total) * 100}%` }} />
+        </div>
+        <span className="text-xs text-gray-500 shrink-0">{idx + 1} / {total}</span>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 p-4 text-center space-y-1">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          {multiChar ? 'Write the first character of' : 'Write the character for'}
+        </p>
+        <p className="text-xl font-semibold text-gray-800">{item.englishMeaning}</p>
+        <p className="text-lg text-orange-500">{item.pinyin}</p>
+      </div>
+
+      <div className="flex justify-center">
+        <div className={`rounded-2xl border-2 ${submitted ? 'border-gray-200 opacity-70' : 'border-dashed border-gray-300'} overflow-hidden bg-white`}>
+          <canvas
+            ref={canvasRef}
+            width={280}
+            height={280}
+            className="touch-none block"
+          />
+        </div>
+      </div>
+
+      {!submitted ? (
+        <div className="flex gap-3">
+          <button
+            onClick={clearCanvas}
+            className="flex-1 border border-gray-300 text-gray-700 font-semibold py-4 rounded-xl hover:bg-gray-50 text-base"
+          >
+            Clear
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="flex-1 bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 text-base"
+          >
+            {loading ? 'Checking…' : 'Submit'}
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <div className={`rounded-xl p-4 ${correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">{correct ? '✅' : '❌'}</span>
+              <span className={`font-semibold ${correct ? 'text-green-700' : 'text-red-700'}`}>
+                {correct ? 'Correct!' : 'Not quite'}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600">
+              Expected:{' '}
+              <span className="text-3xl chinese-text font-bold text-gray-800">{expectedChar}</span>
+              {!correct && predicted && predicted !== expectedChar && (
+                <span className="ml-3">
+                  Recognized:{' '}
+                  <span className="text-3xl chinese-text font-bold text-red-600">{predicted}</span>
+                </span>
+              )}
+            </p>
+            {usedTemplate && !modelReady && (
+              <p className="text-xs text-gray-400 mt-1">
+                Visual matching used — place a model in public/models/ for AI recognition
+              </p>
+            )}
+          </div>
+          <button
+            onClick={handleNext}
+            className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
+          >
+            {idx + 1 >= total ? 'Finish' : 'Next →'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Step 7: Mixed Practice ──────────────────────────────────────────────────
 
 type MixedQ =
@@ -981,6 +1210,20 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     setStepResult({ score, total, xpEarned: xp, autoComplete });
   }
 
+  async function handleStep6Complete(score: number, total: number) {
+    if (!progress) return;
+    const xp = xpForStep(6, score, total);
+    const autoComplete = score === total;
+    const alreadyComplete = !!progress.step6Complete;
+    if (!alreadyComplete) await awardXp(xp);
+    if (autoComplete) {
+      const updated = markStepComplete(6, progress);
+      await saveTopicProgress(updated);
+      setProgress(updated);
+    }
+    setStepResult({ score, total, xpEarned: xp, autoComplete });
+  }
+
   async function handleMixedComplete(score: number, total: number) {
     if (!progress) return;
     const xp = xpForStep(7, score, total);
@@ -1130,7 +1373,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                 <HanziWriterStep items={topic.items} onComplete={handleWritingComplete} />
               )}
               {step === 6 && (
-                <ComingSoonStep step={6} label="Writing Practice" onSkip={handleSkipComingSoon} />
+                <WritingStep items={topic.items} onComplete={handleStep6Complete} />
               )}
               {step === 7 && (
                 <MixedPracticeStep items={topic.items} onComplete={handleMixedComplete} />
