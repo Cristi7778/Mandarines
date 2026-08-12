@@ -36,7 +36,7 @@ function buildDrillQuestions(items: Item[], types: Array<'pinyin-from-english' |
 
 // ─── Step nav ───────────────────────────────────────────────────────────────
 
-const STEP_LABELS = ['Teach', 'Pinyin', 'Chars', 'Speak', 'Write', 'Mixed'];
+const STEP_LABELS = ['Teach', 'Pinyin', 'Chars', 'Speak', 'Stroke', 'Mixed', 'Writing'];
 
 function StepNav({
   current,
@@ -49,7 +49,7 @@ function StepNav({
 }) {
   const dones = [
     progress.step1Complete, progress.step2Complete, progress.step3Complete,
-    progress.step4Complete, progress.step5Complete, progress.step6Complete,
+    progress.step4Complete, progress.step5Complete, progress.step6Complete, progress.step7Complete,
   ];
   return (
     <div className="flex items-center justify-between px-1">
@@ -564,7 +564,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
       const p = await getTopicProgress(topicId);
       setProgress(p);
       setUserProgress(await getUserProgress());
-      const steps = [p.step1Complete, p.step2Complete, p.step3Complete, p.step4Complete, p.step5Complete, p.step6Complete];
+      const steps = [p.step1Complete, p.step2Complete, p.step3Complete, p.step4Complete, p.step5Complete, p.step6Complete, p.step7Complete];
       const firstIncomplete = steps.findIndex(s => !s);
       if (firstIncomplete !== -1) setStep(firstIncomplete + 1);
     }
@@ -598,6 +598,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     if (s === 4) updated.step4Complete = true;
     if (s === 5) updated.step5Complete = true;
     if (s === 6) updated.step6Complete = true;
+    if (s === 7) updated.step7Complete = true;
     return updated;
   }
 
@@ -678,7 +679,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
 
   function handleNextStep() {
     setStepResult(null);
-    setStep(s => Math.min(s + 1, 6));
+    setStep(s => Math.min(s + 1, 7));
   }
 
   function handleRetry() {
@@ -691,7 +692,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     const updated = markStepComplete(step, progress);
     await saveTopicProgress(updated);
     setProgress(updated);
-    setStep(s => Math.min(s + 1, 6));
+    setStep(s => Math.min(s + 1, 7));
   }
 
   async function handleWritingComplete(score: number, total: number) {
@@ -836,12 +837,12 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800">Step 6: Mixed Practice</h2>
                     <p className="text-sm text-gray-500 mt-1">
-                      Both pinyin and character questions, mixed together. 100% = topic complete!
+                      Both pinyin and character questions, mixed together.
                     </p>
                   </div>
                   {progress?.step6Complete && (
                     <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2 text-green-700 text-sm font-medium">
-                      ✓ Topic complete! Great work.
+                      ✓ Step complete — review or move to writing
                     </div>
                   )}
                   <button
@@ -851,11 +852,14 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                     {progress?.step6Complete ? 'Practice again' : 'Start mixed drill'} ({topic.items.length * 2} questions)
                   </button>
                   {progress?.step6Complete && (
-                    <Link href="/" className="block text-center text-sm text-gray-500 underline mt-2">
-                      Back to journey map
-                    </Link>
+                    <button onClick={handleNextStep} className="w-full border border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50">
+                      Next Step →
+                    </button>
                   )}
                 </div>
+              )}
+              {step === 7 && (
+                <ComingSoonStep step={7} label="Writing Practice" onSkip={handleSkipComingSoon} />
               )}
             </>
           )}

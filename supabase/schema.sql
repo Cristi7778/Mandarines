@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS topic_progress (
   step4_complete boolean NOT NULL DEFAULT false,
   step5_complete boolean NOT NULL DEFAULT false,
   step6_complete boolean NOT NULL DEFAULT false,
+  step7_complete boolean NOT NULL DEFAULT false,
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, topic_id)
 );

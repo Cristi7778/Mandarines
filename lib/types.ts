@@ -33,6 +33,7 @@ export interface TopicProgress {
   step4Complete: boolean;
   step5Complete: boolean;
   step6Complete: boolean;
+  step7Complete: boolean;
 }
 
 export interface ItemProgress {

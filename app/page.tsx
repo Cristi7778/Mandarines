@@ -37,14 +37,14 @@ const STATION_BORDER: Record<string, string> = {
 function stepsComplete(p: TopicProgress): number {
   return [
     p.step1Complete, p.step2Complete, p.step3Complete,
-    p.step4Complete, p.step5Complete, p.step6Complete,
+    p.step4Complete, p.step5Complete, p.step6Complete, p.step7Complete,
   ].filter(Boolean).length;
 }
 
 function StepDots({ progress }: { progress: TopicProgress }) {
   const steps = [
     progress.step1Complete, progress.step2Complete, progress.step3Complete,
-    progress.step4Complete, progress.step5Complete, progress.step6Complete,
+    progress.step4Complete, progress.step5Complete, progress.step6Complete, progress.step7Complete,
   ];
   return (
     <div className="flex gap-1 mt-1">
@@ -141,7 +141,7 @@ export default function HomePage() {
           const topics = byStation[station];
           const completedCount = topics.filter(t => {
             const p = topicProgress[t.id];
-            return p && stepsComplete(p) === 6;
+            return p && stepsComplete(p) === 7;
           }).length;
 
           return (
@@ -157,7 +157,7 @@ export default function HomePage() {
                   const p = topicProgress[topic.id];
                   const done = p ? stepsComplete(p) : 0;
                   const hasItems = topic.items.length > 0;
-                  const isComplete = done === 6;
+                  const isComplete = done === 7;
                   const inProgress = done > 0 && done < 6;
 
                   return (
