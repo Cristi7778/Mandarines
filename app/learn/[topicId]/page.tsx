@@ -120,7 +120,7 @@ function ExplanationStep({
         onClick={onComplete}
         className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 transition-colors text-base"
       >
-        I've read this — Continue
+        Continue
       </button>
     </div>
   );
@@ -510,17 +510,18 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
       {/* header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Link href="/" className="text-gray-500 hover:text-gray-700 text-base font-medium shrink-0">
+        <div className="max-w-2xl mx-auto px-2 py-3 flex items-center gap-4">
+          <Link href="/" className="text-gray-600 hover:text-gray-800 text-lg font-semibold shrink-0 pl-1">
             ← Home
           </Link>
-          <h1 className="font-semibold text-gray-800 text-base truncate flex-1">{topic.name}</h1>
+          <h1 className="font-bold text-gray-800 text-xl truncate flex-1">{topic.name}</h1>
           {userProgress && xpInfo && (
-            <div className="flex items-center gap-2 text-sm shrink-0">
-              <span className="text-amber-600 font-semibold">Lv {userProgress.level}</span>
-              <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                <div className="bg-amber-400 h-1.5 rounded-full" style={{ width: `${xpInfo.percent}%` }} />
+            <div className="flex items-center gap-2 text-base shrink-0">
+              <span className="text-amber-600 font-bold">Lv {userProgress.level}</span>
+              <div className="w-20 bg-gray-200 rounded-full h-2">
+                <div className="bg-amber-400 h-2 rounded-full" style={{ width: `${xpInfo.percent}%` }} />
               </div>
+              <span className="text-gray-500 font-medium">{userProgress.totalXp} XP</span>
             </div>
           )}
         </div>

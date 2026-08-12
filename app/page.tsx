@@ -92,12 +92,12 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col bg-[#fcf0d7]">
       {/* Nav */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="w-full px-6 py-3 flex items-center gap-6">
-          <div className="flex items-center gap-2 shrink-0">
+        <div className="w-full px-6 py-3 grid grid-cols-3 items-center">
+          <div className="flex items-center gap-2">
             <span className="text-3xl">🍊</span>
             <span className="text-2xl font-bold text-gray-800">Mandarines</span>
           </div>
-          <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center justify-center gap-4">
             {userProgress && (
               <div className="flex items-center gap-2 text-base">
                 <span className="font-bold text-amber-600">Lv {userProgress.level}</span>
@@ -120,14 +120,14 @@ export default function HomePage() {
               Recap
             </Link>
           </div>
-          <div className="flex items-center gap-4 shrink-0 ml-auto">
-            <Link href="/settings" className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors font-medium text-sm">
-              <span className="text-base">⚙︎</span>
+          <div className="flex items-center gap-5 justify-end">
+            <Link href="/settings" className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors font-medium text-base">
+              <span className="text-lg">⚙︎</span>
               <span>Settings</span>
             </Link>
             <button
               onClick={handleLogout}
-              className="text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
+              className="text-base text-red-500 hover:text-red-700 font-medium transition-colors"
             >
               Sign out
             </button>
