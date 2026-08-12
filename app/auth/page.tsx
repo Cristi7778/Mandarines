@@ -46,8 +46,9 @@ export default function AuthPage() {
       if (error) setError(error.message);
       else router.replace('/');
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) setError(error.message);
+      else if (data.user && data.user.identities?.length === 0) setError('An account with this email already exists. Please sign in instead.');
       else setSignupDone(true);
     }
 

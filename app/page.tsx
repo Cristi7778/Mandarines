@@ -10,6 +10,14 @@ import { xpToNextLevel } from '@/lib/xp';
 import { useUser } from '@/hooks/useUser';
 import type { TopicProgress, UserProgress } from '@/lib/types';
 
+const STATION_EMOJI: Record<string, string> = {
+  Foundation: '',
+  'HSK 1':    '🍊',
+  'HSK 2':    '🍊🍊',
+  'HSK 3':    '🍊🍊🍊',
+  'HSK 4':    '🍊🍊🍊🍊',
+};
+
 const STATION_COLORS: Record<string, string> = {
   Foundation: 'bg-indigo-600',
   'HSK 1':    'bg-emerald-600',
@@ -133,7 +141,7 @@ export default function HomePage() {
           return (
             <section key={station}>
               <div className={`flex items-center justify-between px-4 py-2.5 rounded-t-xl text-white font-semibold ${STATION_COLORS[station]}`}>
-                <span>{station}</span>
+                <span>{station}{STATION_EMOJI[station] ? <span className="ml-2">{STATION_EMOJI[station]}</span> : null}</span>
                 <span className="text-xs font-normal opacity-80">
                   {completedCount}/{topics.length} complete
                 </span>
