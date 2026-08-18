@@ -37,7 +37,19 @@ function buildDrillQuestions(items: Item[], types: Array<'pinyin-from-english' |
 
 // ─── Step nav ───────────────────────────────────────────────────────────────
 
-const STEP_LABELS = ['Teach', 'Pinyin', 'Chars', 'Speak', 'Stroke', 'Writing', 'Mixed'];
+// Visual display order → DB step numbers.
+// step 8 = Listen (new); step 4 = Speak (ComingSoon); steps 1-3,5-7 unchanged.
+const STEP_SEQUENCE = [1, 2, 3, 8, 4, 5, 6, 7] as const;
+const STEP_LABELS   = ['Teach', 'Pinyin', 'Chars', 'Listen', 'Speak', 'Stroke', 'Writing', 'Mixed'];
+
+function speak(text: string) {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
 
 function StepNav({
   current,
@@ -48,20 +60,18 @@ function StepNav({
   progress: TopicProgress;
   onNavigate: (step: number) => void;
 }) {
-  const dones = [
-    progress.step1Complete, progress.step2Complete, progress.step3Complete,
-    progress.step4Complete, progress.step5Complete, progress.step6Complete, progress.step7Complete,
-  ];
   return (
     <div className="flex items-center justify-between px-1">
-      {STEP_LABELS.map((label, i) => {
-        const step = i + 1;
-        const done = dones[i];
+      {STEP_SEQUENCE.map((dbStep, i) => {
+        const label = STEP_LABELS[i]!;
+        const key = `step${dbStep}Complete` as keyof TopicProgress;
+        const done  = !!progress[key];
+        const step  = dbStep;
         const active = step === current;
         return (
           <button
-            key={step}
-            onClick={() => onNavigate(step)}
+            key={dbStep}
+            onClick={() => onNavigate(dbStep)}
             className="flex flex-col items-center gap-1 group"
           >
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors ${
@@ -73,7 +83,7 @@ function StepNav({
             }`}>
               {done ? '✓' : step}
             </div>
-            <span className={`text-sm ${active ? 'text-orange-500 font-medium' : 'text-gray-400'}`}>
+            <span className={`text-xs ${active ? 'text-orange-500 font-medium' : 'text-gray-400'}`}>
               {label}
             </span>
           </button>
@@ -104,7 +114,14 @@ function ExplanationStep({
       <div className="grid gap-3">
         {items.map(item => (
           <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-4 flex gap-4 items-center">
-            <div className="text-5xl font-bold chinese-text text-gray-900 leading-none shrink-0">{item.chineseChar}</div>
+            <div className="flex flex-col items-center gap-2 shrink-0">
+              <div className="text-5xl font-bold chinese-text text-gray-900 leading-none">{item.chineseChar}</div>
+              <button
+                onClick={() => speak(item.chineseChar)}
+                className="w-8 h-8 rounded-full bg-orange-50 hover:bg-orange-100 flex items-center justify-center text-base transition-colors"
+                title="Play pronunciation"
+              >🔊</button>
+            </div>
             <div className="min-w-0">
               <div className="text-lg font-medium text-orange-500">{item.pinyin}</div>
               <div className="text-base font-medium text-gray-800 mt-0.5">{item.englishMeaning}</div>
@@ -785,6 +802,145 @@ function WritingStep({
   );
 }
 
+// ─── Step 8 (visual 4): Listening ───────────────────────────────────────────
+
+function ListeningStep({
+  items,
+  onComplete,
+}: {
+  items: Item[];
+  onComplete: (score: number, total: number) => void;
+}) {
+  const questions = useMemo(() => {
+    return [...items].sort(() => Math.random() - 0.5).slice(0, 6);
+  }, [items]);
+
+  const [idx, setIdx]           = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const scoreRef = useRef(0);
+  const skipRef  = useRef(false);
+
+  const q     = questions[idx]!;
+  const total = questions.length;
+
+  // Build 5 options: correct + 4 distractors (unique meanings)
+  const options = useMemo(() => {
+    const correct     = q.englishMeaning;
+    const pool        = items.filter(i => i.id !== q.id && i.englishMeaning !== correct);
+    const distractors = [...pool].sort(() => Math.random() - 0.5).slice(0, 4).map(i => i.englishMeaning);
+    return [...distractors, correct].sort(() => Math.random() - 0.5);
+  }, [q, items]);
+
+  // Auto-play on new question
+  useEffect(() => {
+    speak(q.chineseChar);
+    return () => { window.speechSynthesis?.cancel(); };
+  }, [idx]);
+
+  // Reset per-question state
+  useEffect(() => {
+    setSelected(null);
+    setSubmitted(false);
+  }, [idx]);
+
+  // Enter to advance
+  useEffect(() => {
+    if (!submitted) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Enter') return;
+      if (skipRef.current) { skipRef.current = false; return; }
+      handleNext();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [submitted, idx]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleSelect(option: string) {
+    if (submitted) return;
+    skipRef.current = true;
+    setSelected(option);
+    setSubmitted(true);
+    if (option === q.englishMeaning) scoreRef.current++;
+  }
+
+  function handleNext() {
+    if (idx + 1 >= total) onComplete(scoreRef.current, total);
+    else setIdx(i => i + 1);
+  }
+
+  const isCorrect = selected === q.englishMeaning;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="flex-1 bg-gray-200 rounded-full h-2">
+          <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${(idx / total) * 100}%` }} />
+        </div>
+        <span className="text-xs text-gray-500 shrink-0">{idx + 1} / {total}</span>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 p-6 text-center space-y-3">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">What do you hear?</p>
+        <button
+          onClick={() => speak(q.chineseChar)}
+          className="mx-auto flex items-center justify-center w-20 h-20 rounded-full bg-orange-100 hover:bg-orange-200 transition-colors"
+        >
+          <span className="text-4xl">🔊</span>
+        </button>
+        <p className="text-xs text-gray-400">Tap to replay</p>
+      </div>
+
+      <div className="grid gap-2">
+        {options.map(option => {
+          const optCorrect  = option === q.englishMeaning;
+          const optSelected = option === selected;
+          let cls = 'w-full text-left px-5 py-4 rounded-xl border-2 font-medium text-base transition-colors ';
+          if (!submitted) {
+            cls += 'border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50';
+          } else if (optCorrect) {
+            cls += 'border-green-500 bg-green-50 text-green-800';
+          } else if (optSelected) {
+            cls += 'border-red-400 bg-red-50 text-red-700';
+          } else {
+            cls += 'border-gray-100 bg-gray-50 text-gray-400';
+          }
+          return (
+            <button key={option} onClick={() => handleSelect(option)} className={cls}>
+              {option}
+              {submitted && optCorrect  && <span className="float-right">✓</span>}
+              {submitted && optSelected && !optCorrect && <span className="float-right">✗</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {submitted && (
+        <div className="space-y-3">
+          <div className={`rounded-xl p-4 ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">{isCorrect ? '✅' : '❌'}</span>
+              <span className={`font-semibold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                {isCorrect ? 'Correct!' : 'Not quite'}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600">
+              <span className="chinese-text text-lg font-bold text-gray-800">{q.chineseChar}</span>
+              {' · '}{q.pinyin}{' · '}{q.englishMeaning}
+            </p>
+          </div>
+          <button
+            onClick={handleNext}
+            className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
+          >
+            {idx + 1 >= total ? 'Finish' : 'Next →'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Step 7: Mixed Practice ──────────────────────────────────────────────────
 
 type MixedQ =
@@ -1065,9 +1221,10 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
       const p = await getTopicProgress(topicId);
       setProgress(p);
       setUserProgress(await getUserProgress());
-      const steps = [p.step1Complete, p.step2Complete, p.step3Complete, p.step4Complete, p.step5Complete, p.step6Complete, p.step7Complete];
-      const firstIncomplete = steps.findIndex(s => !s);
-      if (firstIncomplete !== -1) setStep(firstIncomplete + 1);
+      const firstIncomplete = STEP_SEQUENCE.findIndex(
+        dbStep => !p[`step${dbStep}Complete` as keyof typeof p]
+      );
+      if (firstIncomplete !== -1) setStep(STEP_SEQUENCE[firstIncomplete]!);
     }
     load();
   }, [user, topicId, router]);
@@ -1100,7 +1257,13 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     if (s === 5) updated.step5Complete = true;
     if (s === 6) updated.step6Complete = true;
     if (s === 7) updated.step7Complete = true;
+    if (s === 8) updated.step8Complete = true;
     return updated;
+  }
+
+  function nextInSequence(current: number): number {
+    const idx = STEP_SEQUENCE.indexOf(current as typeof STEP_SEQUENCE[number]);
+    return STEP_SEQUENCE[idx + 1] ?? current;
   }
 
   async function awardXp(xp: number) {
@@ -1180,12 +1343,13 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
 
   function handleNextStep() {
     setStepResult(null);
-    setStep(s => Math.min(s + 1, 7));
+    setStep(s => nextInSequence(s));
   }
 
   function handleRetry() {
     setStepResult(null);
-    startDrill(step);
+    if (step === 2 || step === 3) startDrill(step);
+    // other steps re-render their own component on stepResult clear
   }
 
   async function handleSkipComingSoon() {
@@ -1193,7 +1357,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     const updated = markStepComplete(step, progress);
     await saveTopicProgress(updated);
     setProgress(updated);
-    setStep(s => Math.min(s + 1, 7));
+    setStep(s => nextInSequence(s));
   }
 
   async function handleWritingComplete(score: number, total: number) {
@@ -1218,6 +1382,20 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     if (!alreadyComplete) await awardXp(xp);
     if (autoComplete) {
       const updated = markStepComplete(6, progress);
+      await saveTopicProgress(updated);
+      setProgress(updated);
+    }
+    setStepResult({ score, total, xpEarned: xp, autoComplete });
+  }
+
+  async function handleListenComplete(score: number, total: number) {
+    if (!progress) return;
+    const xp = xpForStep(8, score, total);
+    const autoComplete = score === total;
+    const alreadyComplete = !!progress.step8Complete;
+    if (!alreadyComplete) await awardXp(xp);
+    if (autoComplete) {
+      const updated = markStepComplete(8, progress);
       await saveTopicProgress(updated);
       setProgress(updated);
     }
@@ -1365,6 +1543,9 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                     </button>
                   )}
                 </div>
+              )}
+              {step === 8 && (
+                <ListeningStep items={topic.items} onComplete={handleListenComplete} />
               )}
               {step === 4 && (
                 <ComingSoonStep step={4} label="Speaking Practice" onSkip={handleSkipComingSoon} />

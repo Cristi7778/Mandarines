@@ -57,6 +57,7 @@ export async function getTopicProgress(topicId: string): Promise<TopicProgress> 
       step5Complete: false,
       step6Complete: false,
       step7Complete: false,
+      step8Complete: false,
     };
   return {
     topicId: data.topic_id,
@@ -67,6 +68,7 @@ export async function getTopicProgress(topicId: string): Promise<TopicProgress> 
     step5Complete: data.step5_complete,
     step6Complete: data.step6_complete,
     step7Complete: data.step7_complete ?? false,
+    step8Complete: data.step8_complete ?? false,
   };
 }
 
@@ -84,6 +86,7 @@ export async function saveTopicProgress(p: TopicProgress): Promise<void> {
       step5_complete: p.step5Complete,
       step6_complete: p.step6Complete,
       step7_complete: p.step7Complete,
+      step8_complete: p.step8Complete,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id,topic_id' }
@@ -105,6 +108,7 @@ export async function getAllTopicProgress(): Promise<Record<string, TopicProgres
         step5Complete: row.step5_complete,
         step6Complete: row.step6_complete,
         step7Complete: row.step7_complete ?? false,
+        step8Complete: row.step8_complete ?? false,
       },
     ])
   );
