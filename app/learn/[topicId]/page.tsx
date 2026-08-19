@@ -372,28 +372,173 @@ function StepResultScreen({
 
 // ─── Coming soon placeholder ─────────────────────────────────────────────────
 
-function ComingSoonStep({ step, label, onSkip }: { step: number; label: string; onSkip: () => void }) {
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) { if (e.key === 'Enter') onSkip(); }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onSkip]);
+// ─── Step 4: Speaking practice ───────────────────────────────────────────────
+
+type SpeakResult = 'correct' | 'wrong-tone' | 'incorrect';
+
+function stripToneMarks(pinyin: string): string {
+  return pinyin
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[12345]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, '');
+}
+
+function SpeakingStep({ items, onComplete }: { items: Item[]; onComplete: (score: number, total: number) => void }) {
+  const SAMPLE = Math.min(4, items.length);
+  const [queue] = useState<Item[]>(() => {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy.slice(0, SAMPLE);
+  });
+  const [idx, setIdx] = useState(0);
+  const [listening, setListening] = useState(false);
+  const [result, setResult] = useState<SpeakResult | null>(null);
+  const [recognized, setRecognized] = useState('');
+  const scoreRef = useRef(0);
+  const [supported] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const w = window as unknown as Record<string, unknown>;
+    return !!(w.SpeechRecognition ?? w.webkitSpeechRecognition);
+  });
+
+  const item = queue[idx];
+
+  // Build base-pinyin lookup from all items so we can detect tone variants
+  const basePinyinMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const it of items) {
+      for (const ch of it.chineseChar) {
+        map[ch] = stripToneMarks(it.pinyin);
+      }
+    }
+    return map;
+  }, [items]);
+
+  function classify(text: string, expected: Item): SpeakResult {
+    const clean = text.replace(/\s/g, '');
+    if (clean === expected.chineseChar) return 'correct';
+    const expectedBase = stripToneMarks(expected.pinyin);
+    for (const ch of clean) {
+      if (basePinyinMap[ch] === expectedBase) return 'wrong-tone';
+    }
+    return 'incorrect';
+  }
+
+  function startListening() {
+    type SR = { lang: string; interimResults: boolean; maxAlternatives: number; onresult: ((e: { results: { length: number; [i: number]: { transcript: string }[] } }) => void) | null; onerror: (() => void) | null; onend: (() => void) | null; start(): void };
+    const w = window as unknown as Record<string, unknown>;
+    const SRClass = (w.SpeechRecognition ?? w.webkitSpeechRecognition) as (new () => SR) | undefined;
+    if (!SRClass) return;
+    const rec = new SRClass();
+    rec.lang = 'zh-CN';
+    rec.interimResults = false;
+    rec.maxAlternatives = 5;
+
+    setListening(true);
+    setResult(null);
+    setRecognized('');
+
+    rec.onresult = (e) => {
+      // Check all alternatives for a correct / wrong-tone match
+      let best: SpeakResult = 'incorrect';
+      let bestText = (e.results[0][0] as { transcript: string }).transcript;
+      for (let i = 0; i < e.results[0].length; i++) {
+        const txt = (e.results[0][i] as { transcript: string }).transcript;
+        const r = classify(txt, item);
+        if (r === 'correct') { best = 'correct'; bestText = txt; break; }
+        if (r === 'wrong-tone' && best === 'incorrect') { best = 'wrong-tone'; bestText = txt; }
+      }
+      setRecognized(bestText);
+      setResult(best);
+      if (best === 'correct') scoreRef.current += 1;
+      setListening(false);
+      // Play correct pronunciation
+      const u = new SpeechSynthesisUtterance(item.chineseChar);
+      u.lang = 'zh-CN'; u.rate = 0.85;
+      window.speechSynthesis.speak(u);
+    };
+
+    rec.onerror = () => { setListening(false); setResult('incorrect'); };
+    rec.onend   = () => { setListening(false); };
+    rec.start();
+  }
+
+  function handleNext() {
+    if (idx + 1 >= queue.length) {
+      onComplete(scoreRef.current, queue.length);
+    } else {
+      setIdx(i => i + 1);
+      setResult(null);
+      setRecognized('');
+    }
+  }
+
+  if (!supported) {
+    return (
+      <div className="text-center py-12 space-y-4">
+        <div className="text-5xl">🎙️</div>
+        <p className="text-gray-500 text-sm max-w-xs mx-auto">
+          Speech recognition is not supported in this browser. Try Chrome or Edge.
+        </p>
+      </div>
+    );
+  }
+
+  const resultConfig = {
+    correct:    { color: 'text-green-600',  bg: 'bg-green-50',  border: 'border-green-200', icon: '✅', label: 'Correct!' },
+    'wrong-tone': { color: 'text-amber-600', bg: 'bg-amber-50',  border: 'border-amber-200', icon: '🎵', label: 'Right word, check your tone' },
+    incorrect:  { color: 'text-red-600',    bg: 'bg-red-50',    border: 'border-red-200',   icon: '❌', label: 'Incorrect' },
+  };
 
   return (
-    <div className="text-center py-12 space-y-4">
-      <div className="text-5xl">{step === 4 ? '🎙️' : '✏️'}</div>
-      <p className="text-xl font-semibold text-gray-800">Step {step}: {label}</p>
-      <p className="text-gray-500 text-sm max-w-xs mx-auto">
-        {step === 4
-          ? 'Speaking practice with pronunciation scoring is coming in a future update.'
-          : 'Character writing and stroke-order practice is coming in a future update.'}
+    <div className="space-y-6">
+      <p className="text-sm text-gray-500 text-center">
+        {idx + 1} / {queue.length} — Say the Chinese word aloud
       </p>
-      <button
-        onClick={onSkip}
-        className="bg-gray-100 text-gray-700 font-semibold px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors"
-      >
-        Skip for now →
-      </button>
+
+      {/* Prompt card */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center space-y-2">
+        <p className="text-gray-500 text-sm uppercase tracking-wide">Say</p>
+        <p className="text-3xl font-bold text-gray-800">{item.englishMeaning}</p>
+        <p className="text-orange-500 text-lg">{item.pinyin}</p>
+      </div>
+
+      {/* Speak button / result */}
+      {!result ? (
+        <button
+          onClick={startListening}
+          disabled={listening}
+          className={`w-full py-4 rounded-2xl font-semibold text-lg transition-colors flex items-center justify-center gap-3 ${
+            listening
+              ? 'bg-orange-100 text-orange-600 cursor-not-allowed animate-pulse'
+              : 'bg-orange-500 text-white hover:bg-orange-600'
+          }`}
+        >
+          {listening ? '🎙️ Listening…' : '🎙️ Tap to speak'}
+        </button>
+      ) : (
+        <div className={`rounded-2xl border p-6 text-center space-y-3 ${resultConfig[result].bg} ${resultConfig[result].border}`}>
+          <p className={`text-5xl font-bold ${resultConfig[result].color}`}>{item.chineseChar}</p>
+          <p className={`font-semibold text-lg ${resultConfig[result].color}`}>
+            {resultConfig[result].icon} {resultConfig[result].label}
+          </p>
+          {recognized && recognized !== item.chineseChar && (
+            <p className="text-gray-500 text-sm">You said: <span className="font-medium text-gray-700">{recognized}</span></p>
+          )}
+          <p className="text-gray-600 text-sm">{item.pinyin} — {item.englishMeaning}</p>
+          <button
+            onClick={handleNext}
+            className="mt-2 bg-white border border-gray-300 text-gray-700 font-semibold px-8 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            {idx + 1 >= queue.length ? 'Finish' : 'Next →'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -1382,12 +1527,18 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     // other steps re-render their own component on stepResult clear
   }
 
-  async function handleSkipComingSoon() {
+  async function handleSpeakComplete(score: number, total: number) {
     if (!progress) return;
-    const updated = markStepComplete(step, progress);
-    await saveTopicProgress(updated);
-    setProgress(updated);
-    setStep(s => nextInSequence(s));
+    const xp = xpForStep(4, score, total);
+    const autoComplete = score === total;
+    const alreadyComplete = !!progress.step4Complete;
+    if (!alreadyComplete) await awardXp(xp);
+    if (autoComplete) {
+      const updated = markStepComplete(4, progress);
+      await saveTopicProgress(updated);
+      setProgress(updated);
+    }
+    setStepResult({ score, total, xpEarned: xp, autoComplete });
   }
 
   async function handleWritingComplete(score: number, total: number) {
@@ -1578,7 +1729,7 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
                 <ListeningStep items={topic.items} onComplete={handleListenComplete} />
               )}
               {step === 4 && (
-                <ComingSoonStep step={4} label="Speaking Practice" onSkip={handleSkipComingSoon} />
+                <SpeakingStep items={topic.items} onComplete={handleSpeakComplete} />
               )}
               {step === 5 && (
                 <HanziWriterStep items={topic.items} onComplete={handleWritingComplete} />
