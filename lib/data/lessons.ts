@@ -5,7 +5,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-1',
     name: 'Basic sentence patterns',
     station: 'HSK 1',
-    sequenceOrder: 17,
+    sequenceOrder: 18,
     description: 'SVO word order, 是-sentences, 吗-questions, and 不 negation.',
     xp: 30,
     sections: [
