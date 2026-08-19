@@ -3,7 +3,7 @@
 import { use, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getTopicById } from '@/lib/data/topics';
+import TOPICS, { getTopicById } from '@/lib/data/topics';
 import { comparePinyin, toToneMarks } from '@/lib/pinyin';
 import {
   getTopicProgress,
@@ -385,6 +385,19 @@ function stripToneMarks(pinyin: string): string {
     .replace(/\s+/g, '');
 }
 
+// Global char→basePinyin map built from all vocabulary topics so homophones
+// (e.g. 他/她/它 all "ta") resolve correctly even if only one is in the current topic.
+const GLOBAL_CHAR_PINYIN: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const t of TOPICS) {
+    if (!('items' in t)) continue;
+    for (const it of (t as { items: { chineseChar: string; pinyin: string }[] }).items) {
+      for (const ch of it.chineseChar) map[ch] = stripToneMarks(it.pinyin);
+    }
+  }
+  return map;
+})();
+
 function SpeakingStep({ items, onComplete }: { items: Item[]; onComplete: (score: number, total: number) => void }) {
   const SAMPLE = Math.min(4, items.length);
   const [queue] = useState<Item[]>(() => {
@@ -408,23 +421,12 @@ function SpeakingStep({ items, onComplete }: { items: Item[]; onComplete: (score
 
   const item = queue[idx];
 
-  // Build base-pinyin lookup from all items so we can detect tone variants
-  const basePinyinMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    for (const it of items) {
-      for (const ch of it.chineseChar) {
-        map[ch] = stripToneMarks(it.pinyin);
-      }
-    }
-    return map;
-  }, [items]);
-
   function classify(text: string, expected: Item): SpeakResult {
     const clean = text.replace(/[\s　-〿＀-￯。，！？、…]/g, '');
     if (clean === expected.chineseChar) return 'correct';
     const expectedBase = stripToneMarks(expected.pinyin);
     for (const ch of clean) {
-      if (basePinyinMap[ch] === expectedBase) return 'wrong-tone';
+      if (GLOBAL_CHAR_PINYIN[ch] === expectedBase) return 'wrong-tone';
     }
     return 'incorrect';
   }
