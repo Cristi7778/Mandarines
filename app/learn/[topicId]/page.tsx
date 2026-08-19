@@ -1463,13 +1463,13 @@ export default function LearnPage({ params }: { params: Promise<{ topicId: strin
     <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
       {/* header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-2 py-3 flex items-center gap-4">
-          <Link href="/" className="text-gray-600 hover:text-gray-800 text-lg font-semibold shrink-0 pl-1">
+        <div className="w-full px-6 py-3 grid grid-cols-3 items-center">
+          <Link href="/" className="text-gray-600 hover:text-gray-800 text-lg font-semibold">
             ← Home
           </Link>
-          <h1 className="font-bold text-gray-800 text-xl truncate flex-1">{topic.name}</h1>
+          <h1 className="font-bold text-gray-800 text-xl truncate text-center">{topic.name}</h1>
           {userProgress && xpInfo && (
-            <div className="flex items-center gap-2 text-base shrink-0">
+            <div className="flex items-center gap-2 text-base justify-end">
               <span className="text-amber-600 font-bold">Lv {userProgress.level}</span>
               <div className="w-20 bg-gray-200 rounded-full h-2">
                 <div className="bg-amber-400 h-2 rounded-full" style={{ width: `${xpInfo.percent}%` }} />
