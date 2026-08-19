@@ -674,20 +674,54 @@ const TOPICS: Topic[] = [
     station: 'HSK 4', sequenceOrder: 55, items: [],
   },
   {
+    id: 'topic-56', name: 'Vocabulary: society & culture', category: 'vocab',
+    station: 'HSK 4', sequenceOrder: 56,
+    description: 'Social, civic, and cultural vocabulary.',
+    items: [
+      it('t56i1',  'topic-56', '文化', 'wénhuà',   'culture',               '中国',       '很丰富。',           'Chinese culture is very rich.'),
+      it('t56i2',  'topic-56', '传统', 'chuántǒng','tradition; traditional', '这是中国的', '节日。',             'This is a traditional Chinese festival.'),
+      it('t56i3',  'topic-56', '社会', 'shèhuì',   'society',               '',           '在不断变化。',       'Society is constantly changing.'),
+      it('t56i4',  'topic-56', '政府', 'zhèngfǔ',  'government',            '',           '支持这个计划。',     'The government supports this plan.'),
+      it('t56i5',  'topic-56', '法律', 'fǎlǜ',     'law',                   '我们都要遵守','。',               'We all need to obey the law.'),
+      it('t56i6',  'topic-56', '公民', 'gōngmín',  'citizen',               '每个',       '都有权利。',         'Every citizen has rights.'),
+      it('t56i7',  'topic-56', '权利', 'quánlì',   'right; rights',         '这是你的基本','。',               'This is your basic right.'),
+      it('t56i8',  'topic-56', '义务', 'yìwù',     'duty; obligation',      '保护环境是我们的','。',           'Protecting the environment is our duty.'),
+      it('t56i9',  'topic-56', '发展', 'fāzhǎn',   'development; to develop','经济',      '很快。',             'The economy is developing rapidly.'),
+      it('t56i10', 'topic-56', '影响', 'yǐngxiǎng','influence; to influence','这件事',    '了很多人。',         'This matter influenced many people.'),
+    ],
+  },
+  {
+    id: 'topic-57', name: 'Vocabulary: environment & nature', category: 'vocab',
+    station: 'HSK 4', sequenceOrder: 57,
+    description: 'Environmental and ecological vocabulary.',
+    items: [
+      it('t57i1',  'topic-57', '污染', 'wūrǎn',    'pollution; to pollute', '空气',       '越来越严重。',       'Air pollution is getting more and more serious.'),
+      it('t57i2',  'topic-57', '环保', 'huánbǎo',  'environmental protection; eco-friendly', '我们要注意', '。', 'We need to pay attention to environmental protection.'),
+      it('t57i3',  'topic-57', '气候', 'qìhòu',    'climate',               '',           '变化影响了很多地方。','Climate change has affected many places.'),
+      it('t57i4',  'topic-57', '能源', 'néngyuán', 'energy; energy resources','太阳能是一种清洁','。',         'Solar power is a clean energy source.'),
+      it('t57i5',  'topic-57', '资源', 'zīyuán',   'resources; natural resources','我们要节约','。',           'We need to conserve resources.'),
+      it('t57i6',  'topic-57', '保护', 'bǎohù',    'to protect; protection','我们应该',   '大自然。',           'We should protect nature.'),
+      it('t57i7',  'topic-57', '垃圾', 'lājī',     'garbage; trash',        '不要随地扔', '。',                 "Don't litter."),
+      it('t57i8',  'topic-57', '回收', 'huíshōu',  'to recycle; recycling', '请把塑料瓶', '。',                 'Please recycle the plastic bottles.'),
+      it('t57i9',  'topic-57', '自然', 'zìrán',    'nature; natural',       '大',         '非常美丽。',         'Nature is very beautiful.'),
+      it('t57i10', 'topic-57', '生态', 'shēngtài', 'ecology; ecosystem',    '保护',       '环境很重要。',       'Protecting the ecosystem is very important.'),
+    ],
+  },
+  {
     id: 'topic-52', name: 'Reading: short essays (100–200 characters)', category: 'reading',
-    station: 'HSK 4', sequenceOrder: 56, items: [],
-  },
-  {
-    id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
-    station: 'HSK 4', sequenceOrder: 57, items: [],
-  },
-  {
-    id: 'topic-54', name: 'Full timed mock HSK 4 exams', category: 'exam',
     station: 'HSK 4', sequenceOrder: 58, items: [],
   },
   {
-    id: 'topic-55', name: '★ Boss: HSK 4 exam', category: 'exam',
+    id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
     station: 'HSK 4', sequenceOrder: 59, items: [],
+  },
+  {
+    id: 'topic-54', name: 'Full timed mock HSK 4 exams', category: 'exam',
+    station: 'HSK 4', sequenceOrder: 60, items: [],
+  },
+  {
+    id: 'topic-55', name: '★ Boss: HSK 4 exam', category: 'exam',
+    station: 'HSK 4', sequenceOrder: 61, items: [],
   },
 ];
 
