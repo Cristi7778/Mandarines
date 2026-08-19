@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import TOPICS, { topicsByStation, STATIONS } from '@/lib/data/topics';
-import { getAllTopicProgress, getUserProgress } from '@/lib/db';
+import { lessonsByStation } from '@/lib/data/lessons';
+import { getAllTopicProgress, getAllLessonProgress, getUserProgress } from '@/lib/db';
 import { supabase } from '@/lib/supabase';
 import { xpToNextLevel } from '@/lib/xp';
 import { useUser } from '@/hooks/useUser';
-import type { TopicProgress, UserProgress } from '@/lib/types';
+import type { Lesson, TopicProgress, UserProgress } from '@/lib/types';
 
 const STATION_EMOJI: Record<string, string> = {
   Foundation: '',
@@ -60,12 +61,14 @@ export default function HomePage() {
   const user = useUser();
 
   const [topicProgress, setTopicProgress] = useState<Record<string, TopicProgress>>({});
+  const [lessonProgress, setLessonProgress] = useState<Record<string, boolean>>({});
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
 
   useEffect(() => {
     if (user === null) { router.replace('/auth'); return; }
     if (!user) return;
     getAllTopicProgress().then(setTopicProgress);
+    getAllLessonProgress().then(setLessonProgress);
     getUserProgress().then(setUserProgress);
   }, [user, router]);
 
@@ -75,6 +78,7 @@ export default function HomePage() {
   }
 
   const byStation = topicsByStation();
+  const lessonsByStationMap = lessonsByStation();
   const xpInfo = userProgress ? xpToNextLevel(userProgress.totalXp) : null;
 
   if (user === undefined || user === null) {
@@ -138,22 +142,67 @@ export default function HomePage() {
       {/* Journey */}
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-6">
         {STATIONS.map(station => {
-          const topics = byStation[station];
-          const completedCount = topics.filter(t => {
+          const topics = byStation[station] ?? [];
+          const lessons = lessonsByStationMap[station] ?? [];
+          const completedTopics = topics.filter(t => {
             const p = topicProgress[t.id];
             return p && stepsComplete(p) === 7;
           }).length;
+          const completedLessons = lessons.filter(l => lessonProgress[l.id]).length;
+          const totalItems = topics.length + lessons.length;
+          const completedItems = completedTopics + completedLessons;
+
+          type Row =
+            | { kind: 'topic'; seq: number; data: (typeof topics)[0] }
+            | { kind: 'lesson'; seq: number; data: Lesson };
+          const rows: Row[] = [
+            ...topics.map(t => ({ kind: 'topic' as const, seq: t.sequenceOrder, data: t })),
+            ...lessons.map(l => ({ kind: 'lesson' as const, seq: l.sequenceOrder, data: l })),
+          ].sort((a, b) => a.seq - b.seq);
 
           return (
             <section key={station}>
               <div className={`flex items-center justify-between px-4 py-3 rounded-t-xl text-white font-bold text-lg ${STATION_COLORS[station]}`}>
                 <span>{station}{STATION_EMOJI[station] ? <span className="ml-2">{STATION_EMOJI[station]}</span> : null}</span>
                 <span className="text-xs font-normal opacity-80">
-                  {completedCount}/{topics.length} complete
+                  {completedItems}/{totalItems} complete
                 </span>
               </div>
               <div className={`border rounded-b-xl overflow-hidden divide-y divide-gray-100 ${STATION_BORDER[station]}`}>
-                {topics.map(topic => {
+                {rows.map(row => {
+                  if (row.kind === 'lesson') {
+                    const lesson = row.data;
+                    const isComplete = !!lessonProgress[lesson.id];
+                    return (
+                      <div key={lesson.id} className="bg-white px-4 py-3 flex items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-gray-400 shrink-0">{lesson.sequenceOrder}.</span>
+                            <span className="text-base">📖</span>
+                            <span className={`font-medium text-base ${isComplete ? 'text-green-700' : 'text-gray-800'}`}>
+                              {lesson.name}
+                            </span>
+                            {isComplete && <span className="text-green-500 text-xs shrink-0">✓</span>}
+                          </div>
+                          {!isComplete && lesson.description && (
+                            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{lesson.description}</p>
+                          )}
+                        </div>
+                        <Link
+                          href={`/lesson/${lesson.id}`}
+                          className={`shrink-0 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors ${
+                            isComplete
+                              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {isComplete ? 'Review' : 'Read'}
+                        </Link>
+                      </div>
+                    );
+                  }
+
+                  const topic = row.data;
                   const p = topicProgress[topic.id];
                   const done = p ? stepsComplete(p) : 0;
                   const hasItems = topic.items.length > 0;

@@ -63,6 +63,27 @@ export interface DrillResult {
   correct: boolean;
 }
 
+export interface LessonSection {
+  title: string;
+  body: string;
+  examples?: { chinese: string; pinyin: string; english: string }[];
+}
+
+export interface Lesson {
+  id: string;
+  name: string;
+  station: string;
+  sequenceOrder: number;
+  description: string;
+  xp: number;
+  sections: LessonSection[];
+}
+
+export interface LessonProgress {
+  lessonId: string;
+  completed: boolean;
+}
+
 export interface PendingDrillMeta {
   topicId?: string;
   step?: number;

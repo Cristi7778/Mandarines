@@ -148,6 +148,23 @@ export async function saveItemProgress(p: ItemProgress): Promise<void> {
   );
 }
 
+// ─── LessonProgress ──────────────────────────────────────────────────────────
+
+export async function getAllLessonProgress(): Promise<Record<string, boolean>> {
+  const { data } = await supabase.from('lesson_progress').select('lesson_id');
+  if (!data) return {};
+  return Object.fromEntries(data.map(row => [row.lesson_id, true]));
+}
+
+export async function markLessonComplete(lessonId: string): Promise<void> {
+  const userId = await uid();
+  if (!userId) return;
+  await supabase.from('lesson_progress').upsert(
+    { user_id: userId, lesson_id: lessonId, completed_at: new Date().toISOString() },
+    { onConflict: 'user_id,lesson_id' }
+  );
+}
+
 // ─── Reset all progress ───────────────────────────────────────────────────────
 
 export async function resetAllProgress(): Promise<void> {
@@ -156,6 +173,7 @@ export async function resetAllProgress(): Promise<void> {
   await Promise.all([
     supabase.from('topic_progress').delete().eq('user_id', userId),
     supabase.from('item_progress').delete().eq('user_id', userId),
+    supabase.from('lesson_progress').delete().eq('user_id', userId),
     supabase.from('user_progress').upsert(
       { user_id: userId, total_xp: 0, level: 1, streak_count: 0, last_check_in: null, completed_topics: [], updated_at: new Date().toISOString() },
       { onConflict: 'user_id' }
