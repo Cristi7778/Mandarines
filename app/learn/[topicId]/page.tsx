@@ -592,9 +592,8 @@ function WritingStep({
 
   const [idx, setIdx] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [correct, setCorrect] = useState(false);
-  const [predicted, setPredicted] = useState<string | null>(null);
-  const [usedTemplate, setUsedTemplate] = useState(false);
+  const [correct, setCorrect] = useState<boolean | null>(null); // null = self-assess mode
+  const [snapshot, setSnapshot] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modelReady, setModelReady] = useState(false);
   const scoreRef = useRef(0);
@@ -676,8 +675,8 @@ function WritingStep({
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setSubmitted(false);
-    setCorrect(false);
-    setPredicted(null);
+    setCorrect(null);
+    setSnapshot(null);
   }, [idx]);
 
   function clearCanvas() {
@@ -691,33 +690,39 @@ function WritingStep({
   async function handleSubmit() {
     const canvas = canvasRef.current;
     if (!canvas || loading) return;
-    setLoading(true);
-    const result = await recognizeChar(canvas, expectedChar);
-    setCorrect(result.correct);
-    setPredicted(result.predicted);
-    setUsedTemplate(result.method === 'template');
-    if (result.correct) scoreRef.current += 1;
+    if (modelReady) {
+      setLoading(true);
+      const result = await recognizeChar(canvas, expectedChar);
+      setCorrect(result.correct);
+      if (result.correct) scoreRef.current += 1;
+      setLoading(false);
+    } else {
+      setSnapshot(canvas.toDataURL());
+      setCorrect(null);
+    }
     setSubmitted(true);
-    setLoading(false);
   }
 
-  function handleNext() {
+  function handleAdvance(got?: boolean) {
+    if (got !== undefined) {
+      if (got) scoreRef.current += 1;
+    }
     if (idx + 1 >= total) onComplete(scoreRef.current, total);
     else setIdx(i => i + 1);
   }
 
-  // Enter: advance after submission
+  // Enter to advance when result is auto-determined (model path)
   const skipRef = useRef(false);
   useEffect(() => {
-    if (!submitted) return;
+    if (!submitted || correct === null) return;
     function onKey(e: KeyboardEvent) {
       if (e.key !== 'Enter') return;
       if (skipRef.current) { skipRef.current = false; return; }
-      handleNext();
+      handleAdvance();
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [submitted, idx]);
+  }, [submitted, correct, idx]);
 
   const multiChar = item.chineseChar.length > 1;
 
@@ -765,37 +770,62 @@ function WritingStep({
             {loading ? 'Checking…' : 'Submit'}
           </button>
         </div>
-      ) : (
+      ) : correct !== null ? (
+        // Model result
         <div className="space-y-3">
-          <div className={`rounded-xl p-4 ${correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-lg">{correct ? '✅' : '❌'}</span>
-              <span className={`font-semibold ${correct ? 'text-green-700' : 'text-red-700'}`}>
+          <div className={`rounded-xl p-4 flex items-center gap-4 ${correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+            <span className="text-2xl">{correct ? '✅' : '❌'}</span>
+            <div>
+              <p className={`font-semibold ${correct ? 'text-green-700' : 'text-red-700'}`}>
                 {correct ? 'Correct!' : 'Not quite'}
-              </span>
-            </div>
-            <p className="text-sm text-gray-600">
-              Expected:{' '}
-              <span className="text-3xl chinese-text font-bold text-gray-800">{expectedChar}</span>
-              {!correct && predicted && predicted !== expectedChar && (
-                <span className="ml-3">
-                  Recognized:{' '}
-                  <span className="text-3xl chinese-text font-bold text-red-600">{predicted}</span>
-                </span>
-              )}
-            </p>
-            {usedTemplate && !modelReady && (
-              <p className="text-xs text-gray-400 mt-1">
-                Visual matching used — place a model in public/models/ for AI recognition
               </p>
-            )}
+              <p className="text-sm text-gray-500">
+                Answer: <span className="text-2xl chinese-text font-bold text-gray-800">{expectedChar}</span>
+              </p>
+            </div>
           </div>
           <button
-            onClick={handleNext}
+            onClick={() => handleAdvance()}
             className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
           >
             {idx + 1 >= total ? 'Finish' : 'Next →'}
           </button>
+        </div>
+      ) : (
+        // Self-assess fallback (no model)
+        <div className="space-y-3">
+          <div className="rounded-xl border border-gray-200 p-4">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-3 text-center">Compare your drawing</p>
+            <div className="flex items-center justify-center gap-6">
+              <div className="text-center">
+                <p className="text-xs text-gray-400 mb-1">Yours</p>
+                {snapshot && (
+                  <img src={snapshot} width={100} height={100} className="rounded-lg border border-gray-200 block" alt="your drawing" />
+                )}
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-400 mb-1">Answer</p>
+                <div className="w-[100px] h-[100px] rounded-lg border border-gray-200 bg-white flex items-center justify-center">
+                  <span className="text-6xl chinese-text">{expectedChar}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-center text-gray-500">Were you close?</p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleAdvance(false)}
+              className="flex-1 border-2 border-red-300 text-red-600 font-semibold py-4 rounded-xl hover:bg-red-50 text-base"
+            >
+              Missed it
+            </button>
+            <button
+              onClick={() => handleAdvance(true)}
+              className="flex-1 border-2 border-green-400 text-green-700 font-semibold py-4 rounded-xl hover:bg-green-50 text-base"
+            >
+              Got it
+            </button>
+          </div>
         </div>
       )}
     </div>
