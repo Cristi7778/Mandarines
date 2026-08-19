@@ -454,8 +454,16 @@ def train():
     # ─── Export ───────────────────────────────────────────────────────────────
     os.makedirs('public/models', exist_ok=True)
     model.eval().cpu()
+
+    # Save raw weights first so a failed ONNX export doesn't lose training.
+    torch.save({'state_dict': model.state_dict(), 'classes': final_chars},
+               'public/models/recognizer.pt')
+    print("Saved public/models/recognizer.pt (weights checkpoint)")
+
     dummy = torch.zeros(1, 1, SIZE, SIZE)
 
+    # dynamo=False forces the legacy TorchScript exporter which doesn't
+    # require onnxscript (new default in torch 2.13+).
     torch.onnx.export(
         model, dummy,
         'public/models/recognizer.onnx',
@@ -463,6 +471,7 @@ def train():
         output_names=['logits'],
         opset_version=11,
         dynamic_axes={'input': {0: 'batch'}, 'logits': {0: 'batch'}},
+        dynamo=False,
     )
 
     with open('public/models/classes.json', 'w', encoding='utf-8') as f:
