@@ -29,3 +29,9 @@ Mandarines takes you from zero to HSK 4 through a structured, gamified journey �
 - [Next.js](https://nextjs.org) — React framework
 - [Supabase](https://supabase.com) — auth + database
 - [Tailwind CSS](https://tailwindcss.com) — styling
+
+---
+
+## Character Recognition
+
+**Character Recognition (Writing Exercise)** — The writing step uses a custom-trained Convolutional Neural Network (CNN) for handwriting recognition. The model is a MobileNet-lite architecture (depthwise separable convolutions) with 787 output classes covering HSK 1–6 vocabulary. It was trained entirely from scratch on synthetic data: Chinese characters rendered across three fonts (SimSun, Microsoft YaHei, Microsoft YaHei Bold) with augmentation including elastic distortion, rotation, stroke width variation, and Gaussian noise — 118,050 samples total. Training ran on CPU via PyTorch and the model was exported to ONNX format (2.3 MB) for in-browser inference using `onnxruntime-web`, with no backend calls.
