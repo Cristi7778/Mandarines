@@ -645,37 +645,67 @@ const TOPICS: Topic[] = [
   },
 
   // ─── Station: HSK 4 ───────────────────────────────────────────────────────
-  {
-    id: 'topic-45', name: 'Grammar: 把-construction', category: 'grammar',
-    station: 'HSK 4', sequenceOrder: 49, items: [],
-  },
-  {
-    id: 'topic-46', name: 'Grammar: 被-construction (passive)', category: 'grammar',
-    station: 'HSK 4', sequenceOrder: 50, items: [],
-  },
-  {
-    id: 'topic-47', name: 'Grammar: 是…的 emphasis structure', category: 'grammar',
-    station: 'HSK 4', sequenceOrder: 51, items: [],
-  },
-  {
-    id: 'topic-48', name: 'Grammar: 如果…就 conditionals', category: 'grammar',
-    station: 'HSK 4', sequenceOrder: 52, items: [],
-  },
+  // topic-45 → lesson-8  (把 construction)
+  // topic-46 → lesson-9  (被 construction)
+  // topic-47 → lesson-10 (是…的 emphasis)
+  // topic-48 → lesson-11 (Conditionals 如果/只要/既然)
+  // lesson-12 (连…都/也) at seq 53
   {
     id: 'topic-49', name: 'Grammar: complex comparisons', category: 'grammar',
-    station: 'HSK 4', sequenceOrder: 53, items: [],
+    station: 'HSK 4', sequenceOrder: 54,
+    description: 'Expressing degree, multiples, and nuanced contrasts.',
+    items: [
+      it('t49i1', 'topic-49', '倍',   'bèi',      'times; -fold',             '这个价格是那个的两', '。',               'This price is twice that one.'),
+      it('t49i2', 'topic-49', '不如', 'bùrú',     'not as good as',           '我',                '他跑得快。',       'I can\'t run as fast as him.'),
+      it('t49i3', 'topic-49', '相比', 'xiāngbǐ',  'compared with; by comparison','',              '去年，今年更好。', 'Compared with last year, this year is better.'),
+      it('t49i4', 'topic-49', '差不多','chàbuduō', 'almost the same; about',   '他们的水平',        '。',               'Their level is about the same.'),
+      it('t49i5', 'topic-49', '尤其', 'yóuqí',    'especially; particularly',  '我喜欢运动，',      '是游泳。',         'I like sports, especially swimming.'),
+      it('t49i6', 'topic-49', '相当', 'xiāngdāng','quite; considerably',       '这道题',            '难。',             'This problem is quite difficult.'),
+      it('t49i7', 'topic-49', '反而', 'fǎn\'ér',  'on the contrary; instead',  '他没有变好，',      '更差了。',         'He didn\'t get better; instead he got worse.'),
+      it('t49i8', 'topic-49', '甚至', 'shènzhì',  'even; so much so that',     '他很努力，',        '周末也不休息。',   'He works hard; he doesn\'t even rest on weekends.'),
+    ],
   },
   {
     id: 'topic-50', name: 'Vocabulary: opinions & emotions', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 54, items: [],
+    station: 'HSK 4', sequenceOrder: 55,
+    description: 'Verbs and adjectives for expressing opinions and feelings.',
+    items: [
+      it('t50i1',  'topic-50', '认为', 'rènwéi',   'to think; to believe',     '我',           '这个方法很好。',   'I think this method is good.'),
+      it('t50i2',  'topic-50', '觉得', 'juéde',    'to feel; to think',        '你',           '怎么样？',         'What do you think?'),
+      it('t50i3',  'topic-50', '同意', 'tóngyì',   'to agree',                 '我',           '你的看法。',       'I agree with your view.'),
+      it('t50i4',  'topic-50', '反对', 'fǎnduì',   'to oppose; to object',     '他',           '这个决定。',       'He opposes this decision.'),
+      it('t50i5',  'topic-50', '担心', 'dānxīn',   'to worry',                 '妈妈很',       '我。',             'Mom worries a lot about me.'),
+      it('t50i6',  'topic-50', '后悔', 'hòuhuǐ',   'to regret',                '我很',         '没有去。',         'I really regret not going.'),
+      it('t50i7',  'topic-50', '满足', 'mǎnzú',    'satisfied; to satisfy',    '我对这个结果很','。',              'I am very satisfied with this result.'),
+      it('t50i8',  'topic-50', '骄傲', 'jiāo\'ào', 'proud; pride',             '我为你',       '。',               'I am proud of you.'),
+      it('t50i9',  'topic-50', '羡慕', 'xiànmù',   'to envy; to admire',       '我很',         '他的才华。',       'I really admire his talent.'),
+      it('t50i10', 'topic-50', '失望', 'shīwàng',  'disappointed; to disappoint','我很',       '。',               'I am very disappointed.'),
+      it('t50i11', 'topic-50', '感动', 'gǎndòng',  'to be moved; to be touched','这个故事让我很','。',            'This story moved me deeply.'),
+      it('t50i12', 'topic-50', '紧张', 'jǐnzhāng', 'nervous; tense',           '考试前我很',   '。',               'I\'m very nervous before exams.'),
+    ],
   },
   {
-    id: 'topic-51', name: 'Vocabulary: abstract nouns, workplace & social', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 55, items: [],
+    id: 'topic-51', name: 'Vocabulary: workplace & social', category: 'vocab',
+    station: 'HSK 4', sequenceOrder: 56,
+    description: 'Nouns and verbs for professional and social contexts.',
+    items: [
+      it('t51i1',  'topic-51', '责任', 'zérèn',    'responsibility',           '这是你的',     '。',               'This is your responsibility.'),
+      it('t51i2',  'topic-51', '机会', 'jīhuì',    'opportunity; chance',      '这是一个好',   '。',               'This is a good opportunity.'),
+      it('t51i3',  'topic-51', '经验', 'jīngyàn',  'experience',               '他有很多工作', '。',               'He has a lot of work experience.'),
+      it('t51i4',  'topic-51', '压力', 'yālì',     'pressure; stress',         '工作',         '很大。',           'Work pressure is very high.'),
+      it('t51i5',  'topic-51', '竞争', 'jìngzhēng','competition; to compete',  '市场',         '很激烈。',         'Market competition is very fierce.'),
+      it('t51i6',  'topic-51', '目标', 'mùbiāo',   'goal; target',             '我的',         '是学好中文。',     'My goal is to learn Chinese well.'),
+      it('t51i7',  'topic-51', '成功', 'chénggōng','to succeed; success',      '只要努力，就会','。',             'As long as you work hard, you will succeed.'),
+      it('t51i8',  'topic-51', '失败', 'shībài',   'to fail; failure',         '',             '是成功之母。',     'Failure is the mother of success.'),
+      it('t51i9',  'topic-51', '努力', 'nǔlì',     'to work hard; diligent',   '他非常',       '。',               'He works extremely hard.'),
+      it('t51i10', 'topic-51', '态度', 'tàidù',    'attitude',                 '学习',         '很重要。',         'Study attitude is very important.'),
+      it('t51i11', 'topic-51', '建议', 'jiànyì',   'suggestion; to suggest',   '我有一个',     '。',               'I have a suggestion.'),
+      it('t51i12', 'topic-51', '解决', 'jiějué',   'to solve; to resolve',     '我们要',       '这个问题。',       'We need to solve this problem.'),
+    ],
   },
   {
     id: 'topic-56', name: 'Vocabulary: society & culture', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 56,
+    station: 'HSK 4', sequenceOrder: 57,
     description: 'Social, civic, and cultural vocabulary.',
     items: [
       it('t56i1',  'topic-56', '文化', 'wénhuà',   'culture',               '中国',       '很丰富。',           'Chinese culture is very rich.'),
@@ -692,7 +722,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-57', name: 'Vocabulary: environment & nature', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 57,
+    station: 'HSK 4', sequenceOrder: 58,
     description: 'Environmental and ecological vocabulary.',
     items: [
       it('t57i1',  'topic-57', '污染', 'wūrǎn',    'pollution; to pollute', '空气',       '越来越严重。',       'Air pollution is getting more and more serious.'),
@@ -709,19 +739,19 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-52', name: 'Reading: short essays (100–200 characters)', category: 'reading',
-    station: 'HSK 4', sequenceOrder: 58, items: [],
-  },
-  {
-    id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
     station: 'HSK 4', sequenceOrder: 59, items: [],
   },
   {
-    id: 'topic-54', name: 'Full timed mock HSK 4 exams', category: 'exam',
+    id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
     station: 'HSK 4', sequenceOrder: 60, items: [],
   },
   {
-    id: 'topic-55', name: '★ Boss: HSK 4 exam', category: 'exam',
+    id: 'topic-54', name: 'Full timed mock HSK 4 exams', category: 'exam',
     station: 'HSK 4', sequenceOrder: 61, items: [],
+  },
+  {
+    id: 'topic-55', name: '★ Boss: HSK 4 exam', category: 'exam',
+    station: 'HSK 4', sequenceOrder: 62, items: [],
   },
 ];
 

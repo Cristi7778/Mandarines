@@ -208,6 +208,179 @@ const LESSONS: Lesson[] = [
     ],
   },
   {
+    id: 'lesson-8',
+    name: '把 construction (把字句)',
+    station: 'HSK 4',
+    sequenceOrder: 49,
+    description: 'The disposal marker: restructuring a sentence to focus on what happens to the object.',
+    xp: 30,
+    sections: [
+      {
+        title: 'Structure',
+        body: 'Subject + 把 + Object + Verb + Result/Complement. The key rule: the verb must have something after it — a result complement, directional complement, or other element. 把 cannot stand alone with a bare verb.',
+        examples: [
+          { chinese: '我把作业做完了。', pinyin: 'Wǒ bǎ zuòyè zuò wán le.', english: 'I finished the homework.' },
+          { chinese: '她把书放在桌子上了。', pinyin: 'Tā bǎ shū fàng zài zhuōzi shàng le.', english: 'She put the book on the table.' },
+          { chinese: '请把门关上。', pinyin: 'Qǐng bǎ mén guān shàng.', english: 'Please close the door.' },
+        ],
+      },
+      {
+        title: 'When to use 把',
+        body: '把 is used when the verb describes a deliberate action that changes or moves a specific, known object. The object must be definite (a specific thing, not "a book" in general). Use 把 when you want to emphasize the disposal of or effect on the object.',
+        examples: [
+          { chinese: '他把钱都花完了。', pinyin: 'Tā bǎ qián dōu huā wán le.', english: 'He spent all the money.' },
+          { chinese: '我把那封信写好了。', pinyin: 'Wǒ bǎ nà fēng xìn xiě hǎo le.', english: 'I finished writing that letter.' },
+        ],
+      },
+      {
+        title: 'Verbs that cannot follow 把',
+        body: '把 requires an action verb that involves handling or changing something. Stative verbs and mental-state verbs do not work: 是, 有, 在, 喜欢, 知道, 觉得 cannot follow 把.',
+        examples: [
+          { chinese: '我把这件事告诉了他。', pinyin: 'Wǒ bǎ zhè jiàn shì gàosù le tā.', english: 'I told him about this matter.' },
+          { chinese: '请把这些垃圾扔掉。', pinyin: 'Qǐng bǎ zhèxiē lājī rēng diào.', english: 'Please throw away this garbage.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'lesson-9',
+    name: '被 construction (被字句)',
+    station: 'HSK 4',
+    sequenceOrder: 50,
+    description: 'The passive marker: expressing that the subject is acted upon by someone or something.',
+    xp: 30,
+    sections: [
+      {
+        title: 'Structure',
+        body: 'Subject (receiver) + 被 + Agent (doer) + Verb + Result. The subject is the one who receives the action. The agent (who did it) follows 被. Like 把, the verb usually needs a result complement after it.',
+        examples: [
+          { chinese: '我的钱包被偷了。', pinyin: 'Wǒ de qiánbāo bèi tōu le.', english: 'My wallet was stolen.' },
+          { chinese: '这本书被他借走了。', pinyin: 'Zhè běn shū bèi tā jiè zǒu le.', english: 'This book was borrowed by him.' },
+          { chinese: '蛋糕被孩子们吃完了。', pinyin: 'Dàngāo bèi háizimen chī wán le.', english: 'The cake was eaten up by the children.' },
+        ],
+      },
+      {
+        title: 'The tone of 被',
+        body: 'In Chinese, 被 often carries a negative or undesirable connotation — something unfortunate happened to the subject. It is less neutral than the English passive voice. Positive passives are rarer and often use different structures.',
+        examples: [
+          { chinese: '他被老板批评了。', pinyin: 'Tā bèi lǎobǎn pīpíng le.', english: 'He was criticized by his boss.' },
+          { chinese: '我的计划被否定了。', pinyin: 'Wǒ de jìhuà bèi fǒudìng le.', english: 'My plan was rejected.' },
+        ],
+      },
+      {
+        title: 'Omitting the agent',
+        body: 'The agent can be dropped when it is unknown or unimportant. 被 then appears directly before the verb.',
+        examples: [
+          { chinese: '自行车被偷了。', pinyin: 'Zìxíngchē bèi tōu le.', english: 'The bicycle was stolen.' },
+          { chinese: '这个消息被传出去了。', pinyin: 'Zhège xiāoxi bèi chuán chūqù le.', english: 'The news got out.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'lesson-10',
+    name: '是…的 emphasis structure',
+    station: 'HSK 4',
+    sequenceOrder: 51,
+    description: 'Highlighting when, where, how, or who regarding a past action — not the action itself.',
+    xp: 25,
+    sections: [
+      {
+        title: 'What 是…的 emphasizes',
+        body: '是…的 is used when an action already happened and you want to emphasize the circumstances — the time, place, manner, or person involved. The verb goes inside the frame: 是 [circumstance] Verb 的.',
+        examples: [
+          { chinese: '我是昨天来的。', pinyin: 'Wǒ shì zuótiān lái de.', english: 'It was yesterday that I came.' },
+          { chinese: '他是坐飞机来的。', pinyin: 'Tā shì zuò fēijī lái de.', english: 'He came by plane.' },
+          { chinese: '这件事是在北京发生的。', pinyin: 'Zhè jiàn shì shì zài Běijīng fāshēng de.', english: 'This event happened in Beijing.' },
+        ],
+      },
+      {
+        title: 'Emphasizing different details',
+        body: 'The same event can be framed differently depending on what you want to highlight. The element placed right after 是 receives the emphasis.',
+        examples: [
+          { chinese: '我是去年认识他的。', pinyin: 'Wǒ shì qùnián rènshi tā de.', english: 'It was last year that I met him.' },
+          { chinese: '她是在图书馆学习的。', pinyin: 'Tā shì zài túshūguǎn xuéxí de.', english: 'She studied in the library.' },
+        ],
+      },
+      {
+        title: '是 can be omitted',
+        body: 'In casual speech, 是 is often dropped and only 的 remains at the end. The sentence still reads as a 是…的 emphasis structure.',
+        examples: [
+          { chinese: '你什么时候来的？', pinyin: 'Nǐ shénme shíhou lái de?', english: 'When did you come?' },
+          { chinese: '他骑自行车来的。', pinyin: 'Tā qí zìxíngchē lái de.', english: 'He came by bike.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'lesson-11',
+    name: 'Conditionals: 如果/只要/既然',
+    station: 'HSK 4',
+    sequenceOrder: 52,
+    description: 'Three conditional connectives: hypothetical, sufficient condition, and accepted fact.',
+    xp: 30,
+    sections: [
+      {
+        title: '如果…就 — if…then (hypothetical)',
+        body: '如果 (rúguǒ) introduces a hypothetical condition; 就 (jiù) introduces the result. Use it for situations that may or may not happen.',
+        examples: [
+          { chinese: '如果明天下雨，我们就不去了。', pinyin: 'Rúguǒ míngtiān xià yǔ, wǒmen jiù bù qù le.', english: 'If it rains tomorrow, we won\'t go.' },
+          { chinese: '如果你有问题，就问我。', pinyin: 'Rúguǒ nǐ yǒu wèntí, jiù wèn wǒ.', english: 'If you have questions, ask me.' },
+        ],
+      },
+      {
+        title: '只要…就 — as long as…then (sufficient condition)',
+        body: '只要 (zhǐyào) states a sufficient condition — the minimum requirement. 就 introduces what follows from it. The tone is more optimistic than 如果.',
+        examples: [
+          { chinese: '只要努力，就会成功。', pinyin: 'Zhǐyào nǔlì, jiù huì chénggōng.', english: 'As long as you work hard, you will succeed.' },
+          { chinese: '只要你来，我们就高兴。', pinyin: 'Zhǐyào nǐ lái, wǒmen jiù gāoxìng.', english: 'As long as you come, we\'ll be happy.' },
+        ],
+      },
+      {
+        title: '既然…就 — since…then (accepted fact)',
+        body: '既然 (jìrán) introduces a fact already accepted by both speaker and listener. 就 draws a logical conclusion from it. Unlike 如果, the condition is real and known.',
+        examples: [
+          { chinese: '既然你不喜欢，就别吃了。', pinyin: 'Jìrán nǐ bù xǐhuān, jiù bié chī le.', english: 'Since you don\'t like it, don\'t eat it.' },
+          { chinese: '既然决定了，就认真做吧。', pinyin: 'Jìrán juédìng le, jiù rènzhēn zuò ba.', english: 'Since it\'s been decided, do it seriously.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'lesson-12',
+    name: '连…都/也 (Even)',
+    station: 'HSK 4',
+    sequenceOrder: 53,
+    description: 'Highlighting an extreme or unexpected case to strengthen a claim.',
+    xp: 25,
+    sections: [
+      {
+        title: 'Structure',
+        body: '连 (lián) marks the item being highlighted as an extreme example. 都 or 也 follows the verb to complete the meaning. The pattern signals: "even this — which you would not expect — is true." 都 is more common; 也 is slightly softer.',
+        examples: [
+          { chinese: '他连饭都没吃。', pinyin: 'Tā lián fàn dōu méi chī.', english: 'He didn\'t even eat.' },
+          { chinese: '这个字连老师都不认识。', pinyin: 'Zhège zì lián lǎoshī dōu bù rènshi.', english: 'Even the teacher doesn\'t know this character.' },
+          { chinese: '她连一句话也没说。', pinyin: 'Tā lián yī jù huà yě méi shuō.', english: 'She didn\'t say even a single word.' },
+        ],
+      },
+      {
+        title: 'Positive and negative contexts',
+        body: '连…都/也 works in both positive and negative sentences, though the negative version (emphasizing that even a minimal thing was not done) is the most common.',
+        examples: [
+          { chinese: '他连五岁的孩子都能教。', pinyin: 'Tā lián wǔ suì de háizi dōu néng jiāo.', english: 'He can even teach five-year-olds.' },
+          { chinese: '我连他的名字都忘了。', pinyin: 'Wǒ lián tā de míngzi dōu wàng le.', english: 'I even forgot his name.' },
+        ],
+      },
+      {
+        title: 'Position of 连',
+        body: '连 comes before the highlighted noun or verb phrase, always before the subject\'s verb. If the highlighted item is the object, 连 pulls it to before the verb (similar to 把 movement).',
+        examples: [
+          { chinese: '连你都来了，太好了！', pinyin: 'Lián nǐ dōu lái le, tài hǎo le!', english: 'Even you came — wonderful!' },
+        ],
+      },
+    ],
+  },
+  {
     id: 'lesson-4',
     name: '先…然后 (First…then)',
     station: 'HSK 2',
