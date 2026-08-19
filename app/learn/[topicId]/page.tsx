@@ -420,7 +420,7 @@ function SpeakingStep({ items, onComplete }: { items: Item[]; onComplete: (score
   }, [items]);
 
   function classify(text: string, expected: Item): SpeakResult {
-    const clean = text.replace(/\s/g, '');
+    const clean = text.replace(/[\s　-〿＀-￯。，！？、…]/g, '');
     if (clean === expected.chineseChar) return 'correct';
     const expectedBase = stripToneMarks(expected.pinyin);
     for (const ch of clean) {
