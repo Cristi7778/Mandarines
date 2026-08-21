@@ -248,7 +248,6 @@ function InlineDrill({
               </span>
               {item.exampleSuffix}
             </p>
-            <p className="text-base text-gray-400 italic">{item.exampleEnglish}</p>
           </>
         )}
       </div>
@@ -1252,7 +1251,6 @@ function MixedPracticeStep({
                     </span>
                     {item.exampleSuffix}
                   </p>
-                  <p className="text-base text-gray-400 italic">{item.exampleEnglish}</p>
                 </>
               )}
             </div>
