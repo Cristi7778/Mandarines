@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
-type Mode = 'login' | 'signup';
+type Mode = 'login' | 'signup' | 'forgot';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -16,6 +16,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [signupDone, setSignupDone] = useState(false);
+  const [forgotDone, setForgotDone] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,11 +46,17 @@ export default function AuthPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
       else router.replace('/');
-    } else {
+    } else if (mode === 'signup') {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) setError(error.message);
       else if (data.user && data.user.identities?.length === 0) setError('An account with this email already exists. Please sign in instead.');
       else setSignupDone(true);
+    } else {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+      if (error) setError(error.message);
+      else setForgotDone(true);
     }
 
     setLoading(false);
@@ -88,6 +95,30 @@ export default function AuthPage() {
     );
   }
 
+  if (forgotDone) {
+    return (
+      <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center px-4">
+        <div className="w-full max-w-sm space-y-6 text-center">
+          <div className="text-5xl">🍊</div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-4">
+            <div className="text-4xl">📬</div>
+            <h2 className="text-lg font-semibold text-gray-800">Check your inbox</h2>
+            <p className="text-sm text-gray-500">
+              We sent a reset link to <span className="font-medium text-gray-700">{email}</span>.
+              Click it to choose a new password.
+            </p>
+            <button
+              onClick={() => { setForgotDone(false); switchMode('login'); }}
+              className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors text-sm"
+            >
+              Back to Sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
@@ -100,19 +131,27 @@ export default function AuthPage() {
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
           {/* Tab switcher */}
-          <div className="flex bg-gray-100 rounded-xl p-1">
-            {(['login', 'signup'] as const).map(m => (
-              <button
-                key={m}
-                onClick={() => switchMode(m)}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  mode === m ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {m === 'login' ? 'Sign in' : 'Sign up'}
-              </button>
-            ))}
-          </div>
+          {mode !== 'forgot' && (
+            <div className="flex bg-gray-100 rounded-xl p-1">
+              {(['login', 'signup'] as const).map(m => (
+                <button
+                  key={m}
+                  onClick={() => switchMode(m)}
+                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    mode === m ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {m === 'login' ? 'Sign in' : 'Sign up'}
+                </button>
+              ))}
+            </div>
+          )}
+          {mode === 'forgot' && (
+            <div className="space-y-1">
+              <h2 className="text-base font-semibold text-gray-800">Reset your password</h2>
+              <p className="text-sm text-gray-500">We&apos;ll send a reset link to your email.</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
@@ -123,14 +162,16 @@ export default function AuthPage() {
               placeholder="Email"
               className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
             />
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder={mode === 'signup' ? 'Password (min 6 characters)' : 'Password'}
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-            />
+            {mode !== 'forgot' && (
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder={mode === 'signup' ? 'Password (min 6 characters)' : 'Password'}
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+              />
+            )}
             {mode === 'signup' && (
               <input
                 type="password"
@@ -148,18 +189,36 @@ export default function AuthPage() {
               className="w-full bg-orange-500 text-white font-semibold py-3 rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-50 text-sm"
             >
               {loading
-                ? mode === 'login' ? 'Signing in…' : 'Creating account…'
-                : mode === 'login' ? 'Sign in' : 'Create account'}
+                ? mode === 'login' ? 'Signing in…' : mode === 'forgot' ? 'Sending…' : 'Creating account…'
+                : mode === 'login' ? 'Sign in' : mode === 'forgot' ? 'Send reset link' : 'Create account'}
             </button>
+            {mode === 'login' && (
+              <button
+                type="button"
+                onClick={() => switchMode('forgot')}
+                className="w-full text-center text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Forgot password?
+              </button>
+            )}
+            {mode === 'forgot' && (
+              <button
+                type="button"
+                onClick={() => switchMode('login')}
+                className="w-full text-center text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                ← Back to Sign in
+              </button>
+            )}
           </form>
 
-          <div className="flex items-center gap-3">
+          {mode !== 'forgot' && <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-gray-200" />
             <span className="text-xs text-gray-400">or</span>
             <div className="flex-1 h-px bg-gray-200" />
-          </div>
+          </div>}
 
-          <button
+          {mode !== 'forgot' && <button
             onClick={handleGoogle}
             className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           >
@@ -170,7 +229,7 @@ export default function AuthPage() {
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
             Continue with Google
-          </button>
+          </button>}
         </div>
 
         <p className="text-center text-xs text-gray-400">
