@@ -30,8 +30,9 @@ export default function ResetPasswordPage() {
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     if (error) { setError(error.message); setLoading(false); return; }
+    await supabase.auth.signOut();
     setDone(true);
-    setTimeout(() => router.replace('/'), 2000);
+    setTimeout(() => router.replace('/auth'), 2000);
   }
 
   if (done) {
@@ -42,7 +43,7 @@ export default function ResetPasswordPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-3">
             <div className="text-4xl">✅</div>
             <h2 className="text-lg font-semibold text-gray-800">Password updated</h2>
-            <p className="text-sm text-gray-500">Taking you home…</p>
+            <p className="text-sm text-gray-500">Taking you to sign in…</p>
           </div>
         </div>
       </div>
