@@ -548,12 +548,16 @@ function SpeakingStep({ items, onComplete }: { items: Item[]; onComplete: (score
 
 function WriterCanvas({
   char,
-  phase,
+  mode,
+  onAnimateDone,
   onQuizDone,
+  size = 220,
 }: {
   char: string;
-  phase: 'watch' | 'quiz';
-  onQuizDone: (mistakes: number) => void;
+  mode: 'animate' | 'quiz' | 'outline' | 'done';
+  onAnimateDone?: () => void;
+  onQuizDone?: (mistakes: number) => void;
+  size?: number;
 }) {
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -564,10 +568,11 @@ function WriterCanvas({
     import('hanzi-writer').then(({ default: HanziWriter }) => {
       if (cancelled || !divRef.current) return;
       const writer = (HanziWriter as any).create(divRef.current, char, {
-        width: 220,
-        height: 220,
+        width: size,
+        height: size,
         padding: 5,
-        showOutline: true,
+        showOutline: mode !== 'done',
+        showCharacter: mode === 'done',
         strokeColor: '#ea580c',
         outlineColor: '#d1d5db',
         drawingColor: '#1f2937',
@@ -581,13 +586,13 @@ function WriterCanvas({
         },
       });
 
-      if (phase === 'watch') {
-        writer.animateCharacter();
-      } else {
+      if (mode === 'animate') {
+        writer.animateCharacter({ onComplete: () => { if (!cancelled) onAnimateDone?.(); } });
+      } else if (mode === 'quiz') {
         writer.quiz({
           leniency: 1,
           onComplete: (summary: { totalMistakes: number }) => {
-            if (!cancelled) onQuizDone(summary.totalMistakes);
+            if (!cancelled) onQuizDone?.(summary.totalMistakes);
           },
         });
       }
@@ -597,7 +602,7 @@ function WriterCanvas({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div ref={divRef} style={{ width: 220, height: 220 }} />;
+  return <div ref={divRef} style={{ width: size, height: size }} />;
 }
 
 function HanziWriterStep({
@@ -607,38 +612,51 @@ function HanziWriterStep({
   items: Item[];
   onComplete: (score: number, total: number) => void;
 }) {
-  const chars = useMemo(() =>
-    items.flatMap(item =>
-      [...item.chineseChar].map((c, ci) => ({
-        char: c,
-        word: item.chineseChar,
-        pinyin: item.pinyin,
-        meaning: item.englishMeaning,
-        isFirst: ci === 0,
-      }))
-    ), [items]);
-
-  const total = chars.length;
-  const [idx, setIdx] = useState(0);
+  const total = items.length;
+  const [itemIdx, setItemIdx] = useState(0);
   const [phase, setPhase] = useState<'watch' | 'quiz' | 'result'>('watch');
-  const [currentMistakes, setCurrentMistakes] = useState(0);
+  const [activeCharIdx, setActiveCharIdx] = useState(0);
+  const [displayMistakes, setDisplayMistakes] = useState(0);
   const scoreRef = useRef(0);
+  const mistakesRef = useRef(0);
 
-  const current = chars[idx];
+  const currentItem = items[itemIdx];
+  if (!currentItem) return null;
+  const chars = [...currentItem.chineseChar];
+  const size = chars.length >= 3 ? 140 : chars.length === 2 ? 180 : 220;
 
-  function handleQuizDone(mistakes: number) {
-    setCurrentMistakes(mistakes);
-    if (mistakes < 3) scoreRef.current += 1;
-    setPhase('result');
+  function startQuiz() {
+    setPhase('quiz');
+    setActiveCharIdx(0);
+    mistakesRef.current = 0;
+  }
+
+  function handleAnimateDone() {
+    if (activeCharIdx + 1 < chars.length) setActiveCharIdx(a => a + 1);
+  }
+
+  function handleQuizCharDone(mistakes: number) {
+    mistakesRef.current += mistakes;
+    const next = activeCharIdx + 1;
+    if (next < chars.length) {
+      setActiveCharIdx(next);
+    } else {
+      if (mistakesRef.current < 3) scoreRef.current += 1;
+      setDisplayMistakes(mistakesRef.current);
+      setPhase('result');
+    }
   }
 
   function handleNext() {
-    if (idx + 1 >= total) {
+    const next = itemIdx + 1;
+    if (next >= total) {
       onComplete(scoreRef.current, total);
     } else {
-      setIdx(i => i + 1);
+      setItemIdx(next);
       setPhase('watch');
-      setCurrentMistakes(0);
+      setActiveCharIdx(0);
+      mistakesRef.current = 0;
+      setDisplayMistakes(0);
     }
   }
 
@@ -646,37 +664,53 @@ function HanziWriterStep({
     function onKey(e: KeyboardEvent) {
       if (e.key !== 'Enter') return;
       if (phase === 'result') handleNext();
-      else if (phase === 'watch') setPhase('quiz');
+      else if (phase === 'watch') startQuiz();
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, idx]);
-
-  if (!current) return null;
+  }, [phase, itemIdx]);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <div className="flex-1 bg-gray-200 rounded-full h-2">
-          <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${(idx / total) * 100}%` }} />
+          <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${(itemIdx / total) * 100}%` }} />
         </div>
-        <span className="text-xs text-gray-500 shrink-0">{idx + 1}/{total}</span>
+        <span className="text-xs text-gray-500 shrink-0">{itemIdx + 1}/{total}</span>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 p-4 text-center space-y-1">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{current.meaning}</p>
-        <p className="text-3xl chinese-text font-bold text-gray-800">{current.word}</p>
-        <p className="text-base text-orange-500">{current.pinyin}</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{currentItem.englishMeaning}</p>
+        <p className="text-3xl chinese-text font-bold text-gray-800">{currentItem.chineseChar}</p>
+        <p className="text-base text-orange-500">{currentItem.pinyin}</p>
       </div>
 
       <div className="flex justify-center">
-        <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden">
-          <WriterCanvas
-            key={`${idx}-${phase === 'quiz' ? 'quiz' : 'watch'}`}
-            char={current.char}
-            phase={phase === 'quiz' ? 'quiz' : 'watch'}
-            onQuizDone={handleQuizDone}
-          />
+        <div className="flex gap-3">
+          {chars.map((c, ci) => {
+            const charState = ci < activeCharIdx ? 'done' : ci === activeCharIdx ? 'active' : 'wait';
+            const mode: 'animate' | 'quiz' | 'outline' | 'done' =
+              phase === 'result' ? 'done' :
+              charState === 'done' ? 'done' :
+              charState === 'wait' ? 'outline' :
+              phase === 'watch' ? 'animate' : 'quiz';
+            return (
+              <div
+                key={`${itemIdx}-${phase}-${ci}-${charState}`}
+                className={`bg-white rounded-2xl overflow-hidden border-2 transition-colors ${
+                  charState === 'active' && phase !== 'result' ? 'border-orange-400' : 'border-dashed border-gray-200'
+                }`}
+              >
+                <WriterCanvas
+                  char={c}
+                  mode={mode}
+                  size={size}
+                  onAnimateDone={handleAnimateDone}
+                  onQuizDone={handleQuizCharDone}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -684,7 +718,7 @@ function HanziWriterStep({
         <div className="space-y-2">
           <p className="text-center text-sm text-gray-500">Watch the stroke order, then try it yourself</p>
           <button
-            onClick={() => setPhase('quiz')}
+            onClick={startQuiz}
             className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 text-base"
           >
             Try it yourself →
@@ -699,20 +733,20 @@ function HanziWriterStep({
       )}
       {phase === 'result' && (
         <div className="space-y-3">
-          <div className={`rounded-xl p-4 text-center ${currentMistakes < 3 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'}`}>
-            <p className={`font-semibold text-lg ${currentMistakes < 3 ? 'text-green-700' : 'text-amber-700'}`}>
-              {currentMistakes === 0
+          <div className={`rounded-xl p-4 text-center ${displayMistakes < 3 ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'}`}>
+            <p className={`font-semibold text-lg ${displayMistakes < 3 ? 'text-green-700' : 'text-amber-700'}`}>
+              {displayMistakes === 0
                 ? '✅ Perfect!'
-                : currentMistakes < 3
-                ? `👍 ${currentMistakes} mistake${currentMistakes !== 1 ? 's' : ''}`
-                : `💪 ${currentMistakes} mistakes — keep practicing`}
+                : displayMistakes < 3
+                ? `👍 ${displayMistakes} mistake${displayMistakes !== 1 ? 's' : ''}`
+                : `💪 ${displayMistakes} mistakes — keep practicing`}
             </p>
           </div>
           <button
             onClick={handleNext}
             className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 text-base"
           >
-            {idx + 1 >= total ? 'Finish' : 'Next →'}
+            {itemIdx + 1 >= total ? 'Finish' : 'Next →'}
           </button>
         </div>
       )}
@@ -1319,7 +1353,7 @@ function MixedPracticeStep({
                 <WriterCanvas
                   key={`${idx}-${strokePhase}`}
                   char={char}
-                  phase={strokePhase === 'quiz' ? 'quiz' : 'watch'}
+                  mode={strokePhase === 'quiz' ? 'quiz' : 'animate'}
                   onQuizDone={(mistakes) => { setStrokeMistakes(mistakes); setStrokePhase('result'); }}
                 />
               </div>
