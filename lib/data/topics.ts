@@ -102,6 +102,10 @@ const TOPICS: Topic[] = [
       it('t59i6', 'topic-59', '白色', 'báisè',   'white',          '雪是',       '的。',     'Snow is white.'),
       it('t59i7', 'topic-59', '紫色', 'zǐsè',    'purple',         '她喜欢',     '。',       'She likes purple.'),
       it('t59i8', 'topic-59', '颜色', 'yánsè',   'color (generic)','你喜欢什么', '？',       'What color do you like?'),
+      it('t59i9', 'topic-59', '橙色', 'chéngsè', 'orange',         '橙子是',     '的。',     'Oranges are orange.'),
+      it('t59i10','topic-59', '粉色', 'fěnsè',   'pink',           '玫瑰是',     '的。',     'The rose is pink.'),
+      it('t59i11','topic-59', '灰色', 'huīsè',   'grey',           '云是',       '的。',     'The clouds are grey.'),
+      it('t59i12','topic-59', '棕色', 'zōngsè',  'brown',          '土地是',     '的。',     'The soil is brown.'),
     ],
   },
   {
