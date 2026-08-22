@@ -109,21 +109,6 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-4',
-    name: 'Possessives (的)',
-    category: 'grammar',
-    station: 'HSK 1',
-    sequenceOrder: 6,
-    description: "The particle 的 (de) marks possession and modifies nouns.",
-    items: [
-      it('t4i1', 'topic-4', '的', 'de', 'possessive particle (my, your, his…)',  '我',     '书。',         'My book.',         'Neutral tone (轻声). Always unstressed.'),
-      it('t4i2', 'topic-4', '的', 'de', 'attribute marker (adjective + noun)',   '漂亮',   '花。',         'Beautiful flower.'),
-      it('t4i3', 'topic-4', '的', 'de', 'noun substitute (nominalizer)',         '这是我',  '。',           "This is mine.",    "When 的 ends the phrase it nominalizes: 我的 = 'mine'"),
-      it('t4i4', 'topic-4', '的', 'de', 'end-of-clause emphasis marker',        '我是坐飞机来', '。',     'I came by plane (emphasis).', "是…的 construction emphasizes how/when/where"),
-      it('t4i5', 'topic-4', '的', 'de', 'possessive (complex noun phrase)',      '他',     '妈妈来了。',   'His mother came.'),
-    ],
-  },
-  {
     id: 'topic-5',
     name: 'Measure words',
     category: 'vocab',

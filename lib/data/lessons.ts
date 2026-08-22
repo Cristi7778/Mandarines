@@ -381,6 +381,51 @@ const LESSONS: Lesson[] = [
     ],
   },
   {
+    id: 'lesson-13',
+    name: 'The particle 的 (de)',
+    station: 'HSK 1',
+    sequenceOrder: 6,
+    description: 'How 的 marks possession, links adjectives to nouns, and substitutes for nouns.',
+    xp: 25,
+    sections: [
+      {
+        title: 'Possession: owner + 的 + thing',
+        body: '的 goes between the owner and the thing owned — like "\'s" in English. It works with pronouns, names, and nouns alike.',
+        examples: [
+          { chinese: '我的书', pinyin: 'wǒ de shū', english: 'my book' },
+          { chinese: '她的手机', pinyin: 'tā de shǒujī', english: 'her phone' },
+          { chinese: '老师的名字', pinyin: 'lǎoshī de míngzi', english: "the teacher's name" },
+        ],
+      },
+      {
+        title: 'Drop the noun when it\'s obvious',
+        body: 'If the owned noun is clear from context, drop it — 我的 becomes "mine", 你的 becomes "yours". 的 stays at the end.',
+        examples: [
+          { chinese: '这是我的。', pinyin: 'Zhè shì wǒ de.', english: 'This is mine.' },
+          { chinese: '那是你的吗？', pinyin: 'Nà shì nǐ de ma?', english: 'Is that yours?' },
+          { chinese: '我的在这里，你的在哪里？', pinyin: 'Wǒ de zài zhèlǐ, nǐ de zài nǎlǐ?', english: 'Mine is here — where is yours?' },
+        ],
+      },
+      {
+        title: 'Adjective + 的 + noun',
+        body: '的 also links a describing word to the noun it modifies. Short common adjectives (好、大、小) often drop 的 in everyday speech; longer ones keep it.',
+        examples: [
+          { chinese: '漂亮的花', pinyin: 'piàoliang de huā', english: 'beautiful flower' },
+          { chinese: '很贵的东西', pinyin: 'hěn guì de dōngxi', english: 'very expensive things' },
+          { chinese: '好朋友', pinyin: 'hǎo péngyou', english: 'good friend (的 dropped — common with short adjectives)' },
+        ],
+      },
+      {
+        title: '的 is always neutral tone (轻声)',
+        body: '的 is always unstressed and pronounced lightly as "de" — never with any of the four tones. You will hear it constantly in spoken Mandarin.',
+        examples: [
+          { chinese: '这是我的书。', pinyin: 'Zhè shì wǒ de shū.', english: 'This is my book.' },
+          { chinese: '你的朋友很好。', pinyin: 'Nǐ de péngyou hěn hǎo.', english: 'Your friend is very nice.' },
+        ],
+      },
+    ],
+  },
+  {
     id: 'lesson-4',
     name: '先…然后 (First…then)',
     station: 'HSK 2',
