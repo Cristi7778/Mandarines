@@ -59,7 +59,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-2',
     name: '因为…所以 (Because…therefore)',
     station: 'HSK 2',
-    sequenceOrder: 37,
+    sequenceOrder: 35,
     description: 'The causal connective: stating a reason and its result.',
     xp: 30,
     sections: [
@@ -92,7 +92,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-3',
     name: '虽然…但是 (Although…but)',
     station: 'HSK 2',
-    sequenceOrder: 38,
+    sequenceOrder: 36,
     description: 'The concessive structure: acknowledging one fact while introducing a contrast.',
     xp: 30,
     sections: [
@@ -124,7 +124,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-5',
     name: '越来越 / 越…越 (More and more)',
     station: 'HSK 3',
-    sequenceOrder: 60,
+    sequenceOrder: 58,
     description: 'Expressing gradual change and proportional relationships.',
     xp: 25,
     sections: [
@@ -152,7 +152,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-6',
     name: '一边…一边 (Doing two things at once)',
     station: 'HSK 3',
-    sequenceOrder: 61,
+    sequenceOrder: 59,
     description: 'Expressing two simultaneous actions.',
     xp: 25,
     sections: [
@@ -178,7 +178,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-7',
     name: '除了…以外 (Besides / Except)',
     station: 'HSK 3',
-    sequenceOrder: 62,
+    sequenceOrder: 60,
     description: 'Two contrasting uses: adding to a set (besides) or excluding from a set (except).',
     xp: 25,
     sections: [
@@ -211,7 +211,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-8',
     name: '把 construction (把字句)',
     station: 'HSK 4',
-    sequenceOrder: 69,
+    sequenceOrder: 67,
     description: 'The disposal marker: restructuring a sentence to focus on what happens to the object.',
     xp: 30,
     sections: [
@@ -246,7 +246,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-9',
     name: '被 construction (被字句)',
     station: 'HSK 4',
-    sequenceOrder: 70,
+    sequenceOrder: 68,
     description: 'The passive marker: expressing that the subject is acted upon by someone or something.',
     xp: 30,
     sections: [
@@ -281,7 +281,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-10',
     name: '是…的 emphasis structure',
     station: 'HSK 4',
-    sequenceOrder: 71,
+    sequenceOrder: 69,
     description: 'Highlighting when, where, how, or who regarding a past action — not the action itself.',
     xp: 25,
     sections: [
@@ -316,7 +316,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-11',
     name: 'Conditionals: 如果/只要/既然',
     station: 'HSK 4',
-    sequenceOrder: 72,
+    sequenceOrder: 70,
     description: 'Three conditional connectives: hypothetical, sufficient condition, and accepted fact.',
     xp: 30,
     sections: [
@@ -350,7 +350,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-12',
     name: '连…都/也 (Even)',
     station: 'HSK 4',
-    sequenceOrder: 73,
+    sequenceOrder: 71,
     description: 'Highlighting an extreme or unexpected case to strengthen a claim.',
     xp: 25,
     sections: [
@@ -429,7 +429,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-4',
     name: '先…然后 (First…then)',
     station: 'HSK 2',
-    sequenceOrder: 44,
+    sequenceOrder: 42,
     description: 'Sequencing actions: describing what happens first and what comes next.',
     xp: 25,
     sections: [
