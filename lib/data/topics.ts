@@ -330,7 +330,7 @@ const TOPICS: Topic[] = [
     id: 'topic-9b',
     name: 'Family 2: grandparents & cousins',
     category: 'vocab',
-    station: 'HSK 1',
+    station: 'HSK 2',
     sequenceOrder: 33,
     description: 'All four grandparents and all eight cousin terms (paternal and maternal).',
     items: [
@@ -424,7 +424,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-75',
-    name: 'Animals 1 — Edible',
+    name: 'Animals 1',
     category: 'vocab',
     station: 'HSK 1',
     sequenceOrder: 22,
@@ -558,9 +558,9 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-76',
-    name: 'Animals 2 — Others',
+    name: 'Animals 2',
     category: 'vocab',
-    station: 'HSK 1',
+    station: 'HSK 2',
     sequenceOrder: 35,
     description: 'Non-edible animals: wild, domestic, and iconic — from dogs to pandas.',
     items: [
@@ -669,7 +669,7 @@ const TOPICS: Topic[] = [
     id: 'topic-77',
     name: 'Chinese Zodiac',
     category: 'vocab',
-    station: 'HSK 1',
+    station: 'HSK 2',
     sequenceOrder: 45,
     description: 'The 12 animals of the Chinese zodiac (十二生肖) — their names, order, and how to say which sign you are.',
     items: [
