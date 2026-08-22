@@ -498,7 +498,7 @@ const TOPICS: Topic[] = [
     description: 'Systematic drill of all ~150 HSK 1 words.',
   },
   {
-    id: 'topic-19', name: '★ Boss: HSK 1 exam', category: 'exam',
+    id: 'topic-19', name: 'HSK 1 exam', category: 'exam',
     station: 'HSK 1', sequenceOrder: 28, items: [],
     description: 'The HSK 1 examination milestone.',
   },
@@ -756,7 +756,7 @@ const TOPICS: Topic[] = [
     station: 'HSK 2', sequenceOrder: 48, items: [],
   },
   {
-    id: 'topic-34', name: '★ Boss: HSK 2 exam', category: 'exam',
+    id: 'topic-34', name: 'HSK 2 exam', category: 'exam',
     station: 'HSK 2', sequenceOrder: 49, items: [],
   },
 
@@ -952,7 +952,7 @@ const TOPICS: Topic[] = [
     station: 'HSK 3', sequenceOrder: 65, items: [],
   },
   {
-    id: 'topic-44', name: '★ Boss: HSK 3 exam', category: 'exam',
+    id: 'topic-44', name: 'HSK 3 exam', category: 'exam',
     station: 'HSK 3', sequenceOrder: 66, items: [],
   },
 
@@ -1110,7 +1110,7 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-55', name: '★ Boss: HSK 4 exam', category: 'exam',
+    id: 'topic-55', name: 'HSK 4 exam', category: 'exam',
     station: 'HSK 4', sequenceOrder: 82, items: [],
   },
 ];
