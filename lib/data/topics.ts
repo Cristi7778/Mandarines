@@ -721,7 +721,7 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-31', name: 'Vocabulary: weather', category: 'vocab',
+    id: 'topic-31', name: 'Weather', category: 'vocab',
     station: 'HSK 2', sequenceOrder: 48,
     description: 'Seasons, conditions and temperature.',
     items: [
@@ -740,7 +740,7 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-32', name: 'Vocabulary: transportation', category: 'vocab',
+    id: 'topic-32', name: 'Transportation', category: 'vocab',
     station: 'HSK 2', sequenceOrder: 49,
     description: 'Getting around: buses, trains, taxis and more.',
     items: [
@@ -767,7 +767,7 @@ const TOPICS: Topic[] = [
 
   // ─── Station: HSK 3 ───────────────────────────────────────────────────────
   {
-    id: 'topic-35', name: 'Vocabulary: work', category: 'vocab',
+    id: 'topic-35', name: 'Work', category: 'vocab',
     station: 'HSK 3', sequenceOrder: 52,
     description: 'Office life, jobs and professional vocabulary.',
     items: [
@@ -786,7 +786,7 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-36', name: 'Vocabulary: school', category: 'vocab',
+    id: 'topic-36', name: 'School', category: 'vocab',
     station: 'HSK 3', sequenceOrder: 53,
     description: 'University life, exams and academic vocabulary.',
     items: [
@@ -805,7 +805,7 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-37', name: 'Vocabulary: hobbies', category: 'vocab',
+    id: 'topic-37', name: 'Hobbies', category: 'vocab',
     station: 'HSK 3', sequenceOrder: 54,
     description: 'Sports, arts and leisure activities.',
     items: [
@@ -824,7 +824,7 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-38', name: 'Vocabulary: travel', category: 'vocab',
+    id: 'topic-38', name: 'Travel', category: 'vocab',
     station: 'HSK 3', sequenceOrder: 55,
     description: 'Airports, hotels, passports and getting around.',
     items: [
@@ -843,8 +843,28 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-39', name: 'Vocabulary: shopping', category: 'vocab',
-    station: 'HSK 3', sequenceOrder: 56,
+    id: 'topic-78',
+    name: 'Vegetables',
+    category: 'vocab',
+    station: 'HSK 3',
+    sequenceOrder: 56,
+    description: 'Common vegetables in Chinese cooking and daily life.',
+    items: [
+      it('t78i1',  'topic-78', '白菜',  'báicài',  'Chinese cabbage',  '我妈妈喜欢炒',   '。',                   'My mom likes to stir-fry cabbage.'),
+      it('t78i2',  'topic-78', '土豆',  'tǔdòu',   'potato',           '我喜欢吃',       '。',                   'I like eating potatoes.'),
+      it('t78i3',  'topic-78', '番茄',  'fānqié',  'tomato',           '',               '炒鸡蛋很好吃。',       'Tomato and egg stir-fry is delicious.'),
+      it('t78i4',  'topic-78', '黄瓜',  'huángguā','cucumber',         '她买了几根',     '。',                   'She bought a few cucumbers.'),
+      it('t78i5',  'topic-78', '胡萝卜','húluóbo',  'carrot',           '兔子喜欢吃',     '。',                   'Rabbits like eating carrots.'),
+      it('t78i6',  'topic-78', '茄子',  'qiézi',   'eggplant',         '这道菜是红烧',   '。',                   'This dish is braised eggplant.'),
+      it('t78i7',  'topic-78', '洋葱',  'yángcōng','onion',            '切',             '的时候会流眼泪。',     'You cry when cutting onions.'),
+      it('t78i8',  'topic-78', '菠菜',  'bōcài',   'spinach',          '这个汤里有',     '。',                   'There is spinach in this soup.'),
+      it('t78i9',  'topic-78', '大蒜',  'dàsuàn',  'garlic',           '中国菜常常用',   '。',                   'Chinese cooking often uses garlic.'),
+      it('t78i10', 'topic-78', '豆腐',  'dòufu',   'tofu',             '我喜欢吃麻婆',   '。',                   'I like eating mapo tofu.'),
+    ],
+  },
+  {
+    id: 'topic-39', name: 'Shopping', category: 'vocab',
+    station: 'HSK 3', sequenceOrder: 57,
     description: 'Prices, payments, quality and returns.',
     items: [
       it('t39i1',  'topic-39', '超市',   'chāoshì',    'supermarket',          '我去',       '买东西。',     'I go to the supermarket to buy things.'),
@@ -863,7 +883,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-40', name: 'Result complements', category: 'grammar',
-    station: 'HSK 3', sequenceOrder: 57,
+    station: 'HSK 3', sequenceOrder: 58,
     description: 'Verb + result complement: 好, 完, 到, 错, 住 — expressing the outcome of an action.',
     items: [
       it('t40i1', 'topic-40', '好', 'hǎo', 'result complement: done properly / successfully',  '作业做',   '了。',         'The homework is done properly.',      'Verb + 好 = the action reached a satisfactory result.'),
@@ -878,7 +898,7 @@ const TOPICS: Topic[] = [
     name: 'Potential complements',
     category: 'grammar',
     station: 'HSK 3',
-    sequenceOrder: 58,
+    sequenceOrder: 59,
     description: 'Verb + 得/不 + result: expressing what you can or cannot accomplish.',
     items: [
       it('t67i1', 'topic-67', '看不懂', 'kàn bù dǒng','can\'t understand (reading/watching)', '这本书我',   '。',     "I can't understand this book.",        '看得懂 = can understand; 看不懂 = can\'t.'),
@@ -889,13 +909,13 @@ const TOPICS: Topic[] = [
       it('t67i6', 'topic-67', '找不到', 'zhǎo bù dào','can\'t find',                          '我的钥匙',   '了。',  "I can't find my keys.",                '找得到 = can find.'),
     ],
   },
-  // lessons 越来越, 一边…一边, 除了…以外 are in lib/data/lessons.ts at seq 59, 60, 61
+  // lessons 越来越, 一边…一边, 除了…以外 are in lib/data/lessons.ts at seq 60, 61, 62
   {
     id: 'topic-68',
     name: 'Giving opinions',
     category: 'vocab',
     station: 'HSK 3',
-    sequenceOrder: 62,
+    sequenceOrder: 63,
     description: 'Key vocabulary for expressing and discussing opinions.',
     items: [
       it('t68i1', 'topic-68', '觉得', 'juéde',   'to feel; to think',         '我',       '你说得对。',     'I think you are right.'),
@@ -910,18 +930,18 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-41', name: 'Reading: short dialogues & stories', category: 'reading',
-    station: 'HSK 3', sequenceOrder: 63, items: [],
+    station: 'HSK 3', sequenceOrder: 64, items: [],
   },
   {
     id: 'topic-42', name: 'Listening: multi-speaker dialogues', category: 'listening',
-    station: 'HSK 3', sequenceOrder: 64, items: [],
+    station: 'HSK 3', sequenceOrder: 65, items: [],
   },
   {
     id: 'topic-69',
     name: 'Idioms & set expressions',
     category: 'vocab',
     station: 'HSK 3',
-    sequenceOrder: 65,
+    sequenceOrder: 66,
     description: 'Six common chengyu and set phrases for natural, fluent speech.',
     items: [
       it('t69i1', 'topic-69', '马马虎虎', 'mǎma hūhū',    'so-so; careless',                  '他做事',     '的。',               "He's careless about things."),
@@ -934,25 +954,25 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-43', name: 'Write a short essay (5+ sentences)', category: 'writing',
-    station: 'HSK 3', sequenceOrder: 66, items: [],
+    station: 'HSK 3', sequenceOrder: 67, items: [],
   },
   {
     id: 'topic-44', name: '★ Boss: HSK 3 exam', category: 'exam',
-    station: 'HSK 3', sequenceOrder: 67, items: [],
+    station: 'HSK 3', sequenceOrder: 68, items: [],
   },
 
   // ─── Station: HSK 4 ───────────────────────────────────────────────────────
-  // lesson-8  (把 construction)    at seq 68
-  // lesson-9  (被 construction)    at seq 69
-  // lesson-10 (是…的 emphasis)     at seq 70
-  // lesson-11 (Conditionals)       at seq 71
-  // lesson-12 (连…都/也)            at seq 72
+  // lesson-8  (把 construction)    at seq 69
+  // lesson-9  (被 construction)    at seq 70
+  // lesson-10 (是…的 emphasis)     at seq 71
+  // lesson-11 (Conditionals)       at seq 72
+  // lesson-12 (连…都/也)            at seq 73
   {
     id: 'topic-70',
     name: 'Concessive & conditional connectors',
     category: 'grammar',
     station: 'HSK 4',
-    sequenceOrder: 73,
+    sequenceOrder: 74,
     description: '即使, 只有, 无论, 不管 — advanced conditional and concessive patterns.',
     items: [
       it('t70i1', 'topic-70', '即使', 'jíshǐ',   'even if (即使…也)',             '',         '下雨，他也来。',       'Even if it rains, he will come.'),
@@ -965,7 +985,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-49', name: 'Grammar: complex comparisons', category: 'grammar',
-    station: 'HSK 4', sequenceOrder: 74,
+    station: 'HSK 4', sequenceOrder: 75,
     description: 'Expressing degree, multiples, and nuanced contrasts.',
     items: [
       it('t49i1', 'topic-49', '倍',   'bèi',      'times; -fold',             '这个价格是那个的两', '。',               'This price is twice that one.'),
@@ -979,8 +999,8 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-50', name: 'Vocabulary: opinions & emotions', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 75,
+    id: 'topic-50', name: 'Opinions & emotions', category: 'vocab',
+    station: 'HSK 4', sequenceOrder: 76,
     description: 'Verbs and adjectives for expressing opinions and feelings.',
     items: [
       it('t50i1',  'topic-50', '认为', 'rènwéi',   'to think; to believe',     '我',           '这个方法很好。',   'I think this method is good.'),
@@ -998,8 +1018,8 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-51', name: 'Vocabulary: workplace & social', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 76,
+    id: 'topic-51', name: 'Workplace & social', category: 'vocab',
+    station: 'HSK 4', sequenceOrder: 77,
     description: 'Nouns and verbs for professional and social contexts.',
     items: [
       it('t51i1',  'topic-51', '责任', 'zérèn',    'responsibility',           '这是你的',     '。',               'This is your responsibility.'),
@@ -1017,8 +1037,8 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-56', name: 'Vocabulary: society & culture', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 77,
+    id: 'topic-56', name: 'Society & culture', category: 'vocab',
+    station: 'HSK 4', sequenceOrder: 78,
     description: 'Social, civic, and cultural vocabulary.',
     items: [
       it('t56i1',  'topic-56', '文化', 'wénhuà',   'culture',               '中国',       '很丰富。',           'Chinese culture is very rich.'),
@@ -1034,8 +1054,8 @@ const TOPICS: Topic[] = [
     ],
   },
   {
-    id: 'topic-57', name: 'Vocabulary: environment & nature', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 78,
+    id: 'topic-57', name: 'Environment & nature', category: 'vocab',
+    station: 'HSK 4', sequenceOrder: 79,
     description: 'Environmental and ecological vocabulary.',
     items: [
       it('t57i1',  'topic-57', '污染', 'wūrǎn',    'pollution; to pollute', '空气',       '越来越严重。',       'Air pollution is getting more and more serious.'),
@@ -1052,10 +1072,10 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-71',
-    name: 'Vocabulary: technology & media',
+    name: 'Technology & media',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 79,
+    sequenceOrder: 80,
     description: 'Digital life, internet and media vocabulary.',
     items: [
       it('t71i1',  'topic-71', '网络',   'wǎngluò',   'internet; network',          '现在',       '很普及。',       'The internet is now very widespread.'),
@@ -1072,18 +1092,18 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-52', name: 'Reading: short essays (100–200 characters)', category: 'reading',
-    station: 'HSK 4', sequenceOrder: 80, items: [],
+    station: 'HSK 4', sequenceOrder: 81, items: [],
   },
   {
     id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
-    station: 'HSK 4', sequenceOrder: 81, items: [],
+    station: 'HSK 4', sequenceOrder: 82, items: [],
   },
   {
     id: 'topic-72',
     name: 'Formal register & rhetorical questions',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 82,
+    sequenceOrder: 83,
     description: 'Polite forms and rhetorical structures for formal speech and writing.',
     items: [
       it('t72i1', 'topic-72', '难道',   'nándào',   'could it be that; don\'t tell me', '',   '你不知道吗？',     "Could it be that you don't know?"),
@@ -1096,11 +1116,11 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-54', name: 'Full timed mock HSK 4 exams', category: 'exam',
-    station: 'HSK 4', sequenceOrder: 83, items: [],
+    station: 'HSK 4', sequenceOrder: 84, items: [],
   },
   {
     id: 'topic-55', name: '★ Boss: HSK 4 exam', category: 'exam',
-    station: 'HSK 4', sequenceOrder: 84, items: [],
+    station: 'HSK 4', sequenceOrder: 85, items: [],
   },
 ];
 
