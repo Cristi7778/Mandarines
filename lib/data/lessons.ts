@@ -152,7 +152,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-6',
     name: '一边…一边 (Doing two things at once)',
     station: 'HSK 3',
-    sequenceOrder: 61,
+    sequenceOrder: 62,
     description: 'Expressing two simultaneous actions.',
     xp: 25,
     sections: [
@@ -178,7 +178,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-7',
     name: '除了…以外 (Besides / Except)',
     station: 'HSK 3',
-    sequenceOrder: 62,
+    sequenceOrder: 63,
     description: 'Two contrasting uses: adding to a set (besides) or excluding from a set (except).',
     xp: 25,
     sections: [
@@ -211,7 +211,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-8',
     name: '把 construction (把字句)',
     station: 'HSK 4',
-    sequenceOrder: 69,
+    sequenceOrder: 70,
     description: 'The disposal marker: restructuring a sentence to focus on what happens to the object.',
     xp: 30,
     sections: [
@@ -246,7 +246,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-9',
     name: '被 construction (被字句)',
     station: 'HSK 4',
-    sequenceOrder: 70,
+    sequenceOrder: 71,
     description: 'The passive marker: expressing that the subject is acted upon by someone or something.',
     xp: 30,
     sections: [
@@ -281,7 +281,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-10',
     name: '是…的 emphasis structure',
     station: 'HSK 4',
-    sequenceOrder: 71,
+    sequenceOrder: 72,
     description: 'Highlighting when, where, how, or who regarding a past action — not the action itself.',
     xp: 25,
     sections: [
@@ -316,7 +316,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-11',
     name: 'Conditionals: 如果/只要/既然',
     station: 'HSK 4',
-    sequenceOrder: 72,
+    sequenceOrder: 73,
     description: 'Three conditional connectives: hypothetical, sufficient condition, and accepted fact.',
     xp: 30,
     sections: [
@@ -350,7 +350,7 @@ const LESSONS: Lesson[] = [
     id: 'lesson-12',
     name: '连…都/也 (Even)',
     station: 'HSK 4',
-    sequenceOrder: 73,
+    sequenceOrder: 74,
     description: 'Highlighting an extreme or unexpected case to strengthen a claim.',
     xp: 25,
     sections: [
