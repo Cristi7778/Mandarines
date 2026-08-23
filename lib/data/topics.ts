@@ -758,10 +758,6 @@ const TOPICS: Topic[] = [
     id: 'topic-33', name: 'Listening practice (HSK 2 audio)', category: 'listening',
     station: 'HSK 2', sequenceOrder: 49, items: [],
   },
-  {
-    id: 'topic-34', name: 'HSK 2 exam', category: 'exam',
-    station: 'HSK 2', sequenceOrder: 50, items: [],
-  },
 
   // ─── Station: HSK 3 ───────────────────────────────────────────────────────
   {
