@@ -229,22 +229,19 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-62',
-    name: 'Clothing & body parts',
+    name: 'Body parts',
     category: 'vocab',
     station: 'HSK 1',
     sequenceOrder: 14,
-    description: 'Common clothing items and basic body parts.',
+    description: 'Basic body parts.',
     items: [
-      it('t62i1',  'topic-62', '衣服', 'yīfu',    'clothes',          '这件',     '很漂亮。',       'These clothes are very beautiful.'),
-      it('t62i2',  'topic-62', '裤子', 'kùzi',    'pants; trousers',  '我买了一条新','。',           'I bought new pants.'),
-      it('t62i3',  'topic-62', '鞋',   'xié',     'shoes',            '你的',     '很好看。',       'Your shoes look great.'),
-      it('t62i4',  'topic-62', '帽子', 'màozi',   'hat; cap',         '他戴着一顶','。',             'He is wearing a hat.'),
       it('t62i5',  'topic-62', '手',   'shǒu',    'hand',             '请举',     '。',             'Please raise your hand.'),
       it('t62i6',  'topic-62', '脚',   'jiǎo',    'foot; feet',       '我的',     '很痛。',         'My feet hurt.'),
       it('t62i7',  'topic-62', '头',   'tóu',     'head',             '我',       '疼。',           'My head hurts.'),
       it('t62i8',  'topic-62', '眼睛', 'yǎnjing', 'eyes',             '她的',     '很大。',         'Her eyes are very big.'),
       it('t62i9',  'topic-62', '嘴',   'zuǐ',     'mouth',            '请张',     '。',             'Please open your mouth.'),
       it('t62i10', 'topic-62', '耳朵', 'ěrduo',   'ears',             '他的',     '很灵。',         'His hearing is very sharp.'),
+      it('t62i11', 'topic-62', '背',   'bèi',     'back',             '我的',     '很痛。',         'My back hurts.'),
     ],
   },
   {
@@ -575,17 +572,11 @@ const TOPICS: Topic[] = [
     description: 'Body parts, illness, and healthcare vocabulary.',
     items: [
       it('t23i1',  'topic-23', '身体', 'shēntǐ',   'body; health',             '你的',       '怎么样？',     'How is your health?'),
-      it('t23i2',  'topic-23', '头',   'tóu',      'head',                     '我',         '疼。',         'My head hurts.'),
-      it('t23i3',  'topic-23', '脚',   'jiǎo',     'foot; leg',                '我的',       '受伤了。',     'My foot is injured.'),
-      it('t23i4',  'topic-23', '眼睛', 'yǎnjing',  'eye(s)',                   '她的',       '很大。',       'Her eyes are very big.'),
-      it('t23i5',  'topic-23', '耳朵', 'ěrduo',    'ear(s)',                   '他的',       '很好。',       'His hearing is very good.'),
-      it('t23i6',  'topic-23', '嘴',   'zuǐ',      'mouth',                    '请闭上你的', '。',           'Please close your mouth.'),
       it('t23i7',  'topic-23', '生病', 'shēngbìng','to get sick; to fall ill', '他今天',     '了。',         'He is sick today.'),
       it('t23i8',  'topic-23', '医生', 'yīshēng',  'doctor',                   '',           '说我需要休息。','The doctor said I need to rest.'),
       it('t23i9',  'topic-23', '医院', 'yīyuàn',   'hospital',                 '我去',       '看病。',       'I go to the hospital to see a doctor.'),
       it('t23i10', 'topic-23', '药',   'yào',      'medicine',                 '你吃',       '了吗？',       'Did you take your medicine?'),
       it('t23i11', 'topic-23', '头疼', 'tóuténg',  'headache',                 '我',         '，不想去上课。','I have a headache and don\'t want to go to class.'),
-      it('t23i12', 'topic-23', '发烧', 'fāshāo',   'to have a fever',          '孩子',       '了。',         'The child has a fever.'),
       it('t23i13', 'topic-23', '休息', 'xiūxi',    'to rest',                  '你需要好好', '。',           'You need to rest well.'),
       it('t23i14', 'topic-23', '运动', 'yùndòng',  'exercise; sport',          '每天',       '对身体很好。', 'Exercising every day is good for your health.'),
     ],
@@ -955,7 +946,19 @@ const TOPICS: Topic[] = [
       it('t67i6', 'topic-67', '找不到', 'zhǎo bù dào','can\'t find',                          '我的钥匙',   '了。',  "I can't find my keys.",                '找得到 = can find.'),
     ],
   },
-  // lessons 越来越, 一边…一边, 除了…以外 are in lib/data/lessons.ts at seq 61, 63, 64
+  // lessons 越来越, 一边…一边, 除了…以外 are in lib/data/lessons.ts at seq 61, 64, 65
+  {
+    id: 'topic-84', name: 'Body parts 2', category: 'vocab',
+    station: 'HSK 3', sequenceOrder: 63,
+    description: 'More body parts: torso and limbs.',
+    items: [
+      it('t84i1', 'topic-84', '肚子', 'dùzi',    'stomach; belly', '我',       '疼。',         'My stomach hurts.'),
+      it('t84i2', 'topic-84', '胸',   'xiōng',   'chest',          '他',       '很痛。',       'His chest hurts.'),
+      it('t84i3', 'topic-84', '肩膀', 'jiānbǎng','shoulder',       '我的',     '很酸。',       'My shoulders are sore.'),
+      it('t84i4', 'topic-84', '脖子', 'bózi',    'neck',           '她的',     '很长。',       'Her neck is very long.'),
+      it('t84i5', 'topic-84', '膝盖', 'xīgài',   'knee',           '他的',     '受伤了。',     'His knee is injured.'),
+    ],
+  },
   {
     id: 'topic-81', name: 'Frequency adverbs', category: 'vocab',
     station: 'HSK 3', sequenceOrder: 62,
@@ -976,7 +979,7 @@ const TOPICS: Topic[] = [
     name: 'Giving opinions',
     category: 'vocab',
     station: 'HSK 3',
-    sequenceOrder: 65,
+    sequenceOrder: 66,
     description: 'Key vocabulary for expressing and discussing opinions.',
     items: [
       it('t68i1', 'topic-68', '觉得', 'juéde',   'to feel; to think',         '我',       '你说得对。',     'I think you are right.'),
@@ -991,18 +994,18 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-41', name: 'Reading: short dialogues & stories', category: 'reading',
-    station: 'HSK 3', sequenceOrder: 66, items: [],
+    station: 'HSK 3', sequenceOrder: 67, items: [],
   },
   {
     id: 'topic-42', name: 'Listening: multi-speaker dialogues', category: 'listening',
-    station: 'HSK 3', sequenceOrder: 67, items: [],
+    station: 'HSK 3', sequenceOrder: 68, items: [],
   },
   {
     id: 'topic-69',
     name: 'Idioms & set expressions',
     category: 'vocab',
     station: 'HSK 3',
-    sequenceOrder: 68,
+    sequenceOrder: 69,
     description: 'Six common chengyu and set phrases for natural, fluent speech.',
     items: [
       it('t69i1', 'topic-69', '马马虎虎', 'mǎma hūhū',    'so-so; careless',                  '他做事',     '的。',               "He's careless about things."),
@@ -1015,16 +1018,16 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-43', name: 'Write a short essay (5+ sentences)', category: 'writing',
-    station: 'HSK 3', sequenceOrder: 69, items: [],
+    station: 'HSK 3', sequenceOrder: 70, items: [],
   },
   {
     id: 'topic-44', name: 'HSK 3 exam', category: 'exam',
-    station: 'HSK 3', sequenceOrder: 70, items: [],
+    station: 'HSK 3', sequenceOrder: 71, items: [],
   },
 
   {
     id: 'topic-83', name: 'Festivals & holidays', category: 'vocab',
-    station: 'HSK 3', sequenceOrder: 71,
+    station: 'HSK 3', sequenceOrder: 72,
     description: 'Major Chinese festivals and public holidays.',
     items: [
       it('t83i1', 'topic-83', '春节',   'Chūnjié',    'Spring Festival (Chinese New Year)', '我们一家人一起过', '。',         'Our whole family celebrates Spring Festival together.'),
@@ -1039,17 +1042,17 @@ const TOPICS: Topic[] = [
   },
 
   // ─── Station: HSK 4 ───────────────────────────────────────────────────────
-  // lesson-8  (把 construction)    at seq 72
-  // lesson-9  (被 construction)    at seq 73
-  // lesson-10 (是…的 emphasis)     at seq 74
-  // lesson-11 (Conditionals)       at seq 75
-  // lesson-12 (连…都/也)            at seq 76
+  // lesson-8  (把 construction)    at seq 73
+  // lesson-9  (被 construction)    at seq 74
+  // lesson-10 (是…的 emphasis)     at seq 75
+  // lesson-11 (Conditionals)       at seq 76
+  // lesson-12 (连…都/也)            at seq 77
   {
     id: 'topic-70',
     name: 'Concessive & conditional connectors',
     category: 'grammar',
     station: 'HSK 4',
-    sequenceOrder: 77,
+    sequenceOrder: 78,
     description: '即使, 只有, 无论, 不管 — advanced conditional and concessive patterns.',
     items: [
       it('t70i1', 'topic-70', '即使', 'jíshǐ',   'even if (即使…也)',             '',         '下雨，他也来。',       'Even if it rains, he will come.'),
@@ -1062,7 +1065,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-49', name: 'Grammar: complex comparisons', category: 'grammar',
-    station: 'HSK 4', sequenceOrder: 78,
+    station: 'HSK 4', sequenceOrder: 79,
     description: 'Expressing degree, multiples, and nuanced contrasts.',
     items: [
       it('t49i1', 'topic-49', '倍',   'bèi',      'times; -fold',             '这个价格是那个的两', '。',               'This price is twice that one.'),
@@ -1077,7 +1080,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-50', name: 'Opinions & emotions', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 79,
+    station: 'HSK 4', sequenceOrder: 80,
     description: 'Verbs and adjectives for expressing opinions and feelings.',
     items: [
       it('t50i1',  'topic-50', '认为', 'rènwéi',   'to think; to believe',     '我',           '这个方法很好。',   'I think this method is good.'),
@@ -1096,7 +1099,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-51', name: 'Workplace & social', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 80,
+    station: 'HSK 4', sequenceOrder: 81,
     description: 'Nouns and verbs for professional and social contexts.',
     items: [
       it('t51i1',  'topic-51', '责任', 'zérèn',    'responsibility',           '这是你的',     '。',               'This is your responsibility.'),
@@ -1115,7 +1118,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-56', name: 'Society & culture', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 81,
+    station: 'HSK 4', sequenceOrder: 82,
     description: 'Social, civic, and cultural vocabulary.',
     items: [
       it('t56i1',  'topic-56', '文化', 'wénhuà',   'culture',               '中国',       '很丰富。',           'Chinese culture is very rich.'),
@@ -1132,7 +1135,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-57', name: 'Environment & nature', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 82,
+    station: 'HSK 4', sequenceOrder: 83,
     description: 'Environmental and ecological vocabulary.',
     items: [
       it('t57i1',  'topic-57', '污染', 'wūrǎn',    'pollution; to pollute', '空气',       '越来越严重。',       'Air pollution is getting more and more serious.'),
@@ -1152,7 +1155,7 @@ const TOPICS: Topic[] = [
     name: 'Technology & media',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 83,
+    sequenceOrder: 84,
     description: 'Digital life, internet and media vocabulary.',
     items: [
       it('t71i1',  'topic-71', '网络',   'wǎngluò',   'internet; network',          '现在',       '很普及。',       'The internet is now very widespread.'),
@@ -1169,18 +1172,18 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-52', name: 'Reading: short essays (100–200 characters)', category: 'reading',
-    station: 'HSK 4', sequenceOrder: 84, items: [],
+    station: 'HSK 4', sequenceOrder: 85, items: [],
   },
   {
     id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
-    station: 'HSK 4', sequenceOrder: 85, items: [],
+    station: 'HSK 4', sequenceOrder: 86, items: [],
   },
   {
     id: 'topic-72',
     name: 'Formal register & rhetorical questions',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 86,
+    sequenceOrder: 87,
     description: 'Polite forms and rhetorical structures for formal speech and writing.',
     items: [
       it('t72i1', 'topic-72', '难道',   'nándào',   'could it be that; don\'t tell me', '',   '你不知道吗？',     "Could it be that you don't know?"),
@@ -1193,7 +1196,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-55', name: 'HSK 4 exam', category: 'exam',
-    station: 'HSK 4', sequenceOrder: 87, items: [],
+    station: 'HSK 4', sequenceOrder: 88, items: [],
   },
 ];
 
