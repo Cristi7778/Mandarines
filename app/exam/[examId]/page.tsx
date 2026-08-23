@@ -206,31 +206,58 @@ function OptBtn({
 
 // ── Results screen ────────────────────────────────────────────────────────────
 
+const POINTS_PER_Q = 5; // 40 questions × 5 = 200 total
+const MAX_SCORE    = ALL_QS.length * POINTS_PER_Q; // 200
+const PASS_SCORE   = 120;
+
 function ResultsScreen({ answers, xpEarned }: { answers: Record<number, string>; xpEarned: number }) {
-  const score = ALL_QS.filter(q => answers[q.num] === q.answer).length;
+  const correct = ALL_QS.filter(q => answers[q.num] === q.answer).length;
+  const points  = correct * POINTS_PER_Q;
+  const passed  = points >= PASS_SCORE;
 
   const partScores = PARTS.map(p => ({
-    label: p.label,
-    score: p.questions.filter(q => answers[q.num] === q.answer).length,
-    total: p.questions.length,
+    label:  p.label,
+    points: p.questions.filter(q => answers[q.num] === q.answer).length * POINTS_PER_Q,
+    max:    p.questions.length * POINTS_PER_Q,
   }));
+
+  const listeningPoints = partScores.slice(0, 4).reduce((n, p) => n + p.points, 0);
+  const readingPoints   = partScores.slice(4).reduce((n, p) => n + p.points, 0);
 
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center space-y-2">
-        <p className="text-5xl font-bold text-gray-800">{score}<span className="text-2xl text-gray-400 font-normal"> / {ALL_QS.length}</span></p>
-        <p className="text-base text-gray-500">
-          {score >= 36 ? '🏆 Excellent!' : score >= 28 ? '👍 Good job' : score >= 20 ? '📚 Keep studying' : '💪 Keep going'}
+        <p className="text-5xl font-bold text-gray-800">
+          {points}<span className="text-2xl text-gray-400 font-normal"> / {MAX_SCORE}</span>
+        </p>
+        <p className={`text-base font-semibold ${passed ? 'text-green-600' : 'text-red-500'}`}>
+          {passed ? (points >= 180 ? '🏆 Excellent!' : '✅ Pass') : '❌ Not passed — 120 required'}
         </p>
         <p className="text-sm text-amber-600 font-semibold">+{xpEarned} XP</p>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-gray-100">
-        {partScores.map(p => (
-          <div key={p.label} className="px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-gray-600">{p.label}</span>
-            <span className={`text-sm font-semibold ${p.score === p.total ? 'text-green-600' : p.score >= 3 ? 'text-amber-600' : 'text-red-500'}`}>
-              {p.score} / {p.total}
+        <div className="px-4 py-3 flex items-center justify-between bg-gray-50">
+          <span className="text-sm font-semibold text-gray-700">Listening</span>
+          <span className="text-sm font-semibold text-gray-700">{listeningPoints} / 100</span>
+        </div>
+        {partScores.slice(0, 4).map(p => (
+          <div key={p.label} className="px-4 py-2.5 flex items-center justify-between pl-8">
+            <span className="text-sm text-gray-500">{p.label}</span>
+            <span className={`text-sm font-medium ${p.points === p.max ? 'text-green-600' : p.points >= 15 ? 'text-amber-600' : 'text-red-500'}`}>
+              {p.points} / {p.max}
+            </span>
+          </div>
+        ))}
+        <div className="px-4 py-3 flex items-center justify-between bg-gray-50">
+          <span className="text-sm font-semibold text-gray-700">Reading</span>
+          <span className="text-sm font-semibold text-gray-700">{readingPoints} / 100</span>
+        </div>
+        {partScores.slice(4).map(p => (
+          <div key={p.label} className="px-4 py-2.5 flex items-center justify-between pl-8">
+            <span className="text-sm text-gray-500">{p.label}</span>
+            <span className={`text-sm font-medium ${p.points === p.max ? 'text-green-600' : p.points >= 15 ? 'text-amber-600' : 'text-red-500'}`}>
+              {p.points} / {p.max}
             </span>
           </div>
         ))}
@@ -422,11 +449,8 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen to the dialogue and pick the matching picture.</p>
-              <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  <AudioBtn src={lq.audio} autoPlay />
-                  <p className="chinese-text text-base text-gray-700 leading-relaxed">{lq.zh}</p>
-                </div>
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 flex justify-center">
+                <AudioBtn src={lq.audio} autoPlay />
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {(Object.entries(L3_BANK) as [L6, { img: string; desc: string }][]).map(([letter, opt]) => (

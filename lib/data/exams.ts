@@ -3,10 +3,10 @@ import type { Exam } from '@/lib/types';
 const EXAMS: Exam[] = [
   {
     id: 'exam-hsk1-h10901',
-    name: 'HSK 1 Exam · H10901',
+    name: 'HSK 1 Exam',
     station: 'HSK 1',
     sequenceOrder: 28,
-    description: 'Official HSK 1 practice exam — 20 listening + 20 reading questions.',
+    description: 'Official HSK1 example',
   },
 ];
 
