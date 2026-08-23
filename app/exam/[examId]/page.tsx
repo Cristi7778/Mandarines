@@ -197,10 +197,11 @@ function LetterPicker({
 }
 
 // Shared picture bank grid (for L3 and R2)
-function PictureBank({ bank, confirmed, selected }: {
+function PictureBank({ bank, confirmed, selected, imgHeight = 'h-[72px]' }: {
   bank: Record<L6, { img: string; desc: string }>;
   confirmed: boolean;
   selected: Record<number, string>;
+  imgHeight?: string;
 }) {
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -209,7 +210,7 @@ function PictureBank({ bank, confirmed, selected }: {
         const usedBy = Object.entries(selected).filter(([, v]) => v === letter);
         return (
           <div key={letter} className="relative">
-            <ImgOrDesc src={opt.img} desc={opt.desc} className="w-full h-[72px]" />
+            <ImgOrDesc src={opt.img} desc={opt.desc} className={`w-full ${imgHeight}`} />
             <span className={`absolute top-1 left-1 text-xs font-bold px-1.5 py-0.5 rounded ${
               confirmed && usedBy.length > 0 ? 'bg-orange-500 text-white' : 'bg-black/60 text-white'
             }`}>{letter}</span>
@@ -433,7 +434,7 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
               <p className="text-sm text-gray-500">Listen. Does it match the picture?</p>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
                 <div className="flex justify-center"><AudioBtn src={lq.audio} autoPlay /></div>
-                <ImgOrDesc src={lq.image} desc={lq.desc} className="w-full h-48" />
+                <ImgOrDesc src={lq.image} desc={lq.desc} className="w-full h-36" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {(['✓', '✗'] as TF[]).map(v => {
@@ -476,7 +477,7 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
         {section === 'L3' && (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Listen to each dialogue and pick the matching picture (A–F).</p>
-            <PictureBank bank={L3_BANK} confirmed={matchConfirmed} selected={matchAnswers} />
+            <PictureBank bank={L3_BANK} confirmed={matchConfirmed} selected={matchAnswers} imgHeight="h-[130px]" />
             <div className="space-y-2">
               {L3_QS.map(lq => (
                 <div key={lq.num} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3">
@@ -549,7 +550,7 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
         {section === 'R2' && (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Match each sentence to the correct picture (A–F).</p>
-            <PictureBank bank={R2_BANK} confirmed={matchConfirmed} selected={matchAnswers} />
+            <PictureBank bank={R2_BANK} confirmed={matchConfirmed} selected={matchAnswers} imgHeight="h-[96px]" />
             <div className="space-y-2">
               {R2_QS.map(rq => (
                 <div key={rq.num} className="bg-white rounded-xl border border-gray-100 p-3 space-y-2">
