@@ -456,8 +456,8 @@ export default function ExamHsk2() {
     );
   }
 
-  const q            = partQs[qIdx]!;
-  const isCorrect    = selected === q.answer;
+  const q            = partQs[qIdx];
+  const isCorrect    = !!q && selected === q.answer;
   const section      = part.section;
   const matchAllFilled = partQs.length > 0 && partQs.every(pq => matchAnswers[pq.num] !== undefined);
 
@@ -480,7 +480,7 @@ export default function ExamHsk2() {
             </div>
             <span className="text-xs text-gray-500 shrink-0">{committedCount + inProgressCount} / {TOTAL_Q}</span>
           </div>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{part.label}{!isMatching && ` · Q${q.num}`}</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{part.label}{!isMatching && q && ` · Q${q.num}`}</p>
         </div>
 
         {/* ── L1: audio + image, ✓/✗ ── */}
@@ -682,7 +682,7 @@ export default function ExamHsk2() {
           <>
             <div className={`rounded-xl p-4 ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
               <p className={`font-semibold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
-                {isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${q.answer}`}
+                {isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${q?.answer}`}
               </p>
             </div>
             <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
