@@ -1018,7 +1018,7 @@ const TOPICS: Topic[] = [
 
   {
     id: 'topic-83', name: 'Festivals & holidays', category: 'vocab',
-    station: 'HSK 3', sequenceOrder: 72,
+    station: 'HSK 4', sequenceOrder: 72,
     description: 'Major Chinese festivals and public holidays.',
     items: [
       it('t83i1', 'topic-83', '春节',   'Chūnjié',    'Spring Festival (Chinese New Year)', '我们一家人一起过', '。',         'Our whole family celebrates Spring Festival together.'),
