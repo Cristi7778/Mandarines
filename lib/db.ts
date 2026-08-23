@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { DrillResult, ItemProgress, PendingDrillMeta, TopicProgress, UserProgress } from './types';
+import type { DrillResult, ExamProgress, ItemProgress, PendingDrillMeta, TopicProgress, UserProgress } from './types';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -163,6 +163,41 @@ export async function markLessonComplete(lessonId: string): Promise<void> {
     { user_id: userId, lesson_id: lessonId, completed_at: new Date().toISOString() },
     { onConflict: 'user_id,lesson_id' }
   );
+}
+
+// ─── ExamProgress ─────────────────────────────────────────────────────────────
+
+export async function getExamProgress(examId: string): Promise<ExamProgress | null> {
+  try {
+    const { data } = await supabase
+      .from('exam_progress')
+      .select('*')
+      .eq('exam_id', examId)
+      .maybeSingle();
+    if (!data) return null;
+    return { examId: data.exam_id, score: data.score, total: data.total, completedAt: data.completed_at };
+  } catch { return null; }
+}
+
+export async function saveExamProgress(p: ExamProgress): Promise<void> {
+  const userId = await uid();
+  if (!userId) return;
+  try {
+    await supabase.from('exam_progress').upsert(
+      { user_id: userId, exam_id: p.examId, score: p.score, total: p.total, completed_at: p.completedAt },
+      { onConflict: 'user_id,exam_id' }
+    );
+  } catch {}
+}
+
+export async function getAllExamProgress(): Promise<Record<string, ExamProgress>> {
+  try {
+    const { data } = await supabase.from('exam_progress').select('*');
+    if (!data) return {};
+    return Object.fromEntries(
+      data.map(row => [row.exam_id, { examId: row.exam_id, score: row.score, total: row.total, completedAt: row.completed_at }])
+    );
+  } catch { return {}; }
 }
 
 // ─── Reset all progress ───────────────────────────────────────────────────────

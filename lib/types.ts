@@ -84,6 +84,21 @@ export interface LessonProgress {
   completed: boolean;
 }
 
+export interface Exam {
+  id: string;
+  name: string;
+  station: string;
+  sequenceOrder: number;
+  description?: string;
+}
+
+export interface ExamProgress {
+  examId: string;
+  score: number;
+  total: number;
+  completedAt: string;
+}
+
 export interface PendingDrillMeta {
   topicId?: string;
   step?: number;

@@ -494,11 +494,6 @@ const TOPICS: Topic[] = [
     station: 'HSK 1', sequenceOrder: 27, items: [],
     description: 'Systematic drill of all ~150 HSK 1 words.',
   },
-  {
-    id: 'topic-19', name: 'HSK 1 exam', category: 'exam',
-    station: 'HSK 1', sequenceOrder: 28, items: [],
-    description: 'The HSK 1 examination milestone.',
-  },
 
   // ─── Station: HSK 2 ───────────────────────────────────────────────────────
   {

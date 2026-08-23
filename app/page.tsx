@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import TOPICS, { topicsByStation, STATIONS } from '@/lib/data/topics';
 import { lessonsByStation } from '@/lib/data/lessons';
-import { getAllTopicProgress, getAllLessonProgress, getUserProgress } from '@/lib/db';
+import { examsByStation } from '@/lib/data/exams';
+import { getAllTopicProgress, getAllLessonProgress, getAllExamProgress, getUserProgress } from '@/lib/db';
 import { supabase } from '@/lib/supabase';
 import { xpToNextLevel } from '@/lib/xp';
 import { useUser } from '@/hooks/useUser';
-import type { Lesson, TopicProgress, UserProgress } from '@/lib/types';
+import type { Exam, ExamProgress, Lesson, TopicProgress, UserProgress } from '@/lib/types';
 
 const STATION_EMOJI: Record<string, string> = {
   Foundation: '',
@@ -62,6 +63,7 @@ export default function HomePage() {
 
   const [topicProgress, setTopicProgress] = useState<Record<string, TopicProgress>>({});
   const [lessonProgress, setLessonProgress] = useState<Record<string, boolean>>({});
+  const [examProgress, setExamProgress] = useState<Record<string, ExamProgress>>({});
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export default function HomePage() {
     if (!user) return;
     getAllTopicProgress().then(setTopicProgress);
     getAllLessonProgress().then(setLessonProgress);
+    getAllExamProgress().then(setExamProgress);
     getUserProgress().then(setUserProgress);
   }, [user, router]);
 
@@ -79,6 +82,7 @@ export default function HomePage() {
 
   const byStation = topicsByStation();
   const lessonsByStationMap = lessonsByStation();
+  const examsByStationMap = examsByStation();
   const xpInfo = userProgress ? xpToNextLevel(userProgress.totalXp) : null;
 
   if (user === undefined || user === null) {
@@ -144,20 +148,21 @@ export default function HomePage() {
         {STATIONS.map(station => {
           const topics = byStation[station] ?? [];
           const lessons = lessonsByStationMap[station] ?? [];
-          const completedTopics = topics.filter(t => {
-            const p = topicProgress[t.id];
-            return p && stepsComplete(p) === 7;
-          }).length;
+          const exams = examsByStationMap[station] ?? [];
+          const completedTopics = topics.filter(t => { const p = topicProgress[t.id]; return p && stepsComplete(p) === 7; }).length;
           const completedLessons = lessons.filter(l => lessonProgress[l.id]).length;
-          const totalItems = topics.length + lessons.length;
-          const completedItems = completedTopics + completedLessons;
+          const completedExams = exams.filter(e => !!examProgress[e.id]).length;
+          const totalItems = topics.length + lessons.length + exams.length;
+          const completedItems = completedTopics + completedLessons + completedExams;
 
           type Row =
-            | { kind: 'topic'; seq: number; data: (typeof topics)[0] }
-            | { kind: 'lesson'; seq: number; data: Lesson };
+            | { kind: 'topic';  seq: number; data: (typeof topics)[0] }
+            | { kind: 'lesson'; seq: number; data: Lesson }
+            | { kind: 'exam';   seq: number; data: Exam };
           const rows: Row[] = [
-            ...topics.map(t => ({ kind: 'topic' as const, seq: t.sequenceOrder, data: t })),
+            ...topics.map(t  => ({ kind: 'topic'  as const, seq: t.sequenceOrder, data: t })),
             ...lessons.map(l => ({ kind: 'lesson' as const, seq: l.sequenceOrder, data: l })),
+            ...exams.map(e   => ({ kind: 'exam'   as const, seq: e.sequenceOrder, data: e })),
           ].sort((a, b) => a.seq - b.seq);
 
           return (
@@ -197,6 +202,36 @@ export default function HomePage() {
                           }`}
                         >
                           {isComplete ? 'Review' : 'Read'}
+                        </Link>
+                      </div>
+                    );
+                  }
+
+                  if (row.kind === 'exam') {
+                    const exam = row.data;
+                    const ep = examProgress[exam.id];
+                    return (
+                      <div key={exam.id} className="bg-white px-4 py-3 flex items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-gray-400 shrink-0">{exam.sequenceOrder}.</span>
+                            <span className="text-base">📋</span>
+                            <span className={`font-medium text-base ${ep ? 'text-green-700' : 'text-gray-800'}`}>{exam.name}</span>
+                            {ep && <span className="text-green-500 text-xs shrink-0">✓</span>}
+                          </div>
+                          {ep ? (
+                            <p className="text-xs text-gray-400 mt-0.5">Last score: {ep.score} / {ep.total}</p>
+                          ) : exam.description ? (
+                            <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{exam.description}</p>
+                          ) : null}
+                        </div>
+                        <Link
+                          href={`/exam/${exam.id}`}
+                          className={`shrink-0 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors ${
+                            ep ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {ep ? 'Retake' : 'Take Exam'}
                         </Link>
                       </div>
                     );
