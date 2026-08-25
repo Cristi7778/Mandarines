@@ -459,6 +459,52 @@ const LESSONS: Lesson[] = [
       },
     ],
   },
+  {
+    id: 'lesson-numbers-composed',
+    name: 'Building Any Number',
+    station: 'Foundation',
+    sequenceOrder: 3.5,
+    description: 'How to compose any number in Mandarin using the building blocks you already know.',
+    xp: 20,
+    sections: [
+      {
+        title: 'Tens: place + digit',
+        body: 'For 20–99, say the tens digit, then 十, then the units digit. Drop the units digit if it is zero.',
+        examples: [
+          { chinese: '二十', pinyin: 'èrshí', english: 'twenty (2 × 10)' },
+          { chinese: '三十五', pinyin: 'sānshíwǔ', english: 'thirty-five (3 × 10 + 5)' },
+          { chinese: '九十九', pinyin: 'jiǔshíjiǔ', english: 'ninety-nine' },
+        ],
+      },
+      {
+        title: 'Hundreds: 百',
+        body: 'Say the hundreds digit, then 百, then the rest. If the tens place is zero, insert 零 as a bridge — even if only one zero is missing.',
+        examples: [
+          { chinese: '三百', pinyin: 'sānbǎi', english: 'three hundred' },
+          { chinese: '一百五十六', pinyin: 'yī bǎi wǔshíliù', english: '156' },
+          { chinese: '二百零三', pinyin: 'èr bǎi líng sān', english: '203 (零 bridges the gap)' },
+        ],
+      },
+      {
+        title: 'Thousands: 千 and the 两 rule',
+        body: '两 (liǎng) replaces 二 before 千 and 万 when expressing a quantity. Use 二 only in sequences like phone numbers or ordinals.',
+        examples: [
+          { chinese: '两千', pinyin: 'liǎng qiān', english: '2,000 (not 二千 in speech)' },
+          { chinese: '一千二百三十四', pinyin: 'yī qiān èr bǎi sānshísì', english: '1,234' },
+          { chinese: '九千九百九十九', pinyin: 'jiǔ qiān jiǔ bǎi jiǔshíjiǔ', english: '9,999' },
+        ],
+      },
+      {
+        title: 'Ten-thousands: 万',
+        body: 'Chinese groups large numbers in units of 万 (10,000), not thousands. Think of 25,000 as "two 万 five thousand", not "twenty-five thousand".',
+        examples: [
+          { chinese: '一万', pinyin: 'yī wàn', english: '10,000' },
+          { chinese: '两万五千', pinyin: 'liǎng wàn wǔ qiān', english: '25,000' },
+          { chinese: '一百万', pinyin: 'yī bǎi wàn', english: '1,000,000 (100 × 万)' },
+        ],
+      },
+    ],
+  },
 ];
 
 export default LESSONS;

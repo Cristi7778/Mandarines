@@ -70,7 +70,7 @@ const TOPICS: Topic[] = [
     category: 'vocab',
     station: 'Foundation',
     sequenceOrder: 3,
-    description: 'Numbers 1–10 plus hundred and thousand.',
+    description: 'Numbers 0–10 plus hundred, thousand, and ten-thousand.',
     items: [
       it('t3i1',  'topic-3', '一', 'yī',  'one',      '我有',   '本书。',   'I have one book.'),
       it('t3i2',  'topic-3', '二', 'èr',  'two',      '今天是', '号。',     'Today is the 2nd.'),
@@ -84,6 +84,8 @@ const TOPICS: Topic[] = [
       it('t3i10', 'topic-3', '十', 'shí', 'ten',      '这里有', '个人。',   'There are ten people here.'),
       it('t3i11', 'topic-3', '百', 'bǎi', 'hundred',  '一',     '块钱。',   'One hundred yuan.'),
       it('t3i12', 'topic-3', '千', 'qiān','thousand', '一',     '个字。',   'One thousand characters.'),
+      it('t3i13', 'topic-3', '零', 'líng','zero',     '一百',   '一。',     '101 is yī bǎi líng yī.'),
+      it('t3i14', 'topic-3', '万', 'wàn', 'ten-thousand', '这里有一', '个人。', 'There are ten thousand people here.'),
     ],
   },
   {
