@@ -1013,10 +1013,6 @@ const TOPICS: Topic[] = [
     id: 'topic-43', name: 'Write a short essay (5+ sentences)', category: 'writing',
     station: 'HSK 3', sequenceOrder: 70, items: [],
   },
-  {
-    id: 'topic-44', name: 'HSK 3 exam', category: 'exam',
-    station: 'HSK 3', sequenceOrder: 71, items: [],
-  },
 
   {
     id: 'topic-83', name: 'Festivals & holidays', category: 'vocab',

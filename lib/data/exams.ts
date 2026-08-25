@@ -19,7 +19,7 @@ const EXAMS: Exam[] = [
     id: 'exam-hsk3-h31001',
     name: 'HSK 3 Exam',
     station: 'HSK 3',
-    sequenceOrder: 80,
+    sequenceOrder: 71,
     description: 'Official HSK3 example',
   },
 ];
