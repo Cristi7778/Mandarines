@@ -269,6 +269,27 @@ function TextBank({ bank, letters, confirmed, selected }: {
   );
 }
 
+function ImgBank({ prefix, letters, confirmed, selected }: {
+  prefix:string; letters:string[]; confirmed:boolean; selected:Record<number,string>;
+}) {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {letters.map(letter => {
+        const usedBy = Object.entries(selected).filter(([,v]) => v === letter);
+        return (
+          <div key={letter} className={`relative rounded-xl overflow-hidden border-2 ${
+            confirmed && usedBy.length > 0 ? 'border-orange-400' : 'border-gray-200'
+          }`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`${prefix}${letter.toLowerCase()}.jpg`} alt={`Option ${letter}`} className="w-full h-24 object-cover" />
+            <span className="absolute bottom-1 left-1 bg-black/50 text-white text-xs font-bold px-1.5 py-0.5 rounded">{letter}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function W2DrawCard({ q, modelReady, onResult, disabled }: {
   q:{ num:number; sentence:string; hint:string; answer:string };
   modelReady:boolean;
@@ -592,7 +613,7 @@ export default function ExamHsk3() {
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen and match each item to a picture (A–F).</p>
-              <TextBank bank={L1A_BANK} letters={L1A_LETTERS} confirmed={matchConfirmed} selected={matchAnswers} />
+              <ImgBank prefix="/hsk3/images/l1a_" letters={L1A_LETTERS} confirmed={matchConfirmed} selected={matchAnswers} />
               <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50">
                 {L1A_QS.map(lq => (
                   <div key={lq.num} className="px-4 py-3 flex items-center gap-3">
@@ -622,7 +643,7 @@ export default function ExamHsk3() {
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen and match each item to a picture (A–E).</p>
-              <TextBank bank={L1B_BANK} letters={L1B_LETTERS} confirmed={matchConfirmed} selected={matchAnswers} />
+              <ImgBank prefix="/hsk3/images/l1b_" letters={L1B_LETTERS} confirmed={matchConfirmed} selected={matchAnswers} />
               <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50">
                 {L1B_QS.map(lq => (
                   <div key={lq.num} className="px-4 py-3 flex items-center gap-3">
