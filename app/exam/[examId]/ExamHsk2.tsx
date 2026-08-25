@@ -485,7 +485,8 @@ export default function ExamHsk2() {
 
         {/* ── L1: audio + image, ✓/✗ ── */}
         {section === 'L1' && (() => {
-          const lq = L1_QS[qIdx]!;
+          const lq = L1_QS[qIdx];
+          if (!lq) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen. Does it match the picture?</p>
@@ -532,7 +533,8 @@ export default function ExamHsk2() {
         {/* ── L3 / L4: sequential, audio → A/B/C text MCQ ── */}
         {(section === 'L3' || section === 'L4') && (() => {
           const qs = section === 'L3' ? L3_QS : L4_QS;
-          const lq = qs[qIdx]!;
+          const lq = qs[qIdx];
+          if (!lq) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen, then choose the correct answer.</p>
@@ -610,7 +612,8 @@ export default function ExamHsk2() {
 
         {/* ── R3: sequential — read passage, judge ★ statement ✓/✗ ── */}
         {section === 'R3' && (() => {
-          const rq = R3_QS[qIdx]!;
+          const rq = R3_QS[qIdx];
+          if (!rq) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Read the passage, then judge if the statement is correct.</p>
