@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { saveExamProgress, getUserProgress, saveUserProgress } from '@/lib/db';
 import { addXp, updateStreak } from '@/lib/xp';
@@ -15,10 +16,9 @@ const PASS_SCORE = 180;
 
 const AUD = (n: number) => `/hsk4/audio/item${String(n).padStart(2, '0')}.mp3`;
 
-type TF   = '✓' | '✗';
 type Opt4 = 'A' | 'B' | 'C' | 'D';
 
-// ── Word / text banks ─────────────────────────────────────────────────────────
+// ── Word banks (R1) ───────────────────────────────────────────────────────────
 
 const R1A_BANK: Record<string,string> = { A:'禁止', B:'海洋', C:'推迟', D:'坚持', E:'顺便', F:'估计' };
 const R1A_LETTERS = ['A','B','C','D','E','F'];
@@ -27,20 +27,20 @@ const R1B_LETTERS = ['A','B','C','D','E','F'];
 
 // ── Question data ─────────────────────────────────────────────────────────────
 
-const L1_QS: { num:number; audio:string; statement:string; answer:TF }[] = [
-  { num:1,  audio:AUD(1),  statement:'今天天气不错。',       answer:'✓' },
-  { num:2,  audio:AUD(2),  statement:'他们俩经常聊天。',     answer:'✗' },
+const L1_QS: { num:number; audio:string; statement:string; answer:string }[] = [
+  { num:1,  audio:AUD(1),  statement:'今天天气不错。',         answer:'✓' },
+  { num:2,  audio:AUD(2),  statement:'他们俩经常聊天。',       answer:'✗' },
   { num:3,  audio:AUD(3),  statement:'做西红柿鸡蛋汤很简单。', answer:'✓' },
-  { num:4,  audio:AUD(4),  statement:'他爱打篮球。',         answer:'✓' },
-  { num:5,  audio:AUD(5),  statement:'小刘受到了表扬。',     answer:'✓' },
-  { num:6,  audio:AUD(6),  statement:'他刚下飞机。',         answer:'✗' },
-  { num:7,  audio:AUD(7),  statement:'姐妹俩性格差不多。',   answer:'✗' },
+  { num:4,  audio:AUD(4),  statement:'他爱打篮球。',           answer:'✓' },
+  { num:5,  audio:AUD(5),  statement:'小刘受到了表扬。',       answer:'✓' },
+  { num:6,  audio:AUD(6),  statement:'他刚下飞机。',           answer:'✗' },
+  { num:7,  audio:AUD(7),  statement:'姐妹俩性格差不多。',     answer:'✗' },
   { num:8,  audio:AUD(8),  statement:'他想给老王一张演出票。', answer:'✓' },
   { num:9,  audio:AUD(9),  statement:'小张的调查结果写得很好。', answer:'✗' },
-  { num:10, audio:AUD(10), statement:'女儿不同意打针。',     answer:'✗' },
+  { num:10, audio:AUD(10), statement:'女儿不同意打针。',       answer:'✗' },
 ];
 
-const L2_QS: { num:number; audio:string; options:Record<string,string>; answer:Opt4 }[] = [
+const L2_QS: { num:number; audio:string; options:Record<string,string>; answer:string }[] = [
   { num:11, audio:AUD(11), options:{A:'银行对面',B:'银行右边',C:'车站附近',D:'使馆西边'}, answer:'A' },
   { num:12, audio:AUD(12), options:{A:'请假',B:'唱歌',C:'散步',D:'买东西'}, answer:'D' },
   { num:13, audio:AUD(13), options:{A:'不想吃饭',B:'需要鼓励',C:'放弃减肥',D:'继续运动'}, answer:'C' },
@@ -58,7 +58,7 @@ const L2_QS: { num:number; audio:string; options:Record<string,string>; answer:O
   { num:25, audio:AUD(25), options:{A:'父亲节',B:'花很便宜',C:'妈妈生病了',D:'朋友过生日'}, answer:'A' },
 ];
 
-const L3A_QS: { num:number; audio:string; dialogueZh:string; questionZh:string; options:Record<string,string>; answer:Opt4 }[] = [
+const L3A_QS: { num:number; audio:string; dialogueZh:string; questionZh:string; options:Record<string,string>; answer:string }[] = [
   { num:26, audio:AUD(26), dialogueZh:'女：打了一下午羽毛球，肚子有点儿饿了。男：稍等一会儿，饭马上就好。女：真香，今天吃什么？男：你鼻子真好，今晚我们吃饺子。', questionZh:'他们今晚吃什么？', options:{A:'面条',B:'米饭',C:'饺子',D:'蛋糕'}, answer:'C' },
   { num:27, audio:AUD(27), dialogueZh:'男：小李，刚才跟你说话的那个女孩儿是谁啊？女：我大学同学，你认识？男：应该不认识，但是好像在哪儿见过。女：那你可能是在我的大学毕业照上见过吧。', questionZh:'那个女孩儿和小李是什么关系？', options:{A:'亲戚',B:'同学',C:'师生',D:'同事'}, answer:'B' },
   { num:28, audio:AUD(28), dialogueZh:'女：你好，请问王师傅在家吗？男：他不在家，他游泳去了。女：那他什么时候回来呢？男：一会儿就回来了吧。女：好的，那我过一会儿再联系吧，打扰了，再见。', questionZh:'王师傅做什么去了？', options:{A:'洗澡',B:'游泳',C:'爬山',D:'逛街'}, answer:'B' },
@@ -71,32 +71,17 @@ const L3A_QS: { num:number; audio:string; dialogueZh:string; questionZh:string; 
   { num:35, audio:AUD(35), dialogueZh:'男：你换球鞋干什么啊？又要出去啊？女：去打网球。我约了小王，她打网球很厉害，你敢和她打吗？男：当然敢。女：那一起去！走吧，人多了还热闹。', questionZh:'小王的网球打得怎么样？', options:{A:'很不错',B:'力气太小',C:'仍然不会',D:'动作不漂亮'}, answer:'A' },
 ];
 
-const L3B_PASSAGES: { passageZh:string; questions:{ num:number; questionZh:string; options:Record<string,string>; answer:Opt4 }[] }[] = [
+const L3B_PASSAGES: { passageZh:string; questions:{ num:number; questionZh:string; options:Record<string,string>; answer:string }[] }[] = [
   { passageZh:'这房子家具全，电视、空调、冰箱都有并且都很新；离火车站也很近，交通方便，离您公司也不远，您可以坐公共汽车甚至可以骑自行车上班，把身体也锻炼了；价格也比较便宜，真的很值得考虑。',
-    questions:[
-      { num:36, questionZh:'说话人最可能是做什么的？', options:{A:'校长',B:'服务员',C:'理发师',D:'卖房的'}, answer:'D' },
-      { num:37, questionZh:'关于这房子，下列哪个正确？', options:{A:'很贵',B:'离机场近',C:'交通方便',D:'周围风景不错'}, answer:'C' },
-    ]},
+    questions:[{ num:36, questionZh:'说话人最可能是做什么的？', options:{A:'校长',B:'服务员',C:'理发师',D:'卖房的'}, answer:'D' },{ num:37, questionZh:'关于这房子，下列哪个正确？', options:{A:'很贵',B:'离机场近',C:'交通方便',D:'周围风景不错'}, answer:'C' }]},
   { passageZh:'狗是一种聪明的动物，它能听懂人的话，明白人的心情，会和人产生感情。人们喜欢养狗，是因为在孤单的时候，狗会陪着他们，互相信任，互相照顾。',
-    questions:[
-      { num:38, questionZh:'根据这段话，狗有什么特点？', options:{A:'干净',B:'聪明',C:'有趣',D:'有耐心'}, answer:'B' },
-      { num:39, questionZh:'人们为什么喜欢狗？', options:{A:'可以更勇敢',B:'想减少危险',C:'会感到安全',D:'有时会孤单'}, answer:'D' },
-    ]},
+    questions:[{ num:38, questionZh:'根据这段话，狗有什么特点？', options:{A:'干净',B:'聪明',C:'有趣',D:'有耐心'}, answer:'B' },{ num:39, questionZh:'人们为什么喜欢狗？', options:{A:'可以更勇敢',B:'想减少危险',C:'会感到安全',D:'有时会孤单'}, answer:'D' }]},
   { passageZh:'这个节目我一直在看，它介绍了很多生活中的小知识，包括怎样选择牙膏，擦脸应该用什么毛巾，怎样远离皮肤病等等。很多以前我没有注意到的问题，现在通过它了解了不少。',
-    questions:[
-      { num:40, questionZh:'说话人在介绍什么？', options:{A:'一本书',B:'一个报道',C:'一个广告',D:'一个电视节目'}, answer:'D' },
-      { num:41, questionZh:'说话人了解了哪方面的知识？', options:{A:'艺术',B:'生活',C:'国际',D:'法律'}, answer:'B' },
-    ]},
+    questions:[{ num:40, questionZh:'说话人在介绍什么？', options:{A:'一本书',B:'一个报道',C:'一个广告',D:'一个电视节目'}, answer:'D' },{ num:41, questionZh:'说话人了解了哪方面的知识？', options:{A:'艺术',B:'生活',C:'国际',D:'法律'}, answer:'B' }]},
   { passageZh:'昨天，妻子让我陪她去买一双袜子。进了商店，她先去看帽子，觉得有个帽子很可爱，就买了一个。然后她又买了一条裤子、一件衬衫，把她身上带的钱全花完后我们就回家了。回家以后，我吃惊地发现，竟然没有买袜子。',
-    questions:[
-      { num:42, questionZh:'他们计划买什么？', options:{A:'袜子',B:'食品',C:'饮料',D:'洗衣机'}, answer:'A' },
-      { num:43, questionZh:'说话人是谁？', options:{A:'丈夫',B:'导游',C:'司机',D:'售货员'}, answer:'A' },
-    ]},
+    questions:[{ num:42, questionZh:'他们计划买什么？', options:{A:'袜子',B:'食品',C:'饮料',D:'洗衣机'}, answer:'A' },{ num:43, questionZh:'说话人是谁？', options:{A:'丈夫',B:'导游',C:'司机',D:'售货员'}, answer:'A' }]},
   { passageZh:'哭不一定是坏事。遇到伤心事，哭一场就会感觉心里舒服多了；人们成功的时候，因为激动会哭；人们获得爱情和友谊的时候，因为感动也会哭。所以说，哭不一定是坏事。',
-    questions:[
-      { num:44, questionZh:'伤心时哭一哭会怎么样？', options:{A:'更难过',B:'更紧张',C:'轻松许多',D:'觉得无聊'}, answer:'C' },
-      { num:45, questionZh:'这段话主要想告诉我们什么？', options:{A:'要懂礼貌',B:'要有同情心',C:'要互相理解',D:'哭不一定不好'}, answer:'D' },
-    ]},
+    questions:[{ num:44, questionZh:'伤心时哭一哭会怎么样？', options:{A:'更难过',B:'更紧张',C:'轻松许多',D:'觉得无聊'}, answer:'C' },{ num:45, questionZh:'这段话主要想告诉我们什么？', options:{A:'要懂礼貌',B:'要有同情心',C:'要互相理解',D:'哭不一定不好'}, answer:'D' }]},
 ];
 
 const R1A_QS: { num:number; sentenceZh:string; answer:string }[] = [
@@ -111,7 +96,7 @@ const R1B_QS: { num:number; sentenceZh:string; answer:string }[] = [
   { num:51, sentenceZh:'A：丽丽说再等她几分钟，她马上就来。B：她（　）在干什么呢，怎么这么慢？', answer:'D' },
   { num:52, sentenceZh:'A：那个房间又脏又乱，星期六我去打扫、整理了一下。B：原来是你啊，（　）了，谢谢你！', answer:'E' },
   { num:53, sentenceZh:'A：我刚从会议室过来，怎么一个人也没有？B：对不起，今天的会议改到明天上午了，您没（　）到通知吗？', answer:'B' },
-  { num:54, sentenceZh:'A：语言是交流的（　），只记字典、词典里的字、词是不够的，要多听多说。B：对，这才是学习汉语的好方法。', answer:'A' },
+  { num:54, sentenceZh:'A：语言是交流的（　），只记字典里的字、词是不够的，要多听多说。B：对，这才是学习汉语的好方法。', answer:'A' },
   { num:55, sentenceZh:'A：真（　），我迟到了。B：没关系，表演还有5分钟才开始。', answer:'F' },
 ];
 
@@ -128,7 +113,7 @@ const R2_QS: { num:number; fragments:Record<string,string>; answer:string }[] = 
   { num:65, fragments:{A:'有的父母对孩子的要求很严格',B:'认为应该给孩子更多自己选择的机会',C:'有的父母正好相反'}, answer:'ACB' },
 ];
 
-const R3A_QS: { num:number; passageZh:string; questionZh:string; options:Record<string,string>; answer:Opt4 }[] = [
+const R3A_QS: { num:number; passageZh:string; questionZh:string; options:Record<string,string>; answer:string }[] = [
   { num:66, passageZh:'刷牙的时候，水太冷或者太热，都会给牙的健康带来不好的影响。研究发现，用35度的温水刷牙才是最合适的。', questionZh:'刷牙时，我们应该：', options:{A:'使用温水',B:'常换牙刷',C:'早晚各一次',D:'至少刷5分钟'}, answer:'A' },
   { num:67, passageZh:'这种葡萄酒，不仅味道好，而且每个酒瓶也都像一件高级艺术品。很多人愿意出高价购买它，很多时候是被那些特别的酒瓶吸引了。', questionZh:'这种葡萄酒：', options:{A:'比较甜',B:'是艺术品',C:'酒瓶很特别',D:'是当地制造的'}, answer:'C' },
   { num:68, passageZh:'阅读能力好的人不但容易找到工作，而且工资也比较高。另外，阅读考试的分数往往还能反映一个国家的教育水平。', questionZh:'阅读能力好的人一般：', options:{A:'收入高',B:'烦恼少',C:'经历丰富',D:'年龄比较大'}, answer:'A' },
@@ -145,22 +130,13 @@ const R3A_QS: { num:number; passageZh:string; questionZh:string; options:Record<
   { num:79, passageZh:'什么是真正的朋友？有些人觉得就是能和自己一起快乐的人，其实朋友应该像镜子，能帮你看清自己的缺点；无论你成功或者失败，永远都支持你。', questionZh:'这段话主要谈：', options:{A:'谁能成功',B:'学会改变',C:'怎样支持朋友',D:'什么是真朋友'}, answer:'D' },
 ];
 
-const R3B_PASSAGES: { passageZh:string; questions:{ num:number; questionZh:string; options:Record<string,string>; answer:Opt4 }[] }[] = [
+const R3B_PASSAGES: { passageZh:string; questions:{ num:number; questionZh:string; options:Record<string,string>; answer:string }[] }[] = [
   { passageZh:'世界上第一部无声电影出现的时候，吸引了成千上万的观众。有个女观众看到电影中有一辆马车向自己跑过来，害怕得离开了座位，跑得远远的，直到那辆马车在画面中不见了，她才回到座位上。有的观众看到电影里下雨的画面，把自己的雨伞也打了起来。现在我们都觉得挺好笑的，但是看电影在当时确实是个新鲜事儿。',
-    questions:[
-      { num:80, questionZh:'世界上第一部无声电影：', options:{A:'很幽默',B:'不成功',C:'观众很多',D:'内容复杂'}, answer:'C' },
-      { num:81, questionZh:'那个观众为什么要打伞？', options:{A:'误会了',B:'下雨了',C:'风太大',D:'害怕马车'}, answer:'A' },
-    ]},
+    questions:[{ num:80, questionZh:'世界上第一部无声电影：', options:{A:'很幽默',B:'不成功',C:'观众很多',D:'内容复杂'}, answer:'C' },{ num:81, questionZh:'那个观众为什么要打伞？', options:{A:'误会了',B:'下雨了',C:'风太大',D:'害怕马车'}, answer:'A' }]},
   { passageZh:'研究证明，女孩子们对衣服颜色的选择往往与她们的性格有关。喜欢穿白色衣服的女孩子们性格比较阳光，生活态度积极向上是她们的共同特点；而喜欢红色衣服的女孩子们性格比较浪漫，在爱情上也比较主动。',
-    questions:[
-      { num:82, questionZh:'喜欢穿白色衣服的女孩子在生活中：', options:{A:'很懒',B:'很害羞',C:'很主动',D:'不幸福'}, answer:'C' },
-      { num:83, questionZh:'这段话主要讲了颜色和什么的关系？', options:{A:'理想',B:'能力',C:'性格',D:'性别'}, answer:'C' },
-    ]},
+    questions:[{ num:82, questionZh:'喜欢穿白色衣服的女孩子在生活中：', options:{A:'很懒',B:'很害羞',C:'很主动',D:'不幸福'}, answer:'C' },{ num:83, questionZh:'这段话主要讲了颜色和什么的关系？', options:{A:'理想',B:'能力',C:'性格',D:'性别'}, answer:'C' }]},
   { passageZh:'科学技术的发展确实给生活带来了许多方便，但也给我们增加了不少烦恼。最普遍的是，每个现代人头脑中都要记住很多密码：信用卡需要密码，电脑需要密码，电子信箱需要密码，有时候甚至连开门都需要密码。如果谁不小心忘记了这些密码，那麻烦可就大了。',
-    questions:[
-      { num:84, questionZh:'人们需要记住什么？', options:{A:'友谊',B:'答案',C:'密码',D:'号码'}, answer:'C' },
-      { num:85, questionZh:'给人们带来烦恼的是：', options:{A:'科学技术',B:'电子信箱',C:'工作压力',D:'环境污染'}, answer:'A' },
-    ]},
+    questions:[{ num:84, questionZh:'人们需要记住什么？', options:{A:'友谊',B:'答案',C:'密码',D:'号码'}, answer:'C' },{ num:85, questionZh:'给人们带来烦恼的是：', options:{A:'科学技术',B:'电子信箱',C:'工作压力',D:'环境污染'}, answer:'A' }]},
 ];
 
 const W1_QS: { num:number; words:string[]; answer:string; answerAlt?:string }[] = [
@@ -177,30 +153,86 @@ const W1_QS: { num:number; words:string[]; answer:string; answerAlt?:string }[] 
 ];
 
 const W2_QS: { num:number; pictureDesc:string; word:string; wordPinyin:string; sampleAnswer:string }[] = [
-  { num:96,  pictureDesc:'woman resting chin on hand, thoughtful', word:'日记',  wordPinyin:'rìjì',     sampleAnswer:'她每天都坚持写日记。' },
-  { num:97,  pictureDesc:'chopsticks picking up a dumpling',       word:'尝',    wordPinyin:'cháng',    sampleAnswer:'你尝一尝？味道很好。' },
-  { num:98,  pictureDesc:'broken eggshell',                        word:'破',    wordPinyin:'pò',       sampleAnswer:'鸡蛋被打破了。' },
-  { num:99,  pictureDesc:'father and son walking on the beach',    word:'凉快',  wordPinyin:'liángkuai',sampleAnswer:'走在海边，感觉很凉快。' },
-  { num:100, pictureDesc:'young girl smiling brightly',            word:'活泼',  wordPinyin:'huópō',    sampleAnswer:'这个小女孩儿很活泼。' },
+  { num:96,  pictureDesc:'woman resting chin on hand, thoughtful', word:'日记',  wordPinyin:'rìjì',      sampleAnswer:'她每天都坚持写日记。' },
+  { num:97,  pictureDesc:'chopsticks picking up a dumpling',       word:'尝',    wordPinyin:'cháng',     sampleAnswer:'你尝一尝？味道很好。' },
+  { num:98,  pictureDesc:'broken eggshell',                        word:'破',    wordPinyin:'pò',        sampleAnswer:'鸡蛋被打破了。' },
+  { num:99,  pictureDesc:'father and son walking on the beach',    word:'凉快',  wordPinyin:'liángkuai', sampleAnswer:'走在海边，感觉很凉快。' },
+  { num:100, pictureDesc:'young girl smiling brightly',            word:'活泼',  wordPinyin:'huópō',     sampleAnswer:'这个小女孩儿很活泼。' },
 ];
 
 // ── Parts ─────────────────────────────────────────────────────────────────────
 
 const PARTS = [
-  { label:'Listening · Part 1',  section:'L1',  qCount:10 },
-  { label:'Listening · Part 2',  section:'L2',  qCount:15 },
-  { label:'Listening · Part 3A', section:'L3A', qCount:10 },
-  { label:'Listening · Part 3B', section:'L3B', qCount:10 },
-  { label:'Reading · Part 1A',   section:'R1A', qCount:5  },
-  { label:'Reading · Part 1B',   section:'R1B', qCount:5  },
-  { label:'Reading · Part 2',    section:'R2',  qCount:10 },
-  { label:'Reading · Part 3A',   section:'R3A', qCount:14 },
-  { label:'Reading · Part 3B',   section:'R3B', qCount:6  },
-  { label:'Writing · Part 1',    section:'W1',  qCount:10 },
-  { label:'Writing · Part 2',    section:'W2',  qCount:5  },
+  { label:'Listening · Part 1',  section:'L1',  questions: L1_QS as {num:number;answer:string}[] },
+  { label:'Listening · Part 2',  section:'L2',  questions: L2_QS as {num:number;answer:string}[] },
+  { label:'Listening · Part 3A', section:'L3A', questions: L3A_QS as {num:number;answer:string}[] },
+  { label:'Listening · Part 3B', section:'L3B', questions: L3B_PASSAGES.flatMap(p => p.questions) as {num:number;answer:string}[] },
+  { label:'Reading · Part 1A',   section:'R1A', questions: R1A_QS as {num:number;answer:string}[] },
+  { label:'Reading · Part 1B',   section:'R1B', questions: R1B_QS as {num:number;answer:string}[] },
+  { label:'Reading · Part 2',    section:'R2',  questions: R2_QS as {num:number;answer:string}[] },
+  { label:'Reading · Part 3A',   section:'R3A', questions: R3A_QS as {num:number;answer:string}[] },
+  { label:'Reading · Part 3B',   section:'R3B', questions: R3B_PASSAGES.flatMap(p => p.questions) as {num:number;answer:string}[] },
+  { label:'Writing · Part 1',    section:'W1',  questions: W1_QS as {num:number;answer:string}[] },
+  { label:'Writing · Part 2',    section:'W2',  questions: W2_QS.map(q => ({ num:q.num, answer:'1' })) },
 ];
 
 const MATCHING_SECTIONS = new Set(['R1A','R1B']);
+
+// ── Results screen ────────────────────────────────────────────────────────────
+
+function ResultsScreen({ answers, xpEarned }: { answers:Record<number,string>; xpEarned:number }) {
+  const lCorrect = PARTS.slice(0,4).flatMap(p => p.questions).filter(q => answers[q.num] === q.answer).length;
+  const rCorrect = PARTS.slice(4,9).flatMap(p => p.questions).filter(q => answers[q.num] === q.answer).length;
+  const wCorrect = PARTS.slice(9).flatMap(p => p.questions).filter(q => answers[q.num] === q.answer).length;
+  const lScore   = Math.round(lCorrect / 45 * 100);
+  const rScore   = Math.round(rCorrect / 40 * 100);
+  const wScore   = Math.round(wCorrect / 15 * 100);
+  const total    = lScore + rScore + wScore;
+  const passed   = total >= PASS_SCORE;
+
+  const breakdown = PARTS.map(p => ({
+    label:   p.label,
+    correct: p.questions.filter(q => answers[q.num] === q.answer).length,
+    total:   p.questions.length,
+  }));
+
+  const sections = [
+    { title:'Listening', score:lScore, rows:breakdown.slice(0,4) },
+    { title:'Reading',   score:rScore, rows:breakdown.slice(4,9) },
+    { title:'Writing',   score:wScore, rows:breakdown.slice(9) },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center space-y-2">
+        <p className="text-5xl font-bold text-gray-800">{total}<span className="text-2xl text-gray-400 font-normal"> / {MAX_SCORE}</span></p>
+        <p className={`text-base font-semibold ${passed ? 'text-green-600' : 'text-red-500'}`}>
+          {passed ? (total >= 240 ? '🏆 Excellent!' : '✅ Pass') : '❌ Not passed — 180 required'}
+        </p>
+        <p className="text-sm text-amber-600 font-semibold">+{xpEarned} XP</p>
+      </div>
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-gray-100">
+        {sections.map(sec => (
+          <div key={sec.title}>
+            <div className="px-4 py-3 flex items-center justify-between bg-gray-50">
+              <span className="text-sm font-semibold text-gray-700">{sec.title}</span>
+              <span className="text-sm font-semibold text-gray-700">{sec.score} / 100</span>
+            </div>
+            {sec.rows.map(p => (
+              <div key={p.label} className="px-4 py-2.5 flex items-center justify-between pl-8">
+                <span className="text-sm text-gray-500">{p.label}</span>
+                <span className={`text-sm font-medium ${p.correct === p.total ? 'text-green-600' : p.correct/p.total >= 0.6 ? 'text-amber-600' : 'text-red-500'}`}>{p.correct} / {p.total}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <Link href="/" className="block w-full bg-orange-500 text-white font-semibold py-4 rounded-xl text-center hover:bg-orange-600 transition-colors">
+        Back to home
+      </Link>
+    </div>
+  );
+}
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -241,22 +273,16 @@ function LetterPicker({ letters, selected, correctAnswer, confirmed, onSelect }:
   );
 }
 
-function AbcdPicker({ selected, correctAnswer, confirmed, onSelect }: {
-  selected:string|null; correctAnswer:string; confirmed:boolean; onSelect:(v:string)=>void;
-}) {
-  return <LetterPicker letters={['A','B','C','D']} selected={selected} correctAnswer={correctAnswer} confirmed={confirmed} onSelect={onSelect} />;
-}
-
 function WordBank({ bank, letters, confirmed, selected }: {
   bank:Record<string,string>; letters:string[]; confirmed:boolean; selected:Record<number,string>;
 }) {
   return (
     <div className="grid grid-cols-2 gap-1.5">
       {letters.map(letter => {
-        const usedBy = Object.entries(selected).filter(([,v]) => v === letter);
+        const used = Object.values(selected).includes(letter);
         return (
           <div key={letter} className={`flex gap-2 items-center rounded-xl border px-3 py-2 text-sm ${
-            confirmed && usedBy.length > 0 ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-white'
+            confirmed && used ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-white'
           }`}>
             <span className="font-bold text-gray-500 shrink-0">{letter}.</span>
             <span className="text-gray-700 chinese-text">{bank[letter]}</span>
@@ -267,23 +293,45 @@ function WordBank({ bank, letters, confirmed, selected }: {
   );
 }
 
+function AbcdOptions({ options, selected, correctAnswer, confirmed, onSelect }: {
+  options:Record<string,string>; selected:string|null; correctAnswer:string; confirmed:boolean; onSelect:(v:string)=>void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {(['A','B','C','D'] as Opt4[]).map(opt => (
+        <button key={opt} onClick={() => onSelect(opt)} disabled={confirmed}
+          className={`p-3 rounded-xl border-2 text-sm font-medium text-left transition-colors chinese-text ${
+            confirmed
+              ? opt === correctAnswer  ? 'border-green-400 bg-green-50 text-green-700'
+                : opt === selected     ? 'border-red-400 bg-red-50 text-red-600'
+                :                        'border-gray-100 bg-white text-gray-300'
+              : selected === opt       ? 'border-orange-400 bg-orange-50 text-orange-700'
+                :                        'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+          }`}>
+          <span className="font-bold mr-1">{opt}.</span>{options[opt]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function ExamHsk4() {
-  const user = useUser();
+  const router  = useRouter();
+  const user    = useUser();
+  const exam    = getExamById(EXAM_ID);
 
-  const [partIdx,       setPartIdx]       = useState(0);
-  const [qIdx,          setQIdx]          = useState(0);
-  const [finalAnswers,  setFinalAnswers]  = useState<Record<number,string>>({});
-  const [selected,      setSelected]      = useState<string|null>(null);
-  const [feedback,      setFeedback]      = useState<string|null>(null);
-  const [done,          setDone]          = useState(false);
-  const [score,         setScore]         = useState(0);
-  const [saving,        setSaving]        = useState(false);
-
-  // matching
+  const [partIdx,        setPartIdx]        = useState(0);
+  const [qIdx,           setQIdx]           = useState(0);
+  const [selected,       setSelected]       = useState<string | null>(null);
+  const [confirmed,      setConfirmed]      = useState(false);
   const [matchAnswers,   setMatchAnswers]   = useState<Record<number,string>>({});
   const [matchConfirmed, setMatchConfirmed] = useState(false);
+  const [answers,        setAnswers]        = useState<Record<number,string>>({});
+  const [done,           setDone]           = useState(false);
+  const [xpEarned,       setXpEarned]      = useState(0);
+  const [userProgress,   setUserProgress]   = useState<UserProgress | null>(null);
 
   // W1 / R2 tap-to-build
   const [tapBankIdxs, setTapBankIdxs] = useState<number[]>([]);
@@ -292,231 +340,164 @@ export default function ExamHsk4() {
   // W2
   const [w2Input, setW2Input] = useState('');
 
-  const part    = PARTS[partIdx]!;
-  const section = part.section;
-  const isMatching = MATCHING_SECTIONS.has(section);
-
-  // ── Compute progress ─────────────────────────────────────────────────────────
-
-  const committedCount = (() => {
-    let c = 0;
-    for (let i = 0; i < partIdx; i++) c += PARTS[i]!.qCount;
-    return c;
-  })();
-  const inProgressCount = isMatching ? 0 : qIdx;
-  const matchAllFilled = isMatching && (() => {
-    const qs = section === 'R1A' ? R1A_QS : R1B_QS;
-    return qs.every(q => matchAnswers[q.num] != null);
-  })();
-
-  // ── Reset tap state on question/part change ───────────────────────────────
+  useEffect(() => {
+    if (user === null) { router.replace('/auth'); return; }
+    if (!user) return;
+    getUserProgress().then(setUserProgress);
+  }, [user, router]);
 
   useEffect(() => {
-    setSelected(null);
-    setFeedback(null);
+    setQIdx(0); setSelected(null); setConfirmed(false);
+    setMatchAnswers({}); setMatchConfirmed(false);
+    setTapBankIdxs([]); setTapTrayIdxs([]);
     setW2Input('');
+  }, [partIdx]);
+
+  useEffect(() => {
+    setSelected(null); setConfirmed(false); setW2Input('');
+    const section = PARTS[partIdx]?.section;
     if (section === 'W1') {
       const wq = W1_QS[qIdx];
-      if (wq) { setTapBankIdxs(wq.words.map((_,i)=>i)); setTapTrayIdxs([]); }
+      if (wq) {
+        const shuffled = wq.words.map((_, i) => i).sort(() => Math.random() - 0.5);
+        setTapBankIdxs(shuffled); setTapTrayIdxs([]);
+      }
     } else if (section === 'R2') {
       setTapBankIdxs([0,1,2]); setTapTrayIdxs([]);
-    } else {
-      setTapBankIdxs([]); setTapTrayIdxs([]);
     }
-  }, [qIdx, partIdx, section]);
+  }, [qIdx, partIdx]);
 
-  useEffect(() => {
-    if (isMatching) { setMatchAnswers({}); setMatchConfirmed(false); }
-  }, [partIdx, isMatching]);
-
-  // ── Scoring ───────────────────────────────────────────────────────────────
-
-  function computeScore(answers: Record<number,string>) {
-    let lc = 0, rc = 0, wc = 0;
-    L1_QS.forEach(q  => { if (answers[q.num] === q.answer) lc++; });
-    L2_QS.forEach(q  => { if (answers[q.num] === q.answer) lc++; });
-    L3A_QS.forEach(q => { if (answers[q.num] === q.answer) lc++; });
-    L3B_PASSAGES.forEach(p => p.questions.forEach(q => { if (answers[q.num] === q.answer) lc++; }));
-    R1A_QS.forEach(q => { if (answers[q.num] === q.answer) rc++; });
-    R1B_QS.forEach(q => { if (answers[q.num] === q.answer) rc++; });
-    R2_QS.forEach(q  => { if (answers[q.num] === q.answer) rc++; });
-    R3A_QS.forEach(q => { if (answers[q.num] === q.answer) rc++; });
-    R3B_PASSAGES.forEach(p => p.questions.forEach(q => { if (answers[q.num] === q.answer) rc++; }));
-    W1_QS.forEach(q  => { if (answers[q.num] === q.answer || answers[q.num] === q.answerAlt) wc++; });
-    W2_QS.forEach(q  => { if (answers[q.num] === '1') wc++; });
-    return Math.round(lc/45*100) + Math.round(rc/40*100) + Math.round(wc/15*100);
+  if (user === undefined) {
+    return <div className="min-h-screen bg-[#fcf0d7] flex items-center justify-center"><div className="text-4xl animate-pulse">🍊</div></div>;
+  }
+  if (!exam) {
+    return <div className="min-h-screen flex items-center justify-center"><p className="text-gray-500">Exam not found. <Link href="/" className="text-orange-500 underline">Back to home</Link></p></div>;
   }
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
+  const part       = PARTS[partIdx]!;
+  const section    = part.section;
+  const isMatching = MATCHING_SECTIONS.has(section);
+  const partQs     = part.questions;
 
-  function handleSelect(val: string) {
-    if (feedback) return;
-    setSelected(val);
+  const committedCount  = Object.keys(answers).length;
+  const inProgressCount = isMatching
+    ? Object.keys(matchAnswers).length
+    : (confirmed ? qIdx + 1 : qIdx);
+
+  const currentQ    = section === 'L3B' ? L3B_PASSAGES[Math.floor(qIdx/2)]?.questions[qIdx%2]
+                    : section === 'R3B' ? R3B_PASSAGES[Math.floor(qIdx/2)]?.questions[qIdx%2]
+                    : partQs[qIdx];
+  const isCorrect   = !!currentQ && selected === currentQ.answer;
+  const matchAllFilled = isMatching && partQs.every(q => matchAnswers[q.num] !== undefined);
+
+  async function finishExam(finalAnswers: Record<number,string>) {
+    const lCorrect = PARTS.slice(0,4).flatMap(p => p.questions).filter(q => finalAnswers[q.num] === q.answer).length;
+    const rCorrect = PARTS.slice(4,9).flatMap(p => p.questions).filter(q => finalAnswers[q.num] === q.answer).length;
+    const wCorrect = PARTS.slice(9).flatMap(p => p.questions).filter(q => finalAnswers[q.num] === q.answer).length;
+    const total = Math.round(lCorrect/45*100) + Math.round(rCorrect/40*100) + Math.round(wCorrect/15*100);
+    setXpEarned(total); setAnswers(finalAnswers); setDone(true);
+    await saveExamProgress({ examId:EXAM_ID, score:total, total:MAX_SCORE, completedAt:new Date().toISOString() });
+    if (userProgress) await saveUserProgress(updateStreak(addXp(userProgress, total)));
   }
 
-  function handleCheck() {
-    if (!selected || feedback) return;
-    const partQs = getPartQs();
-    const q = partQs[qIdx];
-    if (!q) return;
-    const correct = selected === (q as {answer:string}).answer;
-    setFeedback(correct ? '✅ Correct!' : `❌ Incorrect — answer: ${(q as {answer:string}).answer}`);
-    setFinalAnswers(prev => ({ ...prev, [(q as {num:number}).num]: selected }));
+  function handleSelect(val: string) { if (!confirmed) setSelected(val); }
+
+  function handleConfirm() {
+    if (!selected || !currentQ) return;
+    setConfirmed(true);
+    setAnswers(prev => ({ ...prev, [currentQ.num]: selected }));
   }
 
-  function handleNext() {
-    setSelected(null);
-    setFeedback(null);
-    if (qIdx + 1 < part.qCount) {
-      setQIdx(qIdx + 1);
-    } else if (partIdx + 1 < PARTS.length) {
-      setQIdx(0);
-      setPartIdx(partIdx + 1);
-    } else {
-      finish({});
-    }
+  async function handleNext() {
+    setSelected(null); setConfirmed(false); setW2Input('');
+    if (qIdx + 1 < partQs.length) { setQIdx(qIdx + 1); return; }
+    if (partIdx + 1 < PARTS.length) { setQIdx(0); setPartIdx(partIdx + 1); return; }
+    await finishExam({ ...answers });
   }
 
-  function handleMatchContinue() {
-    const qs = section === 'R1A' ? R1A_QS : R1B_QS;
-    const newAnswers: Record<number,string> = {};
-    qs.forEach(q => { if (matchAnswers[q.num]) newAnswers[q.num] = matchAnswers[q.num]!; });
-    const merged = { ...finalAnswers, ...newAnswers };
-    setFinalAnswers(merged);
-    if (partIdx + 1 < PARTS.length) {
-      setQIdx(0);
-      setPartIdx(partIdx + 1);
-    } else {
-      finish(newAnswers);
-    }
-  }
-
-  function handleMatchPick(num: number, val: string) {
+  function handleMatchPick(num: number, letter: string) {
     if (matchConfirmed) return;
-    setMatchAnswers(prev => ({ ...prev, [num]: val }));
+    setMatchAnswers(prev => ({ ...prev, [num]: letter }));
   }
 
-  function handleTapBank(idx: number) {
-    setTapBankIdxs(prev => prev.filter(i => i !== idx));
-    setTapTrayIdxs(prev => [...prev, idx]);
-  }
-  function handleTapTray(idx: number) {
-    setTapTrayIdxs(prev => prev.filter(i => i !== idx));
-    setTapBankIdxs(prev => [...prev, idx]);
+  async function handleMatchContinue() {
+    const newAnswers = { ...answers, ...matchAnswers };
+    if (partIdx + 1 < PARTS.length) { setAnswers(newAnswers); setQIdx(0); setPartIdx(partIdx + 1); }
+    else await finishExam(newAnswers);
   }
 
-  function handleTapSubmit() {
-    if (feedback) return;
-    if (section === 'W1') {
-      const wq = W1_QS[qIdx];
-      if (!wq) return;
-      const assembled = tapTrayIdxs.map(i => wq.words[i]).join('') + '。';
-      const correct = assembled === wq.answer || assembled === wq.answerAlt;
-      setFeedback(correct ? '✅ Correct!' : `❌ Incorrect — answer: ${wq.answer}`);
-      setFinalAnswers(prev => ({ ...prev, [wq.num]: assembled }));
-    } else if (section === 'R2') {
-      const rq = R2_QS[qIdx];
-      if (!rq) return;
-      const assembled = tapTrayIdxs.map(i => ['A','B','C'][i] ?? '').join('');
-      const correct = assembled === rq.answer;
-      const answerFull = rq.answer.split('').map(l => `${l}: ${rq.fragments[l]}`).join(' → ');
-      setFeedback(correct ? '✅ Correct!' : `❌ Incorrect — answer: ${rq.answer}\n${answerFull}`);
-      setFinalAnswers(prev => ({ ...prev, [rq.num]: assembled }));
-    }
+  function tapPickFromBank(idx: number) { setTapBankIdxs(p => p.filter(i=>i!==idx)); setTapTrayIdxs(p=>[...p,idx]); }
+  function tapReturnToBank(idx: number) { setTapTrayIdxs(p => p.filter(i=>i!==idx)); setTapBankIdxs(p=>[...p,idx]); }
+
+  function handleW1Check() {
+    const wq = W1_QS[qIdx]; if (!wq) return;
+    const assembled = tapTrayIdxs.map(i => wq.words[i]).join('') + '。';
+    const correct = assembled === wq.answer || assembled === wq.answerAlt;
+    setConfirmed(true);
+    setAnswers(prev => ({ ...prev, [wq.num]: correct ? wq.answer : assembled }));
   }
 
-  function handleW2Submit() {
-    if (feedback) return;
-    const wq = W2_QS[qIdx];
-    if (!wq) return;
+  function handleR2Check() {
+    const rq = R2_QS[qIdx]; if (!rq) return;
+    const assembled = tapTrayIdxs.map(i => ['A','B','C'][i] ?? '').join('');
+    const correct = assembled === rq.answer;
+    setConfirmed(true);
+    setAnswers(prev => ({ ...prev, [rq.num]: correct ? rq.answer : assembled }));
+  }
+
+  function handleW2Check() {
+    const wq = W2_QS[qIdx]; if (!wq) return;
     const correct = w2Input.trim().includes(wq.word);
-    setFeedback(correct ? `✅ Contains "${wq.word}" — accepted!` : `❌ Sentence must include "${wq.word}". Sample: ${wq.sampleAnswer}`);
-    setFinalAnswers(prev => ({ ...prev, [wq.num]: correct ? '1' : '0' }));
+    setConfirmed(true);
+    setAnswers(prev => ({ ...prev, [wq.num]: correct ? '1' : '0' }));
   }
-
-  async function finish(extra: Record<number,string>) {
-    const all = { ...finalAnswers, ...extra };
-    const total = computeScore(all);
-    setScore(total);
-    setDone(true);
-    if (!user) return;
-    setSaving(true);
-    try {
-      const exam = getExamById(EXAM_ID);
-      const prog = await getUserProgress() ?? { totalXp:0, level:1, streakCount:0, lastCheckIn:null, completedTopics:[] };
-      const xpGain = total >= PASS_SCORE ? 500 : Math.round(total / MAX_SCORE * 300);
-      const updated = addXp(updateStreak(prog), xpGain);
-      if (exam) await saveExamProgress({ examId: EXAM_ID, score: total, total: MAX_SCORE, completedAt: new Date().toISOString() });
-      await saveUserProgress(updated);
-    } finally { setSaving(false); }
-  }
-
-  function getPartQs(): { num:number; answer:string }[] {
-    if (section === 'L1') return L1_QS;
-    if (section === 'L2') return L2_QS;
-    if (section === 'L3A') return L3A_QS;
-    if (section === 'L3B') {
-      const pg = L3B_PASSAGES[Math.floor(qIdx/2)];
-      return pg ? pg.questions : [];
-    }
-    if (section === 'R3A') return R3A_QS;
-    if (section === 'R3B') {
-      const pg = R3B_PASSAGES[Math.floor(qIdx/2)];
-      return pg ? pg.questions : [];
-    }
-    if (section === 'W1') return W1_QS;
-    if (section === 'W2') return [];
-    if (section === 'R2') return R2_QS;
-    return [];
-  }
-
-  // ── Done screen ───────────────────────────────────────────────────────────
 
   if (done) {
-    const passed = score >= PASS_SCORE;
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-8 gap-6">
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 max-w-sm w-full text-center space-y-4">
-          <div className="text-6xl">{passed ? '🏆' : '📋'}</div>
-          <h2 className="text-2xl font-bold text-gray-800">{passed ? 'Passed!' : 'Keep Studying'}</h2>
-          <p className="text-5xl font-bold text-gray-800">{score}<span className="text-2xl text-gray-400 font-normal"> / {MAX_SCORE}</span></p>
-          <p className="text-sm text-gray-500">Pass threshold: {PASS_SCORE}</p>
-          {saving && <p className="text-xs text-gray-400">Saving…</p>}
-        </div>
-        <Link href="/" className="text-sm text-orange-500 underline">Back to home</Link>
+      <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+          <div className="w-full px-6 py-3 flex items-center justify-center">
+            <h1 className="font-bold text-gray-800 text-xl">{exam.name} · Results</h1>
+          </div>
+        </header>
+        <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6">
+          <ResultsScreen answers={answers} xpEarned={xpEarned} />
+        </main>
       </div>
     );
   }
 
-  const partQs = getPartQs();
-  const q = partQs[section === 'L3B' || section === 'R3B' ? qIdx % 2 : qIdx];
-
-  // ── Render ────────────────────────────────────────────────────────────────
+  const nextLabel = qIdx + 1 < partQs.length ? 'Next →' : partIdx + 1 < PARTS.length ? 'Continue →' : 'Finish';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
-        <Link href="/" className="text-gray-400 hover:text-gray-600 text-xl shrink-0">←</Link>
-        <div className="flex-1 min-w-0 space-y-1">
+    <div className="min-h-screen bg-[#fcf0d7] flex flex-col">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="w-full px-6 py-3 grid grid-cols-3 items-center">
+          <Link href="/" className="text-gray-600 hover:text-gray-800 text-lg font-semibold">← Home</Link>
+          <h1 className="font-bold text-gray-800 text-base truncate text-center">{exam.name}</h1>
+          <div />
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-6 space-y-4">
+
+        {/* Progress */}
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="flex-1 bg-gray-100 rounded-full h-2">
+            <div className="flex-1 bg-white rounded-full h-2 border border-gray-200">
               <div className="bg-orange-400 h-2 rounded-full transition-all"
                 style={{ width:`${((committedCount + inProgressCount) / TOTAL_Q) * 100}%` }} />
             </div>
             <span className="text-xs text-gray-500 shrink-0">{committedCount + inProgressCount} / {TOTAL_Q}</span>
           </div>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-            {part.label}{!isMatching && q && ` · Q${(q as {num:number}).num}`}
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            {part.label}{!isMatching && currentQ ? ` · Q${currentQ.num}` : ''}
           </p>
         </div>
-      </header>
-
-      <main className="flex-1 max-w-xl mx-auto w-full px-4 py-6 space-y-4">
 
         {/* ── L1: ✓/✗ sequential ── */}
         {section === 'L1' && (() => {
-          const lq = L1_QS[qIdx];
-          if (!lq) return null;
+          const lq = L1_QS[qIdx]; if (!lq) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen once, then judge if the ★ statement is correct.</p>
@@ -525,73 +506,45 @@ export default function ExamHsk4() {
                 <p className="text-base chinese-text text-gray-700 leading-relaxed">★ {lq.statement}</p>
               </div>
               <div className="flex gap-3">
-                {(['✓','✗'] as TF[]).map(opt => (
-                  <button key={opt} onClick={() => handleSelect(opt)} disabled={!!feedback}
+                {(['✓','✗']).map(opt => (
+                  <button key={opt} onClick={() => handleSelect(opt)} disabled={confirmed}
                     className={`flex-1 py-4 rounded-xl text-2xl font-bold border-2 transition-colors ${
-                      selected === opt ? 'border-orange-400 bg-orange-50' : 'border-gray-200 bg-white hover:border-gray-300'
-                    } ${feedback && opt === lq.answer ? 'border-green-400 bg-green-50' : ''}
-                    ${feedback && opt === selected && opt !== lq.answer ? 'border-red-400 bg-red-50' : ''}`}>
-                    {opt}
-                  </button>
+                      confirmed
+                        ? opt === lq.answer    ? 'border-green-400 bg-green-50'
+                          : opt === selected   ? 'border-red-400 bg-red-50'
+                          :                      'border-gray-100 bg-white text-gray-300'
+                        : selected === opt     ? 'border-orange-400 bg-orange-50'
+                          :                      'border-gray-200 bg-white hover:border-gray-300'
+                    }`}>{opt}</button>
                 ))}
               </div>
-              {feedback && <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={handleCheck} disabled={!selected}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">
-                  Check
-                </button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : partIdx + 1 < PARTS.length ? 'Continue →' : 'Finish'}
-                </button>
-              )}
+              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${lq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
-        {/* ── L2: dialogue ABCD sequential ── */}
+        {/* ── L2: dialogue ABCD ── */}
         {section === 'L2' && (() => {
-          const lq = L2_QS[qIdx];
-          if (!lq) return null;
+          const lq = L2_QS[qIdx]; if (!lq) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen once, then choose the best answer.</p>
-              <div className="bg-white rounded-2xl border border-gray-100 p-4 flex justify-center">
-                <AudioBtn src={lq.audio} autoPlay />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {(['A','B','C','D'] as Opt4[]).map(opt => (
-                  <button key={opt} onClick={() => handleSelect(opt)} disabled={!!feedback}
-                    className={`p-3 rounded-xl border-2 text-sm font-medium text-left transition-colors chinese-text ${
-                      feedback
-                        ? opt === lq.answer ? 'border-green-400 bg-green-50 text-green-700'
-                          : opt === selected ? 'border-red-400 bg-red-50 text-red-600'
-                          : 'border-gray-100 bg-white text-gray-300'
-                        : selected === opt ? 'border-orange-400 bg-orange-50 text-orange-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                    }`}>
-                    <span className="font-bold mr-1">{opt}.</span>{lq.options[opt]}
-                  </button>
-                ))}
-              </div>
-              {feedback && <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={handleCheck} disabled={!selected}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Continue →'}
-                </button>
-              )}
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 flex justify-center"><AudioBtn src={lq.audio} autoPlay /></div>
+              <AbcdOptions options={lq.options} selected={selected} correctAnswer={lq.answer} confirmed={confirmed} onSelect={handleSelect} />
+              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${lq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
         {/* ── L3A: longer dialogue ABCD ── */}
         {section === 'L3A' && (() => {
-          const lq = L3A_QS[qIdx];
-          if (!lq) return null;
+          const lq = L3A_QS[qIdx]; if (!lq) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen once, then choose the best answer.</p>
@@ -600,169 +553,111 @@ export default function ExamHsk4() {
                 <p className="text-sm chinese-text text-gray-600 leading-relaxed">{lq.dialogueZh}</p>
                 <p className="text-sm font-medium text-gray-800 chinese-text">问：{lq.questionZh}</p>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {(['A','B','C','D'] as Opt4[]).map(opt => (
-                  <button key={opt} onClick={() => handleSelect(opt)} disabled={!!feedback}
-                    className={`p-3 rounded-xl border-2 text-sm font-medium text-left transition-colors chinese-text ${
-                      feedback
-                        ? opt === lq.answer ? 'border-green-400 bg-green-50 text-green-700'
-                          : opt === selected ? 'border-red-400 bg-red-50 text-red-600'
-                          : 'border-gray-100 bg-white text-gray-300'
-                        : selected === opt ? 'border-orange-400 bg-orange-50 text-orange-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                    }`}>
-                    <span className="font-bold mr-1">{opt}.</span>{lq.options[opt]}
-                  </button>
-                ))}
-              </div>
-              {feedback && <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={handleCheck} disabled={!selected}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Continue →'}
-                </button>
-              )}
+              <AbcdOptions options={lq.options} selected={selected} correctAnswer={lq.answer} confirmed={confirmed} onSelect={handleSelect} />
+              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${lq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
         {/* ── L3B: passage with 2 linked questions ── */}
         {section === 'L3B' && (() => {
-          const pgIdx = Math.floor(qIdx / 2);
-          const qInPg = qIdx % 2;
+          const pgIdx = Math.floor(qIdx/2);
           const pg = L3B_PASSAGES[pgIdx];
-          const lq = pg?.questions[qInPg];
+          const lq = pg?.questions[qIdx%2];
           if (!lq || !pg) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Listen once, then answer both questions about the passage.</p>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
-                <div className="flex justify-center"><AudioBtn src={AUD(36 + pgIdx * 2)} autoPlay={qInPg === 0} /></div>
+                <div className="flex justify-center"><AudioBtn src={AUD(36 + pgIdx * 2)} autoPlay={qIdx%2===0} /></div>
                 <p className="text-sm chinese-text text-gray-600 leading-relaxed">{pg.passageZh}</p>
                 <p className="text-sm font-medium text-gray-800 chinese-text">Q{lq.num}. {lq.questionZh}</p>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {(['A','B','C','D'] as Opt4[]).map(opt => (
-                  <button key={opt} onClick={() => handleSelect(opt)} disabled={!!feedback}
-                    className={`p-3 rounded-xl border-2 text-sm font-medium text-left transition-colors chinese-text ${
-                      feedback
-                        ? opt === lq.answer ? 'border-green-400 bg-green-50 text-green-700'
-                          : opt === selected ? 'border-red-400 bg-red-50 text-red-600'
-                          : 'border-gray-100 bg-white text-gray-300'
-                        : selected === opt ? 'border-orange-400 bg-orange-50 text-orange-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                    }`}>
-                    <span className="font-bold mr-1">{opt}.</span>{lq.options[opt]}
-                  </button>
-                ))}
-              </div>
-              {feedback && <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={() => {
-                  if (!selected) return;
-                  const correct = selected === lq.answer;
-                  setFeedback(correct ? '✅ Correct!' : `❌ Incorrect — answer: ${lq.answer}`);
-                  setFinalAnswers(prev => ({ ...prev, [lq.num]: selected }));
-                }} disabled={!selected}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Continue →'}
-                </button>
-              )}
+              <AbcdOptions options={lq.options} selected={selected} correctAnswer={lq.answer} confirmed={confirmed} onSelect={handleSelect} />
+              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${lq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
-        {/* ── R1A: matching — fill blank from word bank ── */}
-        {section === 'R1A' && (() => (
+        {/* ── R1A: fill blank from word bank ── */}
+        {section === 'R1A' && (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Choose the correct word from the bank to fill each blank (Q46–50).</p>
             <WordBank bank={R1A_BANK} letters={R1A_LETTERS} confirmed={matchConfirmed} selected={matchAnswers} />
             <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50">
               {R1A_QS.map(rq => (
-                <div key={rq.num} className="px-4 py-3 flex items-center gap-3">
-                  <span className="text-sm font-semibold text-gray-500 w-6 shrink-0">Q{rq.num}</span>
-                  <p className="flex-1 text-sm chinese-text text-gray-700 leading-relaxed">{rq.sentenceZh}</p>
-                  <LetterPicker letters={R1A_LETTERS} selected={matchAnswers[rq.num] ?? null} correctAnswer={rq.answer} confirmed={matchConfirmed} onSelect={v => handleMatchPick(rq.num, v)} />
+                <div key={rq.num} className="px-4 py-3 space-y-2">
+                  <p className="text-sm chinese-text text-gray-700 leading-relaxed"><span className="font-semibold text-gray-400 mr-2">Q{rq.num}</span>{rq.sentenceZh}</p>
+                  <LetterPicker letters={R1A_LETTERS} selected={matchAnswers[rq.num]??null} correctAnswer={rq.answer} confirmed={matchConfirmed} onSelect={v=>handleMatchPick(rq.num,v)} />
                 </div>
               ))}
             </div>
-            {!matchConfirmed ? (
-              <button onClick={() => setMatchConfirmed(true)} disabled={!matchAllFilled}
-                className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check answers</button>
-            ) : (
-              <button onClick={handleMatchContinue} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">Continue →</button>
-            )}
+            {!matchConfirmed
+              ? <button onClick={() => setMatchConfirmed(true)} disabled={!matchAllFilled} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check answers</button>
+              : <button onClick={handleMatchContinue} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">Continue →</button>}
           </div>
-        ))()}
+        )}
 
-        {/* ── R1B: matching — fill blank from second word bank ── */}
-        {section === 'R1B' && (() => (
+        {/* ── R1B: fill blank from second word bank ── */}
+        {section === 'R1B' && (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Choose the correct word from the bank to fill each blank (Q51–55).</p>
             <WordBank bank={R1B_BANK} letters={R1B_LETTERS} confirmed={matchConfirmed} selected={matchAnswers} />
             <div className="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-50">
               {R1B_QS.map(rq => (
-                <div key={rq.num} className="px-4 py-3 flex items-center gap-3">
-                  <span className="text-sm font-semibold text-gray-500 w-6 shrink-0">Q{rq.num}</span>
-                  <p className="flex-1 text-sm chinese-text text-gray-700 leading-relaxed">{rq.sentenceZh}</p>
-                  <LetterPicker letters={R1B_LETTERS} selected={matchAnswers[rq.num] ?? null} correctAnswer={rq.answer} confirmed={matchConfirmed} onSelect={v => handleMatchPick(rq.num, v)} />
+                <div key={rq.num} className="px-4 py-3 space-y-2">
+                  <p className="text-sm chinese-text text-gray-700 leading-relaxed"><span className="font-semibold text-gray-400 mr-2">Q{rq.num}</span>{rq.sentenceZh}</p>
+                  <LetterPicker letters={R1B_LETTERS} selected={matchAnswers[rq.num]??null} correctAnswer={rq.answer} confirmed={matchConfirmed} onSelect={v=>handleMatchPick(rq.num,v)} />
                 </div>
               ))}
             </div>
-            {!matchConfirmed ? (
-              <button onClick={() => setMatchConfirmed(true)} disabled={!matchAllFilled}
-                className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check answers</button>
-            ) : (
-              <button onClick={handleMatchContinue} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">Continue →</button>
-            )}
+            {!matchConfirmed
+              ? <button onClick={() => setMatchConfirmed(true)} disabled={!matchAllFilled} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check answers</button>
+              : <button onClick={handleMatchContinue} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">Continue →</button>}
           </div>
-        ))()}
+        )}
 
         {/* ── R2: fragment ordering (tap-to-build) ── */}
         {section === 'R2' && (() => {
-          const rq = R2_QS[qIdx];
-          if (!rq) return null;
+          const rq = R2_QS[qIdx]; if (!rq) return null;
+          const r2Correct = confirmed && tapTrayIdxs.map(i=>['A','B','C'][i]??'').join('') === rq.answer;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Tap the fragments in the correct order to form a sentence.</p>
-              <div className="bg-white rounded-2xl border border-gray-100 p-4 min-h-[60px] flex flex-wrap gap-2 items-center">
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 min-h-[64px] flex flex-wrap gap-2 items-center">
                 {tapTrayIdxs.length === 0 && <span className="text-gray-300 text-sm">Tap fragments below…</span>}
                 {tapTrayIdxs.map((idx, pos) => (
-                  <button key={pos} onClick={() => !feedback && handleTapTray(idx)} disabled={!!feedback}
-                    className="px-3 py-2 rounded-lg bg-orange-100 text-orange-800 text-sm font-medium chinese-text">
-                    {['A','B','C'][idx]}. {rq.fragments[['A','B','C'][idx] ?? 'A']}
+                  <button key={pos} onClick={() => !confirmed && tapReturnToBank(idx)} disabled={confirmed}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium chinese-text ${confirmed ? (r2Correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700') : 'bg-orange-100 text-orange-800'}`}>
+                    {['A','B','C'][idx]}. {rq.fragments[['A','B','C'][idx]??'A']}
                   </button>
                 ))}
               </div>
               <div className="flex flex-col gap-2">
                 {tapBankIdxs.map(idx => (
-                  <button key={idx} onClick={() => !feedback && handleTapBank(idx)} disabled={!!feedback}
+                  <button key={idx} onClick={() => !confirmed && tapPickFromBank(idx)} disabled={confirmed}
                     className="w-full px-3 py-3 rounded-xl border-2 border-gray-200 bg-white text-sm font-medium text-left chinese-text hover:border-gray-300">
-                    <span className="font-bold text-gray-400 mr-2">{['A','B','C'][idx]}.</span>{rq.fragments[['A','B','C'][idx] ?? 'A']}
+                    <span className="font-bold text-gray-400 mr-2">{['A','B','C'][idx]}.</span>{rq.fragments[['A','B','C'][idx]??'A']}
                   </button>
                 ))}
               </div>
-              {feedback && <p className={`text-sm font-medium whitespace-pre-wrap ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={handleTapSubmit} disabled={tapTrayIdxs.length < 3}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Continue →'}
-                </button>
-              )}
+              {confirmed && <p className={`text-sm font-medium ${r2Correct ? 'text-green-600' : 'text-red-500'}`}>{r2Correct ? '✅ Correct!' : `❌ Incorrect — answer: ${rq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleR2Check} disabled={tapTrayIdxs.length < 3} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
         {/* ── R3A: passage + ABCD ── */}
         {section === 'R3A' && (() => {
-          const rq = R3A_QS[qIdx];
-          if (!rq) return null;
+          const rq = R3A_QS[qIdx]; if (!rq) return null;
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Read the passage, then choose the best answer.</p>
@@ -770,40 +665,20 @@ export default function ExamHsk4() {
                 <p className="text-sm chinese-text text-gray-700 leading-relaxed">{rq.passageZh}</p>
                 <p className="text-sm font-medium text-gray-800 chinese-text">★ {rq.questionZh}</p>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {(['A','B','C','D'] as Opt4[]).map(opt => (
-                  <button key={opt} onClick={() => handleSelect(opt)} disabled={!!feedback}
-                    className={`p-3 rounded-xl border-2 text-sm font-medium text-left transition-colors chinese-text ${
-                      feedback
-                        ? opt === rq.answer ? 'border-green-400 bg-green-50 text-green-700'
-                          : opt === selected ? 'border-red-400 bg-red-50 text-red-600'
-                          : 'border-gray-100 bg-white text-gray-300'
-                        : selected === opt ? 'border-orange-400 bg-orange-50 text-orange-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                    }`}>
-                    <span className="font-bold mr-1">{opt}.</span>{rq.options[opt]}
-                  </button>
-                ))}
-              </div>
-              {feedback && <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={handleCheck} disabled={!selected}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Continue →'}
-                </button>
-              )}
+              <AbcdOptions options={rq.options} selected={selected} correctAnswer={rq.answer} confirmed={confirmed} onSelect={handleSelect} />
+              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${rq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
         {/* ── R3B: passage with 2 linked questions ── */}
         {section === 'R3B' && (() => {
-          const pgIdx = Math.floor(qIdx / 2);
-          const qInPg = qIdx % 2;
+          const pgIdx = Math.floor(qIdx/2);
           const pg = R3B_PASSAGES[pgIdx];
-          const rq = pg?.questions[qInPg];
+          const rq = pg?.questions[qIdx%2];
           if (!rq || !pg) return null;
           return (
             <div className="space-y-4">
@@ -812,86 +687,58 @@ export default function ExamHsk4() {
                 <p className="text-sm chinese-text text-gray-700 leading-relaxed">{pg.passageZh}</p>
                 <p className="text-sm font-medium text-gray-800 chinese-text">★ Q{rq.num}. {rq.questionZh}</p>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {(['A','B','C','D'] as Opt4[]).map(opt => (
-                  <button key={opt} onClick={() => handleSelect(opt)} disabled={!!feedback}
-                    className={`p-3 rounded-xl border-2 text-sm font-medium text-left transition-colors chinese-text ${
-                      feedback
-                        ? opt === rq.answer ? 'border-green-400 bg-green-50 text-green-700'
-                          : opt === selected ? 'border-red-400 bg-red-50 text-red-600'
-                          : 'border-gray-100 bg-white text-gray-300'
-                        : selected === opt ? 'border-orange-400 bg-orange-50 text-orange-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
-                    }`}>
-                    <span className="font-bold mr-1">{opt}.</span>{rq.options[opt]}
-                  </button>
-                ))}
-              </div>
-              {feedback && <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={() => {
-                  if (!selected) return;
-                  const correct = selected === rq.answer;
-                  setFeedback(correct ? '✅ Correct!' : `❌ Incorrect — answer: ${rq.answer}`);
-                  setFinalAnswers(prev => ({ ...prev, [rq.num]: selected }));
-                }} disabled={!selected}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Continue →'}
-                </button>
-              )}
+              <AbcdOptions options={rq.options} selected={selected} correctAnswer={rq.answer} confirmed={confirmed} onSelect={handleSelect} />
+              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${rq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
         {/* ── W1: word rearrangement (tap-to-build) ── */}
         {section === 'W1' && (() => {
-          const wq = W1_QS[qIdx];
-          if (!wq) return null;
+          const wq = W1_QS[qIdx]; if (!wq) return null;
+          const assembled = tapTrayIdxs.map(i => wq.words[i]).join('') + '。';
+          const w1Correct = confirmed && (assembled === wq.answer || assembled === wq.answerAlt);
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Tap the words in the correct order to form a sentence.</p>
-              <div className="bg-white rounded-2xl border border-gray-100 p-4 min-h-[60px] flex flex-wrap gap-2 items-center">
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 min-h-[64px] flex flex-wrap gap-2 items-center">
                 {tapTrayIdxs.length === 0 && <span className="text-gray-300 text-sm">Tap words below…</span>}
                 {tapTrayIdxs.map((idx, pos) => (
-                  <button key={pos} onClick={() => !feedback && handleTapTray(idx)} disabled={!!feedback}
-                    className="px-3 py-2 rounded-lg bg-orange-100 text-orange-800 text-sm font-medium chinese-text">
+                  <button key={pos} onClick={() => !confirmed && tapReturnToBank(idx)} disabled={confirmed}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium chinese-text ${confirmed ? (w1Correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700') : 'bg-orange-100 text-orange-800'}`}>
                     {wq.words[idx]}
                   </button>
                 ))}
               </div>
               <div className="flex flex-wrap gap-2">
                 {tapBankIdxs.map(idx => (
-                  <button key={idx} onClick={() => !feedback && handleTapBank(idx)} disabled={!!feedback}
+                  <button key={idx} onClick={() => !confirmed && tapPickFromBank(idx)} disabled={confirmed}
                     className="px-3 py-2 rounded-xl border-2 border-gray-200 bg-white text-sm font-medium chinese-text hover:border-gray-300">
                     {wq.words[idx]}
                   </button>
                 ))}
               </div>
-              {feedback && <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>}
-              {!feedback ? (
-                <button onClick={handleTapSubmit} disabled={tapTrayIdxs.length < wq.words.length}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Continue →'}
-                </button>
-              )}
+              {confirmed && <p className={`text-sm font-medium ${w1Correct ? 'text-green-600' : 'text-red-500'}`}>{w1Correct ? '✅ Correct!' : `❌ Incorrect — answer: ${wq.answer}`}</p>}
+              {!confirmed
+                ? <button onClick={handleW1Check} disabled={tapTrayIdxs.length < wq.words.length} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
 
         {/* ── W2: picture + word → type sentence ── */}
         {section === 'W2' && (() => {
-          const wq = W2_QS[qIdx];
-          if (!wq) return null;
+          const wq = W2_QS[qIdx]; if (!wq) return null;
+          const w2Correct = confirmed && w2Input.trim().includes(wq.word);
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Use the given word to write a sentence about the picture.</p>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
-                <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center text-center px-4">
-                  <p className="text-xs text-gray-400 italic">{wq.pictureDesc}</p>
+                <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center px-4">
+                  <p className="text-xs text-gray-400 italic text-center">{wq.pictureDesc}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">Given word:</span>
@@ -899,27 +746,20 @@ export default function ExamHsk4() {
                   <span className="text-sm text-gray-400">{wq.wordPinyin}</span>
                 </div>
               </div>
-              <textarea
-                value={w2Input}
-                onChange={e => !feedback && setW2Input(e.target.value)}
-                disabled={!!feedback}
+              <textarea value={w2Input} onChange={e => !confirmed && setW2Input(e.target.value)} disabled={confirmed}
                 placeholder="Write your sentence here…"
-                className="w-full border-2 border-gray-200 rounded-xl p-3 text-base chinese-text resize-none h-24 focus:border-orange-400 focus:outline-none"
-              />
-              {feedback && (
+                className="w-full border-2 border-gray-200 rounded-xl p-3 text-base chinese-text resize-none h-24 focus:border-orange-400 focus:outline-none bg-white" />
+              {confirmed && (
                 <div className="space-y-1">
-                  <p className={`text-sm font-medium ${feedback.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>{feedback}</p>
+                  <p className={`text-sm font-medium ${w2Correct ? 'text-green-600' : 'text-red-500'}`}>
+                    {w2Correct ? `✅ Contains "${wq.word}" — accepted!` : `❌ Sentence must include "${wq.word}".`}
+                  </p>
+                  {!w2Correct && <p className="text-xs text-gray-400">Sample: {wq.sampleAnswer}</p>}
                 </div>
               )}
-              {!feedback ? (
-                <button onClick={handleW2Submit} disabled={!w2Input.trim()}
-                  className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-              ) : (
-                <button onClick={qIdx + 1 < part.qCount ? handleNext : () => finish({})}
-                  className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">
-                  {qIdx + 1 < part.qCount ? 'Next →' : 'Finish'}
-                </button>
-              )}
+              {!confirmed
+                ? <button onClick={handleW2Check} disabled={!w2Input.trim()} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
             </div>
           );
         })()}
