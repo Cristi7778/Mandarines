@@ -25,6 +25,14 @@ const EXAMS: Exam[] = [
     passScore: 180,
     description: 'Official HSK3 example',
   },
+  {
+    id: 'exam-hsk4-h41001',
+    name: 'HSK 4 Exam',
+    station: 'HSK 4',
+    sequenceOrder: 88,
+    passScore: 180,
+    description: 'Official HSK4 example',
+  },
 ];
 
 export default EXAMS;

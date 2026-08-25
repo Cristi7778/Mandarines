@@ -1183,10 +1183,6 @@ const TOPICS: Topic[] = [
       it('t72i6', 'topic-72', '谨此',   'jǐn cǐ',   'hereby (formal writing marker)',   '',   '通知。',           'Hereby notified.',                        'Used in formal documents and official letters.'),
     ],
   },
-  {
-    id: 'topic-55', name: 'HSK 4 exam', category: 'exam',
-    station: 'HSK 4', sequenceOrder: 88, items: [],
-  },
 ];
 
 export default TOPICS;
