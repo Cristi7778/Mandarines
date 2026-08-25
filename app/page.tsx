@@ -151,7 +151,7 @@ export default function HomePage() {
           const exams = examsByStationMap[station] ?? [];
           const completedTopics = topics.filter(t => { const p = topicProgress[t.id]; return p && stepsComplete(p) === 7; }).length;
           const completedLessons = lessons.filter(l => lessonProgress[l.id]).length;
-          const completedExams = exams.filter(e => !!examProgress[e.id]).length;
+          const completedExams = exams.filter(e => { const ep = examProgress[e.id]; return !!ep && ep.score >= e.passScore; }).length;
           const totalItems = topics.length + lessons.length + exams.length;
           const completedItems = completedTopics + completedLessons + completedExams;
 
@@ -210,14 +210,15 @@ export default function HomePage() {
                   if (row.kind === 'exam') {
                     const exam = row.data;
                     const ep = examProgress[exam.id];
+                    const passed = !!ep && ep.score >= exam.passScore;
                     return (
                       <div key={exam.id} className="bg-white px-4 py-3 flex items-center justify-between gap-4">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-mono text-gray-400 shrink-0">{exam.sequenceOrder}.</span>
                             <span className="text-base">📋</span>
-                            <span className={`font-medium text-base ${ep ? 'text-green-700' : 'text-gray-800'}`}>{exam.name}</span>
-                            {ep && <span className="text-green-500 text-xs shrink-0">✓</span>}
+                            <span className={`font-medium text-base ${passed ? 'text-green-700' : 'text-gray-800'}`}>{exam.name}</span>
+                            {passed && <span className="text-green-500 text-xs shrink-0">✓</span>}
                           </div>
                           {ep ? (
                             <p className="text-xs text-gray-400 mt-0.5">Last score: {ep.score} / {ep.total}</p>
@@ -228,7 +229,7 @@ export default function HomePage() {
                         <Link
                           href={`/exam/${exam.id}`}
                           className={`shrink-0 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors ${
-                            ep ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            passed ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
                           {ep ? 'Retake' : 'Take Exam'}

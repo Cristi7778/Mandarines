@@ -89,6 +89,7 @@ export interface Exam {
   name: string;
   station: string;
   sequenceOrder: number;
+  passScore: number;
   description?: string;
 }
 

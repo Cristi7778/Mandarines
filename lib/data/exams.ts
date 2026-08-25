@@ -6,6 +6,7 @@ const EXAMS: Exam[] = [
     name: 'HSK 1 Exam',
     station: 'HSK 1',
     sequenceOrder: 28,
+    passScore: 120,
     description: 'Official HSK1 example',
   },
   {
@@ -13,6 +14,7 @@ const EXAMS: Exam[] = [
     name: 'HSK 2 Exam',
     station: 'HSK 2',
     sequenceOrder: 50,
+    passScore: 120,
     description: 'Official HSK2 example',
   },
   {
@@ -20,6 +22,7 @@ const EXAMS: Exam[] = [
     name: 'HSK 3 Exam',
     station: 'HSK 3',
     sequenceOrder: 71,
+    passScore: 180,
     description: 'Official HSK3 example',
   },
 ];
