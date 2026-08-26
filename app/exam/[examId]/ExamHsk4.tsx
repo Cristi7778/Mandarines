@@ -737,9 +737,7 @@ export default function ExamHsk4() {
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Use the given word to write a sentence about the picture.</p>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
-                <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center px-4">
-                  <p className="text-xs text-gray-400 italic text-center">{wq.pictureDesc}</p>
-                </div>
+                <img src={`/hsk4/images/w2_q${wq.num}.jpg`} alt={wq.pictureDesc} className="w-full h-48 object-cover rounded-xl" />
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">Given word:</span>
                   <span className="text-lg chinese-text font-bold text-orange-500">{wq.word}</span>
