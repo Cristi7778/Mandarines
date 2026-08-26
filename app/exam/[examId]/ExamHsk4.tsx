@@ -560,7 +560,6 @@ export default function ExamHsk4() {
               <p className="text-sm text-gray-500">Listen once, then choose the best answer.</p>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
                 <div className="flex justify-center"><AudioBtn src={lq.audio} autoPlay /></div>
-                <p className="text-sm chinese-text text-gray-600 leading-relaxed">{lq.dialogueZh}</p>
                 <p className="text-sm font-medium text-gray-800 chinese-text">问：{lq.questionZh}</p>
               </div>
               <AbcdOptions options={lq.options} selected={selected} correctAnswer={lq.answer} confirmed={confirmed} onSelect={handleSelect} />
@@ -586,7 +585,6 @@ export default function ExamHsk4() {
               <p className="text-sm text-gray-500">Listen once, then answer both questions.</p>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
                 <div className="flex justify-center"><AudioBtn src={`/hsk4/audio/item${36 + pgIdx * 2}-${37 + pgIdx * 2}.mp3`} autoPlay /></div>
-                <p className="text-sm chinese-text text-gray-600 leading-relaxed">{pg.passageZh}</p>
               </div>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
                 <p className="text-sm font-medium text-gray-800 chinese-text">Q{lq1.num}. {lq1.questionZh}</p>
@@ -780,7 +778,7 @@ export default function ExamHsk4() {
               {confirmed && (
                 <div className="space-y-1">
                   <p className={`text-sm font-medium ${w2Correct ? 'text-green-600' : 'text-red-500'}`}>
-                    {w2Correct ? `✅ Contains "${wq.word}" — accepted!` : `❌ Sentence must include "${wq.word}".`}
+                    {w2Correct ? '✅ Correct!' : '❌ Incorrect.'}
                   </p>
                   {!w2Correct && <p className="text-xs text-gray-400">Sample: {wq.sampleAnswer}</p>}
                 </div>
