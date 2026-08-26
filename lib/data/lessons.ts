@@ -506,6 +506,86 @@ const LESSONS: Lesson[] = [
     ],
   },
   {
+    id: 'lesson-16',
+    name: 'Degree complement: V + 得 + Adj',
+    station: 'HSK 4',
+    sequenceOrder: 85,
+    description: 'Describing how well or how intensely an action is performed.',
+    xp: 25,
+    sections: [
+      {
+        title: 'Structure',
+        body: 'Subject + Verb + 得 (de) + Degree adjective/phrase. The particle 得 links the verb to a description of the manner or degree of the action. The degree phrase can be a simple adjective, a comparative, or a longer comment.',
+        examples: [
+          { chinese: '他中文说得很流利。', pinyin: 'Tā Zhōngwén shuō de hěn liúlì.', english: 'He speaks Chinese very fluently.' },
+          { chinese: '她唱得很好听。', pinyin: 'Tā chàng de hěn hǎotīng.', english: 'She sings beautifully.' },
+          { chinese: '这道题做得不对。', pinyin: 'Zhè dào tí zuò de bù duì.', english: 'This problem was done incorrectly.' },
+        ],
+      },
+      {
+        title: 'When the verb has an object',
+        body: 'If the verb takes an object, the verb must be repeated after the object: Subject + Verb + Object + Verb + 得 + Degree. The second verb carries 得.',
+        examples: [
+          { chinese: '他说汉语说得很好。', pinyin: 'Tā shuō Hànyǔ shuō de hěn hǎo.', english: 'He speaks Chinese very well.' },
+          { chinese: '她写字写得很漂亮。', pinyin: 'Tā xiě zì xiě de hěn piàoliang.', english: 'She writes characters beautifully.' },
+        ],
+      },
+      {
+        title: 'Negation and questions',
+        body: 'Negate inside the degree phrase (after 得), not before the verb. For questions, add 吗 or use the 好不好 / 快不快 pattern after 得.',
+        examples: [
+          { chinese: '他跑得不快。', pinyin: 'Tā pǎo de bù kuài.', english: "He doesn't run fast." },
+          { chinese: '你睡得好吗？', pinyin: 'Nǐ shuì de hǎo ma?', english: 'Did you sleep well?' },
+          { chinese: '她做得好不好？', pinyin: 'Tā zuò de hǎo bu hǎo?', english: 'Did she do it well or not?' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'lesson-17',
+    name: 'Frame prepositions: 对 / 为 / 按 / 根据',
+    station: 'HSK 4',
+    sequenceOrder: 86,
+    description: 'Four prepositions that set the frame — topic, beneficiary, standard, or basis — before the main verb.',
+    xp: 25,
+    sections: [
+      {
+        title: '对 — towards / regarding',
+        body: '对 (duì) marks the target or topic of an attitude, feeling, or action. Pattern: Subject + 对 + Topic + Adjective/Verb.',
+        examples: [
+          { chinese: '我对这个城市很熟悉。', pinyin: 'Wǒ duì zhège chéngshì hěn shúxī.', english: 'I am very familiar with this city.' },
+          { chinese: '他对工作很认真。', pinyin: 'Tā duì gōngzuò hěn rènzhēn.', english: 'He is very serious about his work.' },
+          { chinese: '这对你的健康不好。', pinyin: 'Zhè duì nǐ de jiànkāng bù hǎo.', english: 'This is not good for your health.' },
+        ],
+      },
+      {
+        title: '为 — for (beneficiary or purpose)',
+        body: '为 (wèi) marks who benefits from or what purpose motivates the action. Pattern: Subject + 为 + Beneficiary + Verb + Object.',
+        examples: [
+          { chinese: '这椅子是专为老年人提供的。', pinyin: 'Zhè yǐzi shì zhuān wèi lǎonián rén tígōng de.', english: 'This chair is provided specifically for the elderly.' },
+          { chinese: '他为公司做了很多贡献。', pinyin: 'Tā wèi gōngsī zuò le hěn duō gòngxiàn.', english: 'He made many contributions for the company.' },
+        ],
+      },
+      {
+        title: '按 — according to (order or rule)',
+        body: '按 (àn) means "in accordance with" a rule, sequence, or standard. It often appears as 按照 (ànzhào) in formal writing. Common in instructions and procedures.',
+        examples: [
+          { chinese: '请按从小到大的顺序排列这些数字。', pinyin: 'Qǐng àn cóng xiǎo dào dà de shùnxù páiliè zhèxiē shùzì.', english: 'Please arrange these numbers in ascending order.' },
+          { chinese: '请按要求填写表格。', pinyin: 'Qǐng àn yāoqiú tiánxiě biǎogé.', english: 'Please fill in the form according to the requirements.' },
+        ],
+      },
+      {
+        title: '根据 — based on / according to',
+        body: '根据 (gēnjù) introduces the evidence, source, or basis for a statement or decision. More analytical than 按 — it points to a reason or data, not a procedure.',
+        examples: [
+          { chinese: '根据对话，可以知道什么？', pinyin: 'Gēnjù duìhuà, kěyǐ zhīdào shénme?', english: 'Based on the dialogue, what can we know?' },
+          { chinese: '根据研究，运动对健康有好处。', pinyin: 'Gēnjù yánjiū, yùndòng duì jiànkāng yǒu hǎochù.', english: 'Based on research, exercise is beneficial to health.' },
+          { chinese: '根据天气预报，明天会下雨。', pinyin: 'Gēnjù tiānqì yùbào, míngtiān huì xià yǔ.', english: 'According to the weather forecast, it will rain tomorrow.' },
+        ],
+      },
+    ],
+  },
+  {
     id: 'lesson-14',
     name: '不仅……而且…… (Not only… but also…)',
     station: 'HSK 4',

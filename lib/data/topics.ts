@@ -1124,7 +1124,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-57', name: 'Environment & nature', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 85,
+    station: 'HSK 4', sequenceOrder: 87,
     description: 'Environmental and ecological vocabulary.',
     items: [
       it('t57i1',  'topic-57', '污染', 'wūrǎn',    'pollution; to pollute', '空气',       '越来越严重。',       'Air pollution is getting more and more serious.'),
@@ -1144,7 +1144,7 @@ const TOPICS: Topic[] = [
     name: 'Technology & media',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 86,
+    sequenceOrder: 88,
     description: 'Digital life, internet and media vocabulary.',
     items: [
       it('t71i1',  'topic-71', '网络',   'wǎngluò',   'internet; network',          '现在',       '很普及。',       'The internet is now very widespread.'),
@@ -1161,18 +1161,18 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-52', name: 'Reading: short essays (100–200 characters)', category: 'reading',
-    station: 'HSK 4', sequenceOrder: 87, items: [],
+    station: 'HSK 4', sequenceOrder: 89, items: [],
   },
   {
     id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
-    station: 'HSK 4', sequenceOrder: 88, items: [],
+    station: 'HSK 4', sequenceOrder: 90, items: [],
   },
   {
     id: 'topic-72',
     name: 'Formal register & rhetorical questions',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 89,
+    sequenceOrder: 91,
     description: 'Polite forms and rhetorical structures for formal speech and writing.',
     items: [
       it('t72i1', 'topic-72', '难道',   'nándào',   'could it be that; don\'t tell me', '',   '你不知道吗？',     "Could it be that you don't know?"),
