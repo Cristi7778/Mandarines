@@ -325,6 +325,7 @@ export default function ExamHsk4() {
   const [partIdx,        setPartIdx]        = useState(0);
   const [qIdx,           setQIdx]           = useState(0);
   const [selected,       setSelected]       = useState<string | null>(null);
+  const [selected2,      setSelected2]      = useState<string | null>(null);
   const [confirmed,      setConfirmed]      = useState(false);
   const [matchAnswers,   setMatchAnswers]   = useState<Record<number,string>>({});
   const [matchConfirmed, setMatchConfirmed] = useState(false);
@@ -347,14 +348,14 @@ export default function ExamHsk4() {
   }, [user, router]);
 
   useEffect(() => {
-    setQIdx(0); setSelected(null); setConfirmed(false);
+    setQIdx(0); setSelected(null); setSelected2(null); setConfirmed(false);
     setMatchAnswers({}); setMatchConfirmed(false);
     setTapBankIdxs([]); setTapTrayIdxs([]);
     setW2Input('');
   }, [partIdx]);
 
   useEffect(() => {
-    setSelected(null); setConfirmed(false); setW2Input('');
+    setSelected(null); setSelected2(null); setConfirmed(false); setW2Input('');
     const section = PARTS[partIdx]?.section;
     if (section === 'W1') {
       const wq = W1_QS[qIdx];
@@ -379,15 +380,16 @@ export default function ExamHsk4() {
   const isMatching = MATCHING_SECTIONS.has(section);
   const partQs     = part.questions;
 
+  const isPaired       = section === 'L3B' || section === 'R3B';
   const committedCount  = Object.keys(answers).length;
   const inProgressCount = isMatching
     ? Object.keys(matchAnswers).length
-    : (confirmed ? qIdx + 1 : qIdx);
+    : isPaired
+      ? (confirmed ? qIdx + 2 : qIdx)
+      : (confirmed ? qIdx + 1 : qIdx);
 
-  const currentQ    = section === 'L3B' ? L3B_PASSAGES[Math.floor(qIdx/2)]?.questions[qIdx%2]
-                    : section === 'R3B' ? R3B_PASSAGES[Math.floor(qIdx/2)]?.questions[qIdx%2]
-                    : partQs[qIdx];
-  const isCorrect   = !!currentQ && selected === currentQ.answer;
+  const currentQ       = !isPaired ? partQs[qIdx] : undefined;
+  const isCorrect      = !!currentQ && selected === currentQ.answer;
   const matchAllFilled = isMatching && partQs.every(q => matchAnswers[q.num] !== undefined);
 
   async function finishExam(finalAnswers: Record<number,string>) {
@@ -403,14 +405,22 @@ export default function ExamHsk4() {
   function handleSelect(val: string) { if (!confirmed) setSelected(val); }
 
   function handleConfirm() {
-    if (!selected || !currentQ) return;
-    setConfirmed(true);
-    setAnswers(prev => ({ ...prev, [currentQ.num]: selected }));
+    if (isPaired) {
+      const q1 = partQs[qIdx]; const q2 = partQs[qIdx + 1];
+      if (!selected || !selected2 || !q1 || !q2) return;
+      setConfirmed(true);
+      setAnswers(prev => ({ ...prev, [q1.num]: selected, [q2.num]: selected2 }));
+    } else {
+      if (!selected || !currentQ) return;
+      setConfirmed(true);
+      setAnswers(prev => ({ ...prev, [currentQ.num]: selected }));
+    }
   }
 
   async function handleNext() {
-    setSelected(null); setConfirmed(false); setW2Input('');
-    if (qIdx + 1 < partQs.length) { setQIdx(qIdx + 1); return; }
+    setSelected(null); setSelected2(null); setConfirmed(false); setW2Input('');
+    const advance = isPaired ? 2 : 1;
+    if (qIdx + advance < partQs.length) { setQIdx(qIdx + advance); return; }
     if (partIdx + 1 < PARTS.length) { setQIdx(0); setPartIdx(partIdx + 1); return; }
     await finishExam({ ...answers });
   }
@@ -562,25 +572,35 @@ export default function ExamHsk4() {
           );
         })()}
 
-        {/* ── L3B: passage with 2 linked questions ── */}
+        {/* ── L3B: passage with 2 linked questions (both shown at once) ── */}
         {section === 'L3B' && (() => {
-          const pgIdx = Math.floor(qIdx/2);
+          const pgIdx = Math.floor(qIdx / 2);
           const pg = L3B_PASSAGES[pgIdx];
-          const lq = pg?.questions[qIdx%2];
-          if (!lq || !pg) return null;
+          const lq1 = pg?.questions[0];
+          const lq2 = pg?.questions[1];
+          if (!lq1 || !lq2 || !pg) return null;
+          const c1 = selected === lq1.answer, c2 = selected2 === lq2.answer;
+          const pairNextLabel = qIdx + 2 < partQs.length ? 'Next →' : 'Continue →';
           return (
             <div className="space-y-4">
-              <p className="text-sm text-gray-500">Listen once, then answer both questions about the passage.</p>
+              <p className="text-sm text-gray-500">Listen once, then answer both questions.</p>
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
-                <div className="flex justify-center"><AudioBtn src={AUD(36 + pgIdx * 2)} autoPlay={qIdx%2===0} /></div>
+                <div className="flex justify-center"><AudioBtn src={`/hsk4/audio/item${36 + pgIdx * 2}-${37 + pgIdx * 2}.mp3`} autoPlay /></div>
                 <p className="text-sm chinese-text text-gray-600 leading-relaxed">{pg.passageZh}</p>
-                <p className="text-sm font-medium text-gray-800 chinese-text">Q{lq.num}. {lq.questionZh}</p>
               </div>
-              <AbcdOptions options={lq.options} selected={selected} correctAnswer={lq.answer} confirmed={confirmed} onSelect={handleSelect} />
-              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${lq.answer}`}</p>}
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+                <p className="text-sm font-medium text-gray-800 chinese-text">Q{lq1.num}. {lq1.questionZh}</p>
+                <AbcdOptions options={lq1.options} selected={selected} correctAnswer={lq1.answer} confirmed={confirmed} onSelect={v => !confirmed && setSelected(v)} />
+                {confirmed && <p className={`text-sm font-medium ${c1 ? 'text-green-600' : 'text-red-500'}`}>{c1 ? '✅ Correct!' : `❌ Incorrect — answer: ${lq1.answer}`}</p>}
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+                <p className="text-sm font-medium text-gray-800 chinese-text">Q{lq2.num}. {lq2.questionZh}</p>
+                <AbcdOptions options={lq2.options} selected={selected2} correctAnswer={lq2.answer} confirmed={confirmed} onSelect={v => !confirmed && setSelected2(v)} />
+                {confirmed && <p className={`text-sm font-medium ${c2 ? 'text-green-600' : 'text-red-500'}`}>{c2 ? '✅ Correct!' : `❌ Incorrect — answer: ${lq2.answer}`}</p>}
+              </div>
               {!confirmed
-                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
+                ? <button onClick={handleConfirm} disabled={!selected || !selected2} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{pairNextLabel}</button>}
             </div>
           );
         })()}
@@ -674,24 +694,34 @@ export default function ExamHsk4() {
           );
         })()}
 
-        {/* ── R3B: passage with 2 linked questions ── */}
+        {/* ── R3B: passage with 2 linked questions (both shown at once) ── */}
         {section === 'R3B' && (() => {
-          const pgIdx = Math.floor(qIdx/2);
+          const pgIdx = Math.floor(qIdx / 2);
           const pg = R3B_PASSAGES[pgIdx];
-          const rq = pg?.questions[qIdx%2];
-          if (!rq || !pg) return null;
+          const rq1 = pg?.questions[0];
+          const rq2 = pg?.questions[1];
+          if (!rq1 || !rq2 || !pg) return null;
+          const c1 = selected === rq1.answer, c2 = selected2 === rq2.answer;
+          const pairNextLabel = qIdx + 2 < partQs.length ? 'Next →' : 'Continue →';
           return (
             <div className="space-y-4">
               <p className="text-sm text-gray-500">Read the passage, then answer both questions.</p>
-              <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+              <div className="bg-white rounded-2xl border border-gray-100 p-4">
                 <p className="text-sm chinese-text text-gray-700 leading-relaxed">{pg.passageZh}</p>
-                <p className="text-sm font-medium text-gray-800 chinese-text">★ Q{rq.num}. {rq.questionZh}</p>
               </div>
-              <AbcdOptions options={rq.options} selected={selected} correctAnswer={rq.answer} confirmed={confirmed} onSelect={handleSelect} />
-              {confirmed && <p className={`text-sm font-medium ${isCorrect ? 'text-green-600' : 'text-red-500'}`}>{isCorrect ? '✅ Correct!' : `❌ Incorrect — answer: ${rq.answer}`}</p>}
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+                <p className="text-sm font-medium text-gray-800 chinese-text">★ Q{rq1.num}. {rq1.questionZh}</p>
+                <AbcdOptions options={rq1.options} selected={selected} correctAnswer={rq1.answer} confirmed={confirmed} onSelect={v => !confirmed && setSelected(v)} />
+                {confirmed && <p className={`text-sm font-medium ${c1 ? 'text-green-600' : 'text-red-500'}`}>{c1 ? '✅ Correct!' : `❌ Incorrect — answer: ${rq1.answer}`}</p>}
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
+                <p className="text-sm font-medium text-gray-800 chinese-text">★ Q{rq2.num}. {rq2.questionZh}</p>
+                <AbcdOptions options={rq2.options} selected={selected2} correctAnswer={rq2.answer} confirmed={confirmed} onSelect={v => !confirmed && setSelected2(v)} />
+                {confirmed && <p className={`text-sm font-medium ${c2 ? 'text-green-600' : 'text-red-500'}`}>{c2 ? '✅ Correct!' : `❌ Incorrect — answer: ${rq2.answer}`}</p>}
+              </div>
               {!confirmed
-                ? <button onClick={handleConfirm} disabled={!selected} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
-                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{nextLabel}</button>}
+                ? <button onClick={handleConfirm} disabled={!selected || !selected2} className="w-full bg-orange-500 text-white font-semibold py-4 rounded-xl hover:bg-orange-600 disabled:opacity-40 transition-colors">Check</button>
+                : <button onClick={handleNext} className="w-full bg-gray-800 text-white font-semibold py-4 rounded-xl hover:bg-gray-900 transition-colors">{pairNextLabel}</button>}
             </div>
           );
         })()}
