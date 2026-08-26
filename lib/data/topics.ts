@@ -1069,7 +1069,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-50', name: 'Opinions & emotions', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 80,
+    station: 'HSK 4', sequenceOrder: 81,
     description: 'Verbs and adjectives for expressing opinions and feelings.',
     items: [
       it('t50i1',  'topic-50', '认为', 'rènwéi',   'to think; to believe',     '我',           '这个方法很好。',   'I think this method is good.'),
@@ -1088,7 +1088,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-51', name: 'Workplace & social', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 81,
+    station: 'HSK 4', sequenceOrder: 83,
     description: 'Nouns and verbs for professional and social contexts.',
     items: [
       it('t51i1',  'topic-51', '责任', 'zérèn',    'responsibility',           '这是你的',     '。',               'This is your responsibility.'),
@@ -1107,7 +1107,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-56', name: 'Society & culture', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 82,
+    station: 'HSK 4', sequenceOrder: 84,
     description: 'Social, civic, and cultural vocabulary.',
     items: [
       it('t56i1',  'topic-56', '文化', 'wénhuà',   'culture',               '中国',       '很丰富。',           'Chinese culture is very rich.'),
@@ -1124,7 +1124,7 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-57', name: 'Environment & nature', category: 'vocab',
-    station: 'HSK 4', sequenceOrder: 83,
+    station: 'HSK 4', sequenceOrder: 85,
     description: 'Environmental and ecological vocabulary.',
     items: [
       it('t57i1',  'topic-57', '污染', 'wūrǎn',    'pollution; to pollute', '空气',       '越来越严重。',       'Air pollution is getting more and more serious.'),
@@ -1144,7 +1144,7 @@ const TOPICS: Topic[] = [
     name: 'Technology & media',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 84,
+    sequenceOrder: 86,
     description: 'Digital life, internet and media vocabulary.',
     items: [
       it('t71i1',  'topic-71', '网络',   'wǎngluò',   'internet; network',          '现在',       '很普及。',       'The internet is now very widespread.'),
@@ -1161,18 +1161,18 @@ const TOPICS: Topic[] = [
   },
   {
     id: 'topic-52', name: 'Reading: short essays (100–200 characters)', category: 'reading',
-    station: 'HSK 4', sequenceOrder: 85, items: [],
+    station: 'HSK 4', sequenceOrder: 87, items: [],
   },
   {
     id: 'topic-53', name: 'Writing: structured short paragraphs', category: 'writing',
-    station: 'HSK 4', sequenceOrder: 86, items: [],
+    station: 'HSK 4', sequenceOrder: 88, items: [],
   },
   {
     id: 'topic-72',
     name: 'Formal register & rhetorical questions',
     category: 'vocab',
     station: 'HSK 4',
-    sequenceOrder: 87,
+    sequenceOrder: 89,
     description: 'Polite forms and rhetorical structures for formal speech and writing.',
     items: [
       it('t72i1', 'topic-72', '难道',   'nándào',   'could it be that; don\'t tell me', '',   '你不知道吗？',     "Could it be that you don't know?"),

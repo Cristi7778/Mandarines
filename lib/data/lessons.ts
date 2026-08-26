@@ -505,6 +505,74 @@ const LESSONS: Lesson[] = [
       },
     ],
   },
+  {
+    id: 'lesson-14',
+    name: '不仅……而且…… (Not only… but also…)',
+    station: 'HSK 4',
+    sequenceOrder: 80,
+    description: 'Additive escalation: presenting a second point that goes beyond the first.',
+    xp: 25,
+    sections: [
+      {
+        title: 'Structure',
+        body: '不仅 (bùjǐn) introduces the first point; 而且 (érqiě) introduces the second, stronger point. Both clauses share the same subject, or each can have its own. The pattern signals that the second fact is even more notable than the first.',
+        examples: [
+          { chinese: '她不仅会说汉语，而且说得很流利。', pinyin: 'Tā bùjǐn huì shuō Hànyǔ, érqiě shuō de hěn liúlì.', english: 'She not only speaks Chinese, but speaks it fluently.' },
+          { chinese: '这家餐厅不仅便宜，而且好吃。', pinyin: 'Zhè jiā cāntīng bùjǐn piányí, érqiě hǎochī.', english: 'This restaurant is not only cheap, but also delicious.' },
+          { chinese: '不仅我去了，我朋友也去了。', pinyin: 'Bùjǐn wǒ qù le, wǒ péngyou yě qù le.', english: 'Not only did I go, my friend went too.' },
+        ],
+      },
+      {
+        title: '也 as an alternative to 而且',
+        body: '不仅……也…… is equally common and slightly more conversational. 也 replaces 而且 when the second clause adds a parallel fact rather than escalating.',
+        examples: [
+          { chinese: '他不仅聪明，也很努力。', pinyin: 'Tā bùjǐn cōngmíng, yě hěn nǔlì.', english: 'He is not only smart but also hardworking.' },
+          { chinese: '这个问题不仅复杂，也很重要。', pinyin: 'Zhège wèntí bùjǐn fùzá, yě hěn zhòngyào.', english: 'This issue is not only complex but also very important.' },
+        ],
+      },
+      {
+        title: 'Negative escalation',
+        body: '不仅……连……都…… escalates into an extreme negative: "not only [A], but not even [extreme B]."',
+        examples: [
+          { chinese: '他不仅没来，连电话也没打。', pinyin: 'Tā bùjǐn méi lái, lián diànhuà yě méi dǎ.', english: "He not only didn't come, he didn't even call." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'lesson-15',
+    name: '因此 / 所以 (Therefore / So)',
+    station: 'HSK 4',
+    sequenceOrder: 82,
+    description: 'Drawing conclusions: expressing that one fact leads directly to another.',
+    xp: 25,
+    sections: [
+      {
+        title: '所以 — spoken cause-and-effect',
+        body: '所以 (suǒyǐ) is the everyday word for "so / therefore." It follows the cause clause and introduces the result. It almost always pairs with 因为 earlier in the sentence, though 因为 can be omitted in casual speech.',
+        examples: [
+          { chinese: '因为下雨，所以我没去。', pinyin: 'Yīnwèi xià yǔ, suǒyǐ wǒ méi qù.', english: 'Because it rained, I didn\'t go.' },
+          { chinese: '他很努力，所以成功了。', pinyin: 'Tā hěn nǔlì, suǒyǐ chénggōng le.', english: 'He worked hard, so he succeeded.' },
+        ],
+      },
+      {
+        title: '因此 — written cause-and-effect',
+        body: '因此 (yīncǐ) means the same as 所以 but is more formal and common in written Chinese, news, and academic contexts. It can open a new sentence or clause without needing 因为.',
+        examples: [
+          { chinese: '研究表明运动有益健康，因此专家建议每天锻炼。', pinyin: 'Yánjiū biǎomíng yùndòng yǒuyì jiànkāng, yīncǐ zhuānjiā jiànyì měitiān duànliàn.', english: 'Research shows exercise is beneficial to health; therefore experts recommend daily exercise.' },
+          { chinese: '天气突然变冷，因此很多人感冒了。', pinyin: 'Tiānqì tūrán biàn lěng, yīncǐ hěn duō rén gǎnmào le.', english: 'The weather suddenly turned cold, so many people caught colds.' },
+        ],
+      },
+      {
+        title: 'Choosing between the two',
+        body: '所以 is natural in speech and informal writing. 因此 sounds bookish in conversation — prefer it in essays, reports, and formal emails. Both follow the cause; neither appears at the very start of a discourse without context.',
+        examples: [
+          { chinese: '价格太高，所以我没买。', pinyin: 'Jiàgé tài gāo, suǒyǐ wǒ méi mǎi.', english: 'The price was too high, so I didn\'t buy it.' },
+          { chinese: '成本上升，因此公司决定调整价格。', pinyin: 'Chéngběn shàngshēng, yīncǐ gōngsī juédìng tiáozhěng jiàgé.', english: 'Costs rose; therefore the company decided to adjust prices.' },
+        ],
+      },
+    ],
+  },
 ];
 
 export default LESSONS;
