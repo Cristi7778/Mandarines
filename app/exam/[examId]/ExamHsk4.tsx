@@ -780,7 +780,7 @@ export default function ExamHsk4() {
                   <p className={`text-sm font-medium ${w2Correct ? 'text-green-600' : 'text-red-500'}`}>
                     {w2Correct ? '✅ Correct!' : '❌ Incorrect.'}
                   </p>
-                  {!w2Correct && <p className="text-xs text-gray-400">Sample: {wq.sampleAnswer}</p>}
+                  {!w2Correct && <p className="text-xs text-gray-400">Example: {wq.sampleAnswer}</p>}
                 </div>
               )}
               {!confirmed
