@@ -533,6 +533,26 @@ const TOPICS: Topic[] = [
 
   // ─── Station: HSK 2 ───────────────────────────────────────────────────────
   {
+    id: 'topic-94',
+    name: 'Adjectives 2',
+    category: 'vocab',
+    station: 'HSK 2',
+    sequenceOrder: 31,
+    description: 'Opposite-pair adjectives for speed, length, difficulty, energy, and body shape.',
+    items: [
+      it('t94i1',  'topic-94', '快', 'kuài',   'fast; quick',          '他走得很',   '。',         'He walks very fast.'),
+      it('t94i2',  'topic-94', '慢', 'màn',    'slow',                 '请说',       '一点。',     'Please speak more slowly.'),
+      it('t94i3',  'topic-94', '长', 'cháng',  'long',                 '这条路很',   '。',         'This road is very long.'),
+      it('t94i4',  'topic-94', '短', 'duǎn',   'short',                '这篇文章很', '。',         'This article is very short.'),
+      it('t94i5',  'topic-94', '难', 'nán',    'difficult; hard',      '这道题很',   '。',         'This question is very difficult.'),
+      it('t94i6',  'topic-94', '容易', 'róngyì','easy',                 '这个',       '学。',       'This is easy to learn.'),
+      it('t94i7',  'topic-94', '忙', 'máng',   'busy',                 '我最近很',   '。',         'I have been very busy lately.'),
+      it('t94i8',  'topic-94', '累', 'lèi',    'tired; exhausted',     '我今天很',   '。',         'I am very tired today.'),
+      it('t94i9',  'topic-94', '胖', 'pàng',   'fat; chubby',          '他比以前',   '了。',       'He is chubbier than before.'),
+      it('t94i10', 'topic-94', '瘦', 'shòu',   'thin; slim',           '她最近',     '了很多。',   'She has lost a lot of weight recently.'),
+    ],
+  },
+  {
     id: 'topic-20', name: 'Social expression: 不错', category: 'vocab',
     station: 'HSK 2', sequenceOrder: 32,
     description: '不错 (pretty good) and similar everyday affirmations.',
